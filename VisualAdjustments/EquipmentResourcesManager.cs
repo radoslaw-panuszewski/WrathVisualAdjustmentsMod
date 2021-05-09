@@ -5,9 +5,30 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using static Kingmaker.UI.Common.ItemsFilter;
+using Kingmaker.BundlesLoading;
+using UnityEngine;
+using Kingmaker.Cheats;
 
 namespace VisualAdjustments
 {
+        // Token: 0x02000013 RID: 19
+        internal static class LibraryThing
+        {
+            // Token: 0x06000054 RID: 84 RVA: 0x000039D8 File Offset: 0x00001BD8
+            public static Dictionary<string, string> GetResourceGuidMap()
+            {
+                LocationList locationList = (LocationList)HarmonyLib.AccessTools.Field(typeof(BundlesLoadService), "m_LocationList").GetValue(BundlesLoadService.Instance);
+                return locationList.GuidToBundle;
+            }
+        }
+    internal static class BluePrintThing
+    {
+        // Token: 0x06000053 RID: 83 RVA: 0x000039A0 File Offset: 0x00001BA0
+        public static TBlueprint[] GetBlueprints<TBlueprint>() where TBlueprint : BlueprintScriptableObject
+        {
+          return  Utilities.GetScriptableObjects<BlueprintScriptableObject>().OfType<TBlueprint>().ToArray();
+        }
+    }
     public class EquipmentResourcesManager
     {
         public static UnorderedList<BlueprintRef, string> Helm
@@ -18,12 +39,18 @@ namespace VisualAdjustments
                 return m_Helm;
             }
         }
-        public static UnorderedList<BlueprintRef, string> Cloak
-        {
+        public static UnorderedList<BlueprintRef, string> Glasses {
+            get {
+                if (!loaded) Init();
+                return m_Glasses;
+            }
+        }
+        public static UnorderedList<BlueprintRef, string> Shirt 
+            {
             get
             {
                 if (!loaded) Init();
-                return m_Cloak;
+                return m_Shirt;
             }
         }
         public static UnorderedList<BlueprintRef, string> Armor
@@ -97,7 +124,8 @@ namespace VisualAdjustments
             }
         }
         private static UnorderedList<BlueprintRef, string> m_Helm = new UnorderedList<BlueprintRef, string>();
-        private static UnorderedList<BlueprintRef, string> m_Cloak = new UnorderedList<BlueprintRef, string>();
+        private static UnorderedList<BlueprintRef, string> m_Shirt = new UnorderedList<BlueprintRef, string>();
+        private static UnorderedList<BlueprintRef, string> m_Glasses = new UnorderedList<BlueprintRef, string>();
         private static UnorderedList<BlueprintRef, string> m_Armor = new UnorderedList<BlueprintRef, string>();
         private static UnorderedList<BlueprintRef, string> m_Bracers = new UnorderedList<BlueprintRef, string>();
         private static UnorderedList<BlueprintRef, string> m_Gloves = new UnorderedList<BlueprintRef, string>();
@@ -109,20 +137,24 @@ namespace VisualAdjustments
         private static bool loaded = false;
         static void BuildEquipmentLookup()
         {
-            var blueprints = ResourcesLibrary.GetBlueprints<BlueprintItemEquipment>()
+            var blueprints = BluePrintThing.GetBlueprints<BlueprintItemEquipment>()
                 .Where(bp => bp.EquipmentEntity != null)
                 .OrderBy(bp => bp.EquipmentEntity.name);
             foreach (var bp in blueprints)
             {
                 switch (bp.ItemType)
                 {
+                    case ItemType.Glasses:
+                        if (m_Helm.ContainsKey(bp.EquipmentEntity.AssetGuid)) break;
+                        m_Glasses[bp.EquipmentEntity.AssetGuid] = bp.EquipmentEntity.name;
+                        break;
                     case ItemType.Head:
                         if (m_Helm.ContainsKey(bp.EquipmentEntity.AssetGuid)) break;
                         m_Helm[bp.EquipmentEntity.AssetGuid] = bp.EquipmentEntity.name;
                         break;
-                    case ItemType.Shoulders:
-                        if (m_Cloak.ContainsKey(bp.EquipmentEntity.AssetGuid)) break;
-                        m_Cloak[bp.EquipmentEntity.AssetGuid] = bp.EquipmentEntity.name;
+                    case ItemType.Shirt:
+                        if (m_Shirt.ContainsKey(bp.EquipmentEntity.AssetGuid)) break;
+                        m_Shirt[bp.EquipmentEntity.AssetGuid] = bp.EquipmentEntity.name;
                         break;
                     case ItemType.Armor:
                         if (m_Armor.ContainsKey(bp.EquipmentEntity.AssetGuid)) break;
@@ -147,7 +179,7 @@ namespace VisualAdjustments
         }
         static void BuildWeaponLookup()
         {
-            var weapons = ResourcesLibrary.GetBlueprints<BlueprintItemEquipmentHand>().OrderBy((bp) => bp.name);
+            var weapons = BluePrintThing.GetBlueprints<BlueprintItemEquipmentHand>().OrderBy((bp) => bp.name);
             foreach (var bp in weapons)
             {
                 var visualParameters = bp.VisualParameters;
@@ -172,7 +204,7 @@ namespace VisualAdjustments
         }
         static void BuildWeaponEnchantmentLookup()
         {
-            var enchantments = ResourcesLibrary.GetBlueprints<BlueprintWeaponEnchantment>()
+            var enchantments = BluePrintThing.GetBlueprints<BlueprintWeaponEnchantment>()
                     .Where(bp => bp.WeaponFxPrefab != null)
                     .OrderBy(bp => bp.WeaponFxPrefab.name);
             HashSet<int> seen = new HashSet<int>();
@@ -189,15 +221,15 @@ namespace VisualAdjustments
         {
             string getViewName(BlueprintUnit bp)
             {
-                if (!ResourcesLibrary.LibraryObject.ResourceNamesByAssetId.ContainsKey(bp.Prefab.AssetId)) return "NULL";
-                var path = ResourcesLibrary.LibraryObject.ResourceNamesByAssetId[bp.Prefab.AssetId].Split('/');
+                if (!LibraryThing.GetResourceGuidMap().ContainsKey(bp.Prefab.AssetId)) return "NULL";
+                var path = LibraryThing.GetResourceGuidMap()[bp.Prefab.AssetId].Split('/');
                 return path[path.Length - 1];
             }
-            var units = ResourcesLibrary.GetBlueprints<BlueprintUnit>().OrderBy(getViewName);
+            var units = BluePrintThing.GetBlueprints<BlueprintUnit>().OrderBy(getViewName);
             foreach (var bp in units)
             {
                 if (bp.Prefab.AssetId == "") continue;
-                if (!ResourcesLibrary.LibraryObject.ResourceNamesByAssetId.ContainsKey(bp.Prefab.AssetId)) continue;             
+                if (!LibraryThing.GetResourceGuidMap().ContainsKey(bp.Prefab.AssetId)) continue;             
                 if (m_Units.ContainsKey(bp.Prefab.AssetId)) continue;
                 m_Units[bp.Prefab.AssetId] = getViewName(bp);
             }

@@ -1,4 +1,5 @@
-﻿using Harmony12;
+﻿
+using HarmonyLib;
 using Kingmaker;
 using Kingmaker.Blueprints;
 using Kingmaker.Blueprints.Facts;
@@ -8,6 +9,7 @@ using Kingmaker.UI.Selection;
 using Kingmaker.UnitLogic.Buffs;
 using Kingmaker.UnitLogic.Commands;
 using Kingmaker.UnitLogic.Commands.Base;
+using Kingmaker.UnitLogic.FactLogic;
 using Kingmaker.View;
 using System;
 using UnityEngine;
@@ -20,7 +22,7 @@ namespace VisualAdjustments
         {
             if (string.IsNullOrEmpty(id)) return null;
             return ResourcesLibrary.TryGetResource<UnitEntityView>(id);
-        }
+         }
         /*
          * Based on Polymorph.TryReplaceView. Replaces view, only used when changing view through UI
          * When id is null or "", rebuilds original view
@@ -48,7 +50,7 @@ namespace VisualAdjustments
             instance.Blueprint = unit.Blueprint;
             unit.AttachToViewOnLoad(instance);
             unit.Commands.InterruptAll((UnitCommand cmd) => !(cmd is UnitMoveTo));
-            SelectionManager selectionManager = Game.Instance.UI.SelectionManager;
+            SelectionManagerBase selectionManager = Game.Instance.UI.SelectionManager; // SelectionManager to SelectionManagerBase
             if (selectionManager != null)
             {
                 selectionManager.ForceCreateMarks();
@@ -71,18 +73,19 @@ namespace VisualAdjustments
                     var characterSettings = Main.settings.GetCharacterSettings(__instance);
                     if (characterSettings == null) return true;
                     if (characterSettings.overrideView == null || characterSettings.overrideView == "") return true;
-                    foreach (Fact fact in __instance.Buffs.RawFacts)
+                    foreach (Kingmaker.UnitLogic.UnitFact fact in __instance.Buffs.RawFacts)
                     {
                         if (fact.Active && !fact.Deactivating)
                         {
                             Buff buff = (Buff)fact;
-                            if (buff.Get<Polymorph>() != null)
+                            if (buff.GetComponent<Polymorph>() != null)
                             {
                                 return true;
                             }
                         }
                     }
-                    UnitEntityView template = GetView(characterSettings.overrideView);
+
+                        UnitEntityView template = GetView(characterSettings.overrideView);
                     if (template == null)
                     {
                         Main.Log("Overriding invalid view " + characterSettings.overrideView);
@@ -195,10 +198,10 @@ namespace VisualAdjustments
             var m_Scale = __instance.transform.localScale.x / m_OriginalScale.x;
             if (!sizeScale.Equals(m_Scale) && !__instance.DoNotAdjustScale)
             {
-                /*float scaleDelta = sizeScale - m_Scale;
+                float scaleDelta = sizeScale - m_Scale;
                 float deltaTime = Game.Instance.TimeController.DeltaTime;
                 float scaleStep = scaleDelta * deltaTime * 2f;
-                m_Scale = (scaleDelta <= 0f) ? Math.Max(sizeScale, m_Scale + scaleStep) : Math.Min(sizeScale, m_Scale + scaleStep);*/
+                m_Scale = (scaleDelta <= 0f) ? Math.Max(sizeScale, m_Scale + scaleStep) : Math.Min(sizeScale, m_Scale + scaleStep);
                 m_Scale = sizeScale; //Skip animating
                 __instance.transform.localScale = m_OriginalScale * m_Scale;
             }
@@ -211,8 +214,8 @@ namespace VisualAdjustments
             //Prevent fighting m_Scale to set transform scale
             m_ScaleRef(__instance) = __instance.GetSizeScale();
         }
-        static Harmony12.AccessTools.FieldRef<UnitEntityView, Vector3> m_OriginalScaleRef;
-        static Harmony12.AccessTools.FieldRef<UnitEntityView, float> m_ScaleRef;
+        static HarmonyLib.AccessTools.FieldRef<UnitEntityView, Vector3> m_OriginalScaleRef;
+        static HarmonyLib.AccessTools.FieldRef<UnitEntityView, float> m_ScaleRef;
         [HarmonyPatch(typeof(UnitEntityView), "LateUpdate")]
         static class UnitEntityView_LateUpdate_Patch
         {
@@ -234,7 +237,7 @@ namespace VisualAdjustments
                     if (!characterSettings.overrideScale || characterSettings.overrideScaleCheatMode) return;
                     if (__instance.EntityData.Body == null) return;
                     if (characterSettings.overrideScaleShapeshiftOnly &&
-                        !__instance.EntityData.Body.IsPolymorphed)
+                    !__instance.EntityData.Body.IsPolymorphed)
                     {
                         return;
                     }

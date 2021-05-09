@@ -19,11 +19,11 @@ namespace VisualAdjustments
     public delegate TResult FastStaticInvoker<in T1, in T2, in T3, out TResult>(T1 arg1, T2 arg2, T3 arg3);
     public class Accessors
     {
-        public static Harmony12.AccessTools.FieldRef<TClass, TResult> CreateFieldRef<TClass, TResult>(string name)
+        public static HarmonyLib.AccessTools.FieldRef<TClass, TResult> CreateFieldRef<TClass, TResult>(string name)
         {
             var classType = typeof(TClass);
             var resultType = typeof(TResult);
-            var fieldInfo = Harmony12.AccessTools.Field(classType, name);
+            var fieldInfo = HarmonyLib.AccessTools.Field(classType, name);
             if (fieldInfo == null)
             {
                 throw new Exception($"{classType} does not contain field {name}");
@@ -32,12 +32,12 @@ namespace VisualAdjustments
             {
                 throw new InvalidCastException($"Cannot cast field type {resultType} as {fieldInfo.FieldType} for class {classType} field {name}");
             }
-            return Harmony12.AccessTools.FieldRefAccess<TClass, TResult>(name);
+            return HarmonyLib.AccessTools.FieldRefAccess<TClass, TResult>(name);
         }
-        public static FastGetter CreateGetter(Type classType, Type resultType, string name)
+        /*public static FastGetter CreateGetter(Type classType, Type resultType, string name)
         {
-            var fieldInfo = Harmony12.AccessTools.Field(classType, name);
-            var propInfo = Harmony12.AccessTools.Property(classType, name);
+            var fieldInfo = HarmonyLib.AccessTools.Field(classType, name);
+            var propInfo = HarmonyLib.AccessTools.Property(classType, name);
             if (fieldInfo == null && propInfo == null)
             {
                 throw new Exception($"{classType} does not contain field or property {name}");
@@ -50,8 +50,8 @@ namespace VisualAdjustments
                 throw new InvalidCastException($"Cannot cast field type {resultType} as {memberType} for class {classType} {memberTypeName} {name}");
             }
             var handler = isProp ?
-                Harmony12.FastAccess.CreateGetterHandler(propInfo) :
-                Harmony12.FastAccess.CreateGetterHandler(fieldInfo);
+                HarmonyLib.FastAccess.CreateGetterHandler(propInfo) :
+                HarmonyLib.FastAccess.CreateGetterHandler(fieldInfo);
             return new FastGetter(handler);
         }
         public static FastGetter<TClass, TResult> CreateGetter<TClass, TResult>(string name)
@@ -63,8 +63,8 @@ namespace VisualAdjustments
         }
         public static FastSetter CreateSetter(Type classType, Type valueType, string name)
         {
-            var propertyInfo = Harmony12.AccessTools.Property(classType, name);
-            var fieldInfo = Harmony12.AccessTools.Field(classType, name);
+            var propertyInfo = HarmonyLib.AccessTools.Property(classType, name);
+            var fieldInfo = HarmonyLib.AccessTools.Field(classType, name);
             if (propertyInfo == null && fieldInfo == null)
             {
                 throw new Exception($"{classType} does not contain a field or property {name}");
@@ -77,8 +77,8 @@ namespace VisualAdjustments
                 throw new Exception($"Cannot cast property type {valueType} as {memberType} for class {classType} {memberTypeName} {name}");
             }
             var handler = isProperty ?
-                Harmony12.FastAccess.CreateSetterHandler(propertyInfo) :
-                Harmony12.FastAccess.CreateSetterHandler(fieldInfo);
+                HarmonyLib.FastAccess.CreateSetterHandler(propertyInfo) :
+                HarmonyLib.FastAccess.CreateSetterHandler(fieldInfo);
             return new FastSetter(handler);
         }
         public static FastSetter<TClass, TValue> CreateSetter<TClass, TValue>(string name)
@@ -87,10 +87,10 @@ namespace VisualAdjustments
             var valueType = typeof(TValue);
             var handler = CreateSetter(classType, valueType, name);
             return new FastSetter<TClass, TValue>((instance, value) => handler.Invoke(instance, value));
-        }
+        }*/
         public static FastInvoker CreateInvoker(Type classType, string name, Type resultType, params Type[] parameters)
         {
-            var methodInfo = Harmony12.AccessTools.Method(classType, name, parameters);
+            var methodInfo = HarmonyLib.AccessTools.Method(classType, name, parameters);
             if (methodInfo == null)
             {
                 var argString = string.Join(", ", parameters.Select(t => t.ToString()));
@@ -112,7 +112,7 @@ namespace VisualAdjustments
                     throw new Exception($"Cannot cast paramter type {parameters[i]} as {_parameters[i].ParameterType} for class {classType} method {name}");
                 }
             }
-            return new FastInvoker(Harmony12.MethodInvoker.GetHandler(methodInfo));
+            return new FastInvoker(HarmonyLib.MethodInvoker.GetHandler(methodInfo));
         }
         public static FastInvoker<TClass, TResult> CreateInvoker<TClass, TResult>(string name)
         {
@@ -149,9 +149,9 @@ namespace VisualAdjustments
         private class StaticFastInvokeHandler
         {
             private readonly Type classType;
-            private readonly Harmony12.FastInvokeHandler invoker;
+            private readonly HarmonyLib.FastInvokeHandler invoker;
 
-            public StaticFastInvokeHandler(Type classType, Harmony12.FastInvokeHandler invoker)
+            public StaticFastInvokeHandler(Type classType, HarmonyLib.FastInvokeHandler invoker)
             {
                 this.classType = classType;
                 this.invoker = invoker;
@@ -164,7 +164,7 @@ namespace VisualAdjustments
         }
         public static FastStaticInvoker CreateStateInvoker(Type classType, string name, Type resultType, params Type[] parameters)
         {
-            var methodInfo = Harmony12.AccessTools.Method(classType, name, parameters);
+            var methodInfo = HarmonyLib.AccessTools.Method(classType, name, parameters);
             if (methodInfo == null)
             {
                 var argString = string.Join(", ", parameters.Select(t => t.ToString()));
@@ -186,7 +186,7 @@ namespace VisualAdjustments
                     throw new Exception($"Cannot cast paramter type {parameters[i]} as {_parameters[i].ParameterType} for class {classType} method {name}");
                 }
             }
-            return new StaticFastInvokeHandler(classType, Harmony12.MethodInvoker.GetHandler(methodInfo)).Invoke;
+            return new StaticFastInvokeHandler(classType, HarmonyLib.MethodInvoker.GetHandler(methodInfo)).Invoke;
         }
     }
 }

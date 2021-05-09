@@ -1,4 +1,4 @@
-using Harmony12;
+using HarmonyLib;
 using Kingmaker;
 using Kingmaker.Blueprints;
 using Kingmaker.Blueprints.CharGen;
@@ -55,7 +55,7 @@ namespace VisualAdjustments
         static bool showPortrait = false;
         static string GetName(EquipmentEntityLink link)
         {
-            if (ResourcesLibrary.LibraryObject.ResourceNamesByAssetId.ContainsKey(link.AssetId)) return ResourcesLibrary.LibraryObject.ResourceNamesByAssetId[link.AssetId];
+            if (LibraryThing.GetResourceGuidMap().ContainsKey(link.AssetId)) return LibraryThing.GetResourceGuidMap()[link.AssetId];
             return null;
         }
         static void AddLinks(EquipmentEntityLink[] links, string type, Race race, Gender gender)
@@ -82,9 +82,9 @@ namespace VisualAdjustments
         static void BuildLookup()
         {
             m_lookup = new Dictionary<string, EquipmentEntityInfo>(); ;
-            var races = ResourcesLibrary.GetBlueprints<BlueprintRace>();
-            var racePresets = ResourcesLibrary.GetBlueprints<BlueprintRaceVisualPreset>();
-            var classes = ResourcesLibrary.GetBlueprints<BlueprintCharacterClass>();
+            var races = BluePrintThing.GetBlueprints<BlueprintRace>();
+            var racePresets = BluePrintThing.GetBlueprints<BlueprintRaceVisualPreset>();
+            var classes = BluePrintThing.GetBlueprints<BlueprintCharacterClass>();
             foreach (var race in races)
             {
                 foreach (var gender in new Gender[] { Gender.Male, Gender.Female })
@@ -115,7 +115,7 @@ namespace VisualAdjustments
                     }
                 }
             }
-            var gear = ResourcesLibrary.GetBlueprints<KingmakerEquipmentEntity>();
+            var gear = BluePrintThing.GetBlueprints<KingmakerEquipmentEntity>();
             foreach (var race in races)
             {
                 foreach (var gender in new Gender[] { Gender.Male, Gender.Female })
@@ -126,89 +126,90 @@ namespace VisualAdjustments
                     }
                 }
             }
-            blueprintBuffs = ResourcesLibrary.GetBlueprints<BlueprintBuff>().ToArray();
+            blueprintBuffs = BluePrintThing.GetBlueprints<BlueprintBuff>().ToArray();
         }
-        public static void ShowInfo(UnitEntityData unitEntityData)
-        {;
-            GUILayout.BeginHorizontal();
-            if (GUILayout.Button("Rebuild Character"))
-            {
-                CharacterManager.RebuildCharacter(unitEntityData);
-            }
-            if (GUILayout.Button("Rebuild Outfit"))
-            {
-                var bakedCharacter = unitEntityData.View.CharacterAvatar.BakedCharacter;
-                unitEntityData.View.CharacterAvatar.BakedCharacter = null;
-                unitEntityData.View.CharacterAvatar.RebuildOutfit();
-                unitEntityData.View.CharacterAvatar.BakedCharacter = bakedCharacter;
-            }
-            if (GUILayout.Button("Update Class Equipment"))
-            {
-                var bakedCharacter = unitEntityData.View.CharacterAvatar.BakedCharacter;
-                unitEntityData.View.CharacterAvatar.BakedCharacter = null;
-                bool useClassEquipment = unitEntityData.Descriptor.ForcceUseClassEquipment;
-                unitEntityData.Descriptor.ForcceUseClassEquipment = true;
-                unitEntityData.View.UpdateClassEquipment();
-                unitEntityData.Descriptor.ForcceUseClassEquipment = useClassEquipment;
-                unitEntityData.View.CharacterAvatar.BakedCharacter = bakedCharacter;
-            }
-            if (GUILayout.Button("Update Body Equipment"))
-            {
-                var bakedCharacter = unitEntityData.View.CharacterAvatar.BakedCharacter;
-                unitEntityData.View.CharacterAvatar.BakedCharacter = null;
-                unitEntityData.View.UpdateBodyEquipmentModel();
-                unitEntityData.View.CharacterAvatar.BakedCharacter = bakedCharacter;
-            }
-            if (GUILayout.Button("Update Model"))
-            {
-                CharacterManager.UpdateModel(unitEntityData.View);
-            }
-            if (GUILayout.Button("Update HandsEquipment"))
-            {
-                unitEntityData.View.HandsEquipment.UpdateAll();
-            }
-            GUILayout.EndHorizontal();
-            GUILayout.BeginHorizontal();
-            if (GUILayout.Button("Toggle Stance"))
-            {
-                unitEntityData.View.HandsEquipment.ForceSwitch(!unitEntityData.View.HandsEquipment.InCombat);
-            }
-            GUILayout.EndHorizontal();
-            GUILayout.BeginHorizontal();
-            GUILayout.Label($"Original size {unitEntityData.Descriptor.OriginalSize}");
-            GUILayout.Label($"Current size {unitEntityData.Descriptor.State.Size}");
-            var m_OriginalScale = Traverse.Create(unitEntityData.View).Field("m_OriginalScale").GetValue<Vector3>();
-            var m_Scale = Traverse.Create(unitEntityData.View).Field("m_Scale").GetValue<float>();
-            var realScale = unitEntityData.View.transform.localScale;
-            GUILayout.Label($"View Original {m_OriginalScale.x:0.#}");
-            GUILayout.Label($"View Current {m_Scale:0.#}");
-            GUILayout.Label($"View Real {realScale.x:0.#}");
-            GUILayout.Label($"Disabled Scaling {unitEntityData.View.DisableSizeScaling}");
-            GUILayout.EndHorizontal();
-            var message =
-                    unitEntityData.View == null ? "No View" :
-                    unitEntityData.View.CharacterAvatar == null ? "No Character Avatar" :
-                    null;
-            if(message != null) GUILayout.Label(message);
-            GUILayout.BeginHorizontal();
-            showCharacter = GUILayout.Toggle(showCharacter, "Show Character");
-            showWeapons = GUILayout.Toggle(showWeapons, "Show Weapons");
-            showDoll = GUILayout.Toggle(showDoll, "Show Doll");
-            showBuffs = GUILayout.Toggle(showBuffs, "Show Buffs");
-            showFx = GUILayout.Toggle(showFx, "Show FX");
-            showPortrait = GUILayout.Toggle(showPortrait, "Show Portrait");
-            showAsks = GUILayout.Toggle(showAsks, "Show Asks");
+            public static void ShowInfo(UnitEntityData unitEntityData)
+                {;
+                    GUILayout.BeginHorizontal();
+                    if (GUILayout.Button("Rebuild Character",GUILayout.Width(175f)))
+                    {
+                        CharacterManager.RebuildCharacter(unitEntityData);
+                    }
+                    if (GUILayout.Button("Rebuild Outfit",GUILayout.Width(175f)))
+                    {
+                       var bakedCharacter = unitEntityData.View.CharacterAvatar.BakedCharacter;
+                       unitEntityData.View.CharacterAvatar.BakedCharacter = null;
+                        unitEntityData.View.CharacterAvatar.RebuildOutfit();
+                        unitEntityData.View.CharacterAvatar.BakedCharacter = bakedCharacter;
+                    }
+                    if (GUILayout.Button("Update Class Equipment",GUILayout.Width(175f)))
+                    {
+                        var bakedCharacter = unitEntityData.View.CharacterAvatar.BakedCharacter;
+                        unitEntityData.View.CharacterAvatar.BakedCharacter = null;
+                        bool useClassEquipment = unitEntityData.Descriptor.ForcceUseClassEquipment;
+                        unitEntityData.Descriptor.ForcceUseClassEquipment = true;
+                        unitEntityData.View.UpdateClassEquipment();
+                        unitEntityData.Descriptor.ForcceUseClassEquipment = useClassEquipment;
+                        unitEntityData.View.CharacterAvatar.BakedCharacter = bakedCharacter;
+                    }
+                    if (GUILayout.Button("Update Body Equipment",GUILayout.Width(175f)))
+                    {
+                        var bakedCharacter = unitEntityData.View.CharacterAvatar.BakedCharacter;
+                        unitEntityData.View.CharacterAvatar.BakedCharacter = null;
+                        unitEntityData.View.UpdateBodyEquipmentModel();
+                        unitEntityData.View.CharacterAvatar.BakedCharacter = bakedCharacter;
+                    }
+                    if (GUILayout.Button("Update Model",GUILayout.Width(175f)))
+                    {
+                      CharacterManager.UpdateModel(unitEntityData.View);
+                    }
+                    if (GUILayout.Button("Update HandsEquipment",GUILayout.Width(175f)))
+                    {
+                        unitEntityData.View.HandsEquipment.UpdateAll();
+                    }
+                    GUILayout.EndHorizontal();
+                    GUILayout.BeginHorizontal();
+                    if (GUILayout.Button("Toggle Stance",GUILayout.Width(175f)))
+                    {
+                        unitEntityData.View.HandsEquipment.ForceSwitch(!unitEntityData.View.HandsEquipment.InCombat);
+                    }
+                    GUILayout.EndHorizontal();
+                    GUILayout.BeginHorizontal();
+                    GUILayout.Label($"Original size {unitEntityData.Descriptor.OriginalSize}", GUILayout.Width(200f));
+                    GUILayout.Label($"Current size {unitEntityData.Descriptor.State.Size}", GUILayout.Width(200f));
+                    var m_OriginalScale = Traverse.Create(unitEntityData.View).Field("m_OriginalScale").GetValue<Vector3>();
+                    var m_Scale = Traverse.Create(unitEntityData.View).Field("m_Scale").GetValue<float>();
+                    var realScale = unitEntityData.View.transform.localScale;
+                    GUILayout.Label($"View Original {m_OriginalScale.x:0.#}", GUILayout.Width(200f));
+                    GUILayout.Label($"View Current {m_Scale:0.#}", GUILayout.Width(200f));
+                    GUILayout.Label($"View Real {realScale.x:0.#}", GUILayout.Width(200f));
+                    GUILayout.Label($"Disabled Scaling {unitEntityData.View.DisableSizeScaling}", GUILayout.Width(200f));
+                    GUILayout.EndHorizontal();
+                    var message =
+                            unitEntityData.View == null ? "No View" :
+                            unitEntityData.View.CharacterAvatar == null ? "No Character Avatar" :
+                            null;
+                    if(message != null) GUILayout.Label(message, GUILayout.Width(200f));
+                    GUILayout.BeginHorizontal();
+                    showCharacter = GUILayout.Toggle(showCharacter, "Show Character",GUILayout.Width(175f));
+                    showWeapons = GUILayout.Toggle(showWeapons, "Show Weapons",GUILayout.Width(175f));
+                    showDoll = GUILayout.Toggle(showDoll, "Show Doll",GUILayout.Width(175f));
+                    showBuffs = GUILayout.Toggle(showBuffs, "Show Buffs",GUILayout.Width(175f));
+                    showFx = GUILayout.Toggle(showFx, "Show FX",GUILayout.Width(175f));
+                    showPortrait = GUILayout.Toggle(showPortrait, "Show Portrait", GUILayout.Width(175f));
+                    showAsks = GUILayout.Toggle(showAsks, "Show Asks", GUILayout.Width(175f));
 
-            GUILayout.EndHorizontal();
-            if (showCharacter) ShowCharacterInfo(unitEntityData);
-            if (showWeapons) ShowWeaponInfo(unitEntityData);
-            if (showDoll) ShowDollInfo(unitEntityData);
-            if (showBuffs) ShowBuffInfo(unitEntityData);
-            if (showFx) ShowFxInfo(unitEntityData);
-            if (showPortrait) ShowPortraitInfo(unitEntityData);
-            if (showAsks) ShowAsksInfo(unitEntityData);
+                    GUILayout.EndHorizontal();
+                    if (showCharacter) ShowCharacterInfo(unitEntityData);
+                    if (showWeapons) ShowWeaponInfo(unitEntityData);
+                    if (showDoll) ShowDollInfo(unitEntityData);
+                    if (showBuffs) ShowBuffInfo(unitEntityData);
+                    if (showFx) ShowFxInfo(unitEntityData);
+                    if (showPortrait) ShowPortraitInfo(unitEntityData);
+                    if (showAsks) ShowAsksInfo(unitEntityData);
 
-        }
+                }
+     
         static void BuildOrphanedEquipment()
         {
             string maleFilepath = "Mods/VisualAdjustments/MaleOrphanedEquipment.json";
@@ -243,7 +244,7 @@ namespace VisualAdjustments
                 {
                     foreach (var race in BlueprintRoot.Instance.Progression.CharacterRaces)
                     {
-                        var armorLinks = ResourcesLibrary.GetBlueprints<KingmakerEquipmentEntity>()
+                        var armorLinks = BluePrintThing.GetBlueprints<KingmakerEquipmentEntity>()
                             .SelectMany(kee => kee.GetLinks(gender, race.RaceId));
                         var options = gender == Gender.Male ? race.MaleOptions : race.FemaleOptions;
                         var links = race.Presets
@@ -263,7 +264,7 @@ namespace VisualAdjustments
 
                 m_OrphanedMaleEquipment = new UnorderedList<string, string>();
                 m_OrphanedFemaleEquipment = new UnorderedList<string, string>();
-                foreach (var kv in ResourcesLibrary.LibraryObject.ResourceNamesByAssetId.OrderBy(kv => kv.Value))
+                foreach (var kv in LibraryThing.GetResourceGuidMap().OrderBy(kv => kv.Value))
                 {
                     if (eeBlacklist.Contains(kv.Key)) continue;
                     var ee = ResourcesLibrary.TryGetResource<EquipmentEntity>(kv.Key);
@@ -298,14 +299,14 @@ namespace VisualAdjustments
         {
             m_OrphanedKingmakerEquipment = new UnorderedList<string, string>();
             var itemLinks = EquipmentResourcesManager.Helm.Keys
-                            .Concat(EquipmentResourcesManager.Cloak.Keys)
+                            .Concat(EquipmentResourcesManager.Shirt.Keys)
                             .Concat(EquipmentResourcesManager.Armor.Keys)
                             .Concat(EquipmentResourcesManager.Bracers.Keys)
                             .Concat(EquipmentResourcesManager.Gloves.Keys)
                             .Concat(EquipmentResourcesManager.Boots.Keys)
                             .Distinct()
                             .ToDictionary(key => key);
-            foreach (var kee in ResourcesLibrary.GetBlueprints<KingmakerEquipmentEntity>())
+            foreach (var kee in BluePrintThing.GetBlueprints<KingmakerEquipmentEntity>())
             {
                 if (!itemLinks.ContainsKey(kee.AssetGuid))
                 {
@@ -318,8 +319,8 @@ namespace VisualAdjustments
         {
             var character = unitEntityData.View.CharacterAvatar;
             if (character == null) return;
-            GUILayout.Label($"View: {unitEntityData.View.name}");
-            GUILayout.Label($"BakedCharacter: {character.BakedCharacter?.name ?? "NULL"}");
+            GUILayout.Label($"View: {unitEntityData.View.name}", GUILayout.Width(200f));
+            GUILayout.Label($"BakedCharacter: {character.BakedCharacter?.name ?? "NULL"}", GUILayout.Width(200f));
 
             if (m_OrphanedKingmakerEquipment == null) BuildOrphenedKingmakerEquipment();
             if (m_OrphanedMaleEquipment == null || m_OrphanedFemaleEquipment == null)
@@ -350,7 +351,7 @@ namespace VisualAdjustments
             Util.ChooseSlider($"OrphanedKingmakerEquipment", m_OrphanedKingmakerEquipment, ref selectedKingmakerOrphanedEquipment, onEquipment);
             Util.ChooseSlider($"OrphanedEquipment", equipmentList, ref selectedOrphanedEquipment, onEquipment);
 
-            GUILayout.Label("Equipment");
+            GUILayout.Label("Equipment", GUILayout.Width(200f));
             foreach (var ee in character.EquipmentEntities.ToArray())
             {
                 GUILayout.BeginHorizontal();
@@ -363,7 +364,7 @@ namespace VisualAdjustments
                     GUILayout.Label(
                         String.Format("{0}:{1}:{2}:P{3}:S{4}", ee.name, ee.BodyParts.Count, ee.OutfitParts.Count,
                             character.GetPrimaryRampIndex(ee), character.GetSecondaryRampIndex(ee)),
-                        GUILayout.ExpandWidth(true));
+                        GUILayout.ExpandWidth(false));
                 }
                 if (GUILayout.Button("Remove", GUILayout.ExpandWidth(false)))
                 {
@@ -381,18 +382,18 @@ namespace VisualAdjustments
                 if (expanded)
                 {
                     EquipmentEntityInfo settings = lookup.ContainsKey(ee.name) ? lookup[ee.name] : new EquipmentEntityInfo();
-                    GUILayout.Label($" HideFlags: {ee.HideBodyParts}");
+                    GUILayout.Label($" HideFlags: {ee.HideBodyParts}", GUILayout.Width(200f));
                     var primaryIndex = character.GetPrimaryRampIndex(ee);
                     Texture2D primaryRamp = null;
                     if (primaryIndex < 0 || primaryIndex > ee.PrimaryRamps.Count - 1) primaryRamp = ee.PrimaryRamps.FirstOrDefault();
                     else primaryRamp = ee.PrimaryRamps[primaryIndex];
-                    GUILayout.Label($"PrimaryRamp: {primaryRamp?.name ?? "NULL"}");
+                    GUILayout.Label($"PrimaryRamp: {primaryRamp?.name ?? "NULL"}", GUILayout.Width(200f));
 
                     var secondaryIndex = character.GetSecondaryRampIndex(ee);
                     Texture2D secondaryRamp = null;
                     if (secondaryIndex < 0 || secondaryIndex > ee.SecondaryRamps.Count - 1) secondaryRamp = ee.SecondaryRamps.FirstOrDefault();
                     else secondaryRamp = ee.SecondaryRamps[secondaryIndex];
-                    GUILayout.Label($"SecondaryRamp: {secondaryRamp?.name ?? "NULL"}");
+                    GUILayout.Label($"SecondaryRamp: {secondaryRamp?.name ?? "NULL"}", GUILayout.Width(200f));
 
                     foreach (var bodypart in ee.BodyParts.ToArray())
                     {
@@ -410,7 +411,7 @@ namespace VisualAdjustments
                         GUILayout.BeginHorizontal();
                         var prefab = Traverse.Create(outfitpart).Field("m_Prefab").GetValue<GameObject>();
                         GUILayout.Label(String.Format(" OP {0}:{1}", prefab?.name ?? "NULL", outfitpart?.Special), GUILayout.ExpandWidth(false));
-                        if (GUILayout.Button("Remove"))
+                        if (GUILayout.Button("Remove",GUILayout.ExpandWidth(false)))
                         {
                             ee.OutfitParts.Remove(outfitpart);
                         }
@@ -419,18 +420,18 @@ namespace VisualAdjustments
                 }
             }
             GUILayout.Label("Character", GUILayout.Width(300));
-            GUILayout.Label("RampIndices");
+            GUILayout.Label("RampIndices", GUILayout.Width(200f));
             foreach(var index in Traverse.Create(character).Field("m_RampIndices").GetValue<List<Character.SelectedRampIndices>>())
             {
                 var name = index.EquipmentEntity != null ? index.EquipmentEntity.name : "NULL";
                 GUILayout.Label($"  {name} - {index.PrimaryIndex}, {index.SecondaryIndex}");
             }
-            GUILayout.Label("SavedRampIndices");
+            GUILayout.Label("SavedRampIndices", GUILayout.Width(200f));
             foreach (var index in Traverse.Create(character).Field("m_SavedRampIndices").GetValue<List<Character.SavedSelectedRampIndices>>())
             {
                 GUILayout.Label($"  {GetName(index.EquipmentEntityLink)} - {index.PrimaryIndex}, {index.SecondaryIndex}");
             }
-            GUILayout.Label("SavedEquipmentEntities");
+            GUILayout.Label("SavedEquipmentEntities", GUILayout.Width(200f));
             foreach (var link in Traverse.Create(character).Field("m_SavedEquipmentEntities").GetValue<List<EquipmentEntityLink>>())
             {
                 var name = GetName(link);
@@ -443,12 +444,12 @@ namespace VisualAdjustments
             var asks = unitEntityData.Descriptor.Asks;
             var customAsks = unitEntityData.Descriptor.CustomAsks;
             var overrideAsks = unitEntityData.Descriptor.OverrideAsks;
-            GUILayout.Label($"Current Asks: {asks?.name}, Display: {asks?.DisplayName}");
-            GUILayout.Label($"Current CustomAsks: {customAsks?.name}, Display: {customAsks?.DisplayName}");
-            GUILayout.Label($"Current OverrideAsks: {overrideAsks?.name}, Display: {overrideAsks?.DisplayName}");
-            foreach (var blueprint in ResourcesLibrary.GetBlueprints<BlueprintUnitAsksList>())
+            GUILayout.Label($"Current Asks: {asks?.name}, Display: {asks?.DisplayName}", GUILayout.Width(200f));
+            GUILayout.Label($"Current CustomAsks: {customAsks?.name}, Display: {customAsks?.DisplayName}", GUILayout.Width(200f));
+            GUILayout.Label($"Current OverrideAsks: {overrideAsks?.name}, Display: {overrideAsks?.DisplayName}", GUILayout.Width(200f));
+            foreach (var blueprint in BluePrintThing.GetBlueprints<BlueprintUnitAsksList>())
             {
-                GUILayout.Label($"Asks: {blueprint}, Display: {blueprint.DisplayName}");
+                GUILayout.Label($"Asks: {blueprint}, Display: {blueprint.DisplayName}", GUILayout.Width(200f));
             }
 
         }
@@ -458,10 +459,10 @@ namespace VisualAdjustments
             var portraitBP = unitEntityData.Descriptor.UISettings.PortraitBlueprint;
             var uiPortrait = unitEntityData.Descriptor.UISettings.Portrait;
             var CustomPortrait = unitEntityData.Descriptor.UISettings.CustomPortraitRaw;
-            GUILayout.Label($"Portrait Blueprint: {portraitBP}, {portraitBP?.name}");
-            GUILayout.Label($"Descriptor Portrait: {portrait}, isCustom {portrait?.IsCustom}");
-            GUILayout.Label($"UI Portrait: {portrait}, isCustom {portrait?.IsCustom}");
-            GUILayout.Label($"Custom Portrait: {portrait}, isCustom {portrait?.IsCustom}");
+            GUILayout.Label($"Portrait Blueprint: {portraitBP}, {portraitBP?.name}", GUILayout.Width(200f));
+            GUILayout.Label($"Descriptor Portrait: {portrait}, isCustom {portrait?.IsCustom}", GUILayout.Width(200f));
+            GUILayout.Label($"UI Portrait: {portrait}, isCustom {portrait?.IsCustom}", GUILayout.Width(200f));
+            GUILayout.Label($"Custom Portrait: {portrait}, isCustom {portrait?.IsCustom}", GUILayout.Width(200f));
             foreach (var blueprint in DollResourcesManager.Portrait.Values)
             {
                 GUILayout.Label($"Portrait Blueprint: {blueprint}");
@@ -473,14 +474,14 @@ namespace VisualAdjustments
             var pItem = handSlot != null && handSlot.HasItem ? handSlot.Item : null;
             GUILayout.Label(string.Format("Slot {0}, {1}, Active {2}", 
                 pItem?.Name, pItem?.GetType(), handSlot?.Active), GUILayout.Width(500));
-            if (GUILayout.Button("Remove"))
+            if (GUILayout.Button("Remove",GUILayout.ExpandWidth(false)))
             {
                 handSlot.RemoveItem();
             }
             GUILayout.EndHorizontal();
         }
             static void ShowUnitViewHandSlotData(UnitViewHandSlotData handData)
-        {
+              {
             var ownerScale = handData.Owner.View.GetSizeScale() * Game.Instance.BlueprintRoot.WeaponModelSizing.GetCoeff(handData.Owner.Descriptor.OriginalSize);
             var visualScale = handData.VisualModel?.transform.localScale ?? Vector3.zero;
             var visualPosition = handData.VisualModel?.transform.localPosition ?? Vector3.zero;
@@ -491,21 +492,21 @@ namespace VisualAdjustments
             GUILayout.BeginHorizontal();
             GUILayout.Label(string.Format("Data {0} Slot {1} Active {2}", handData?.VisibleItem?.Name, handData?.VisualSlot, handData?.IsActiveSet), GUILayout.Width(500));
 
-            if (GUILayout.Button("Unequip"))
+            if (GUILayout.Button("Unequip", GUILayout.Width(200f)))
             {
                 handData.Unequip();
             }
-            if (GUILayout.Button("Swap Slot"))
+            if (GUILayout.Button("Swap Slot", GUILayout.Width(200f)))
             {
                 handData.VisualSlot += 1;
                 if(handData.VisualSlot == UnitEquipmentVisualSlotType.Quiver) handData.VisualSlot = 0;
                 handData.Owner.View.HandsEquipment.UpdateAll();
             }
-            if (GUILayout.Button("ShowItem 0"))
+            if (GUILayout.Button("ShowItem 0", GUILayout.Width(200f)))
             {
                 handData.ShowItem(false);
             }
-            if (GUILayout.Button("ShowItem 1"))
+            if (GUILayout.Button("ShowItem 1", GUILayout.Width(200f)))
             {
                 handData.ShowItem(true);
             }
@@ -541,7 +542,7 @@ namespace VisualAdjustments
                 buffIndex = buffIndex >= blueprintBuffs.Length - 1 ? blueprintBuffs.Length - 1 : buffIndex + 1;
             }
             GUILayout.Label($"{blueprintBuffs[buffIndex].Name}, {blueprintBuffs[buffIndex].name}");
-            if (GUILayout.Button("Apply"))
+            if (GUILayout.Button("Apply", GUILayout.Width(200f)))
             {
                 GameHelper.ApplyBuff(unitEntityData, blueprintBuffs[buffIndex]);
             }
@@ -550,7 +551,7 @@ namespace VisualAdjustments
             {
                 GUILayout.BeginHorizontal();
                 GUILayout.Label($"{buff.Blueprint.name}, {buff.Name}");
-                if (GUILayout.Button("Remove"))
+                if (GUILayout.Button("Remove", GUILayout.Width(200f)))
                 {
                     GameHelper.RemoveBuff(unitEntityData, buff.Blueprint);   
                 }
@@ -562,16 +563,16 @@ namespace VisualAdjustments
             var doll = unitEntityData.Descriptor.Doll;
             if(doll == null)
             {
-                GUILayout.Label("No Doll");
+                GUILayout.Label("No Doll", GUILayout.Width(200f));
                 return;
             }
-            GUILayout.Label("Indices");
+            GUILayout.Label("Indices", GUILayout.Width(200f));
             foreach(var kv in doll.EntityRampIdices)
             {
                 var ee = ResourcesLibrary.TryGetResource<EquipmentEntity>(kv.Key);
                 GUILayout.Label($"{kv.Key} - {ee?.name} - {kv.Value}");
             }
-            GUILayout.Label("EquipmentEntities");
+            GUILayout.Label("EquipmentEntities", GUILayout.Width(200f));
             foreach (var id in doll.EquipmentEntityIds)
             {
                 var ee = ResourcesLibrary.TryGetResource<EquipmentEntity>(id);
@@ -587,11 +588,11 @@ namespace VisualAdjustments
             {
                 FXIds = File
                     .ReadAllLines($"{Main.ModEntry.Path}/fxlookup.txt")
-                    .Where(id => ResourcesLibrary.LibraryObject.ResourceNamesByAssetId.ContainsKey(id))
+                    .Where(id => LibraryThing.GetResourceGuidMap().ContainsKey(id))
                     .ToArray();
             } else { 
                 var idList = new List<string>();
-                foreach (var kv in ResourcesLibrary.LibraryObject.ResourceNamesByAssetId)
+                foreach (var kv in LibraryThing.GetResourceGuidMap())
                 {
                     var obj = ResourcesLibrary.TryGetResource<UnityEngine.Object>(kv.Key);
                     var go = obj as GameObject;
@@ -602,7 +603,7 @@ namespace VisualAdjustments
                     ResourcesLibrary.CleanupLoadedCache();
                 }
                 FXIds = idList
-                    .OrderBy(id => ResourcesLibrary.LibraryObject.ResourceNamesByAssetId[id])
+                    .OrderBy(id => LibraryThing.GetResourceGuidMap()[id])
                     .ToArray();
                 File.WriteAllLines(filepath, FXIds);
             }
@@ -611,7 +612,7 @@ namespace VisualAdjustments
         static void ShowFxInfo(UnitEntityData unitEntityData)
         {
             //Choose FX
-            GUILayout.Label($"Choose FX {FXIds.Length} available");
+            GUILayout.Label($"Choose FX {FXIds.Length} available", GUILayout.Width(200f));
             if(FXIds.Length == 0) LoadFxLookup();
             GUILayout.BeginHorizontal();
             fxIndex = (int)GUILayout.HorizontalSlider(fxIndex, 0, FXIds.Length - 1, GUILayout.Width(300));
@@ -624,7 +625,7 @@ namespace VisualAdjustments
                 fxIndex = fxIndex >= FXIds.Length - 1 ? FXIds.Length - 1 : fxIndex + 1;
             }
             var fxId = FXIds[fxIndex];
-            GUILayout.Label($"{ResourcesLibrary.LibraryObject.ResourceNamesByAssetId[fxId]} {FXIds[fxIndex]}");
+            GUILayout.Label($"{LibraryThing.GetResourceGuidMap()[fxId]} {FXIds[fxIndex]}");
             if (GUILayout.Button("Apply", GUILayout.Width(200)))
             {
                 var prefab = ResourcesLibrary.TryGetResource<GameObject>(fxId);
@@ -639,7 +640,7 @@ namespace VisualAdjustments
             var spawnOnStart = unitEntityData.View.GetComponent<SpawnFxOnStart>();
             if (spawnOnStart)
             {
-                GUILayout.Label("Spawn on Start");
+                GUILayout.Label("Spawn on Start", GUILayout.Width(200f));
                 GUILayout.Label("FxOnStart " + spawnOnStart.FxOnStart?.Load()?.name, GUILayout.Width(400));
                 GUILayout.Label("FXFxOnDeath " + spawnOnStart.FxOnStart?.Load()?.name, GUILayout.Width(400));
             }
@@ -649,13 +650,13 @@ namespace VisualAdjustments
             {
                 var decal = decals[i];
                 GUILayout.Label("Decal: " + decal.name, GUILayout.Width(400));
-                if (GUILayout.Button("Destroy"))
+                if (GUILayout.Button("Destroy", GUILayout.Width(200f)))
                 {
                     GameObject.Destroy(decal.gameObject);
                     decals.RemoveAt(i);
                 }
             }
-            GUILayout.Label("CustomWeaponEffects");
+            GUILayout.Label("CustomWeaponEffects", GUILayout.Width(200f));
             var dollroom = Game.Instance.UI.Common.DollRoom;
             foreach(var kv in EffectsManager.WeaponEnchantments)
             {
@@ -671,7 +672,7 @@ namespace VisualAdjustments
                     GUILayout.EndHorizontal();
                 }
             }
-            GUILayout.Label("FXRoot");
+            GUILayout.Label("FXRoot", GUILayout.Width(200f));
             foreach(Transform t in FxHelper.FxRoot.transform)
             {
                 var pooledFX = t.gameObject.GetComponent<PooledFx>();
@@ -693,10 +694,10 @@ namespace VisualAdjustments
                 GUILayout.BeginHorizontal();
                 if (unit != null)
                 {
-                    GUILayout.Label($"{pooledFX.name} - {unit.EntityData.CharacterName} - {unit.name}");
+                    GUILayout.Label($"{pooledFX.name} - {unit.EntityData.CharacterName} - {unit.name}", GUILayout.Width(200f));
                 } else
                 {
-                    GUILayout.Label($"{pooledFX.name}");
+                    GUILayout.Label($"{pooledFX.name}", GUILayout.Width(200f));
                 }
                 if(GUILayout.Button("DestroyFX", GUILayout.Width(200))){
                     FxHelper.Destroy(t.gameObject);

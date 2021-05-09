@@ -1,4 +1,4 @@
-﻿using Harmony12;
+﻿using HarmonyLib;
 using Kingmaker;
 using Kingmaker.Blueprints;
 using Kingmaker.Blueprints.Classes;
@@ -25,7 +25,7 @@ namespace VisualAdjustments
         /*
          * Based on DollData.CreateUnitView, DollRoom.CreateAvatar and 
          * UnitEntityData.CreateView
-         */ 
+         */
         public static void RebuildCharacter(UnitEntityData unitEntityData)
         {
             var character = unitEntityData.View.CharacterAvatar;
@@ -34,13 +34,13 @@ namespace VisualAdjustments
             {
                 var doll = unitEntityData.Descriptor.Doll;
                 var savedEquipment = true;
-                character.RemoveAllEquipmentEntities(savedEquipment);
+              character.RemoveAllEquipmentEntities(savedEquipment);
                 if (doll.RacePreset != null)
                 {
                     character.Skeleton = (doll.Gender != Gender.Male) ? doll.RacePreset.FemaleSkeleton : doll.RacePreset.MaleSkeleton;
                     character.AddEquipmentEntities(doll.RacePreset.Skin.Load(doll.Gender, doll.RacePreset.RaceId), savedEquipment);
                 }
-                character.Mirror = doll.LeftHanded;
+                ///character.m_Mirror = doll.LeftHanded;
                 foreach (string assetID in doll.EquipmentEntityIds)
                 {
                     EquipmentEntity ee = ResourcesLibrary.TryGetResource<EquipmentEntity>(assetID);
@@ -49,9 +49,9 @@ namespace VisualAdjustments
                 doll.ApplyRampIndices(character);
                 Traverse.Create(unitEntityData.View).Field("m_EquipmentClass").SetValue(null); //UpdateClassEquipment won't update if the class doesn't change
                 //Adds Armor
-                unitEntityData.View.UpdateBodyEquipmentModel();
+               unitEntityData.View.UpdateBodyEquipmentModel();
                 unitEntityData.View.UpdateClassEquipment();
-            }
+            } 
             else
             {
                 character.RemoveAllEquipmentEntities();
@@ -64,7 +64,7 @@ namespace VisualAdjustments
             EventBus.RaiseEvent<IUnitViewAttachedHandler>(unitEntityData, delegate (IUnitViewAttachedHandler h)
             {
                 h.HandleUnitViewAttached();
-            });
+            }); 
         }
         static void ChangeCompanionOutfit(UnitEntityView __instance, CharacterSettings characterSettings)
         {
@@ -217,17 +217,17 @@ namespace VisualAdjustments
         }
         /*
          * Fix "bug" where Male Ranger Cape would hide hair and ears         * 
-         */ 
-        static void FixRangerCloak(UnitEntityView view)
+         */
+      /*  static void FixRangerCloak(UnitEntityView view)
         {
             foreach (var ee in view.CharacterAvatar.EquipmentEntities)
             {
                 if (ee.name == "EE_Ranger_M_Cape")
                 {
-                    ee.HideBodyParts &= ~(BodyPartType.Hair | BodyPartType.Hair2 | BodyPartType.Ears);
+                    ee.HideBodyParts &= ~(BodyPartType.Hair | BodyPartType.Ears);
                 }
             }
-        }
+        }*/
         public static void NoClassOutfit(UnitEntityView view)
         {
             var classOutfit = view.EntityData.Descriptor.Progression.GetEquipmentClass();
@@ -237,147 +237,162 @@ namespace VisualAdjustments
             view.CharacterAvatar.AddEquipmentEntities(newClothes);
         }
         public static void UpdateModel(UnitEntityView view)
-        {
-            if (view.CharacterAvatar == null || view.EntityData == null) return;
-            if (!view.EntityData.IsPlayerFaction) return;
-            Settings.CharacterSettings characterSettings = Main.settings.GetCharacterSettings(view.EntityData);
-            if (characterSettings == null) return;
-            bool dirty = view.CharacterAvatar.IsDirty;
-            if (view.EntityData.Descriptor.Doll == null && characterSettings.classOutfit != "Default")
-            {
-                ChangeCompanionOutfit(view, characterSettings);
-            }
-            if (characterSettings.classOutfit == "None") NoClassOutfit(view);
-            if (characterSettings.hideHelmet)
-            {
-                HideSlot(view, view.EntityData.Body.Head, ref dirty);
-            }
-            if (characterSettings.hideItemCloak)
-            {
-                HideSlot(view, view.EntityData.Body.Shoulders, ref dirty);
-            }
-            if (characterSettings.hideArmor)
-            {
-                HideSlot(view, view.EntityData.Body.Armor, ref dirty);
-            }
-            if (characterSettings.hideGloves)
-            {
-                HideSlot(view, view.EntityData.Body.Gloves, ref dirty);
-            }
-            if (characterSettings.hideBracers)
-            {
-                HideSlot(view, view.EntityData.Body.Wrist, ref dirty);
-            }
-            if (characterSettings.hideBoots)
-            {
-                HideSlot(view, view.EntityData.Body.Feet, ref dirty);
-            }
-            if (characterSettings.hideHorns)
-            {
-                foreach (var ee in view.CharacterAvatar.EquipmentEntities.ToArray())
                 {
-                    if (ee.BodyParts.Exists((bodypart) => bodypart.Type == BodyPartType.Horns))
+                    if (view.CharacterAvatar == null || view.EntityData == null) return;
+                    if (!view.EntityData.IsPlayerFaction) return;
+                    Settings.CharacterSettings characterSettings = Main.settings.GetCharacterSettings(view.EntityData);
+                    if (characterSettings == null) return;
+                    bool dirty = view.CharacterAvatar.IsDirty;
+                    if (view.EntityData.Descriptor.Doll == null && characterSettings.classOutfit != "Default")
                     {
-                        view.CharacterAvatar.EquipmentEntities.Remove(ee);
-                        dirty = true;
+                        ChangeCompanionOutfit(view, characterSettings);
                     }
-                }
-            }
-            if (characterSettings.hideTail)
-            {
-                foreach (var ee in view.CharacterAvatar.EquipmentEntities.ToArray())
-                {
-                    if (ee.name.StartsWith("Tail"))
+                    if (characterSettings.classOutfit == "None") NoClassOutfit(view);
+                    if (characterSettings.hideHelmet)
                     {
-                        view.CharacterAvatar.EquipmentEntities.Remove(ee);
-                        dirty = true;
+                        HideSlot(view, view.EntityData.Body.Head, ref dirty);
                     }
-                }
-            }
-            if (characterSettings.hideClassCloak || characterSettings.overrideCloak != null)
-            {
-                foreach (var ee in view.CharacterAvatar.EquipmentEntities.ToArray())
-                {
-                    if (ee.OutfitParts.Exists((outfit) => {
-                        return outfit.Special == EquipmentEntity.OutfitPartSpecialType.Cloak ||
-                            outfit.Special == EquipmentEntity.OutfitPartSpecialType.CloakSquashed;
-                    }) && !view.ExtractEquipmentEntities(view.EntityData.Body.Shoulders).Contains(ee))
+                    if (characterSettings.hideItemCloak)
                     {
-                        view.CharacterAvatar.EquipmentEntities.Remove(ee);
-                        dirty = true;
+                        HideSlot(view, view.EntityData.Body.Shoulders, ref dirty);
                     }
-                }
-            }
-            if (characterSettings.hideCap)
-            {
-                foreach (var ee in view.CharacterAvatar.EquipmentEntities.ToArray())
-                {
-                    if (ee.BodyParts.Exists((bodypart) => bodypart.Type == BodyPartType.Cap) &&
-                        !view.ExtractEquipmentEntities(view.EntityData.Body.Head).Contains(ee))
+                    if (characterSettings.hideArmor)
                     {
-                        view.CharacterAvatar.EquipmentEntities.Remove(ee);
-                        dirty = true;
+                        HideSlot(view, view.EntityData.Body.Armor, ref dirty);
                     }
+                    if (characterSettings.hideGloves)
+                    {
+                        HideSlot(view, view.EntityData.Body.Gloves, ref dirty);
+                    }
+                    if (characterSettings.hideBracers)
+                    {
+                        HideSlot(view, view.EntityData.Body.Wrist, ref dirty);
+                    }
+                    if (characterSettings.hideBoots)
+                    {
+                        HideSlot(view, view.EntityData.Body.Feet, ref dirty);
+                    }
+                    if (characterSettings.hideHorns)
+                    {
+                        foreach (var ee in view.CharacterAvatar.EquipmentEntities.ToArray())
+                        {
+                            if (ee.BodyParts.Exists((bodypart) => bodypart.Type == BodyPartType.Horns))
+                            {
+                                view.CharacterAvatar.EquipmentEntities.Remove(ee);
+                                dirty = true;
+                            }
+                        }
+                    }
+                    if (characterSettings.hideTail)
+                    {
+                        foreach (var ee in view.CharacterAvatar.EquipmentEntities.ToArray())
+                        {
+                            if (ee.name.StartsWith("Tail"))
+                            {
+                                view.CharacterAvatar.EquipmentEntities.Remove(ee);
+                                dirty = true;
+                            }
+                        }
+                    }
+                   /* if (characterSettings.hideClassCloak || characterSettings.overrideCloak != null)
+                    {
+                        foreach (var ee in view.CharacterAvatar.EquipmentEntities.ToArray())
+                        {
+                            if (ee.OutfitParts.Exists((outfit) => {
+                                return outfit.Special == EquipmentEntity.OutfitPartSpecialType.Cloak ||
+                                    outfit.Special == EquipmentEntity.OutfitPartSpecialType.CloakSquashed;
+                            }) && !view.ExtractEquipmentEntities(view.EntityData.Body.Shoulders).Contains(ee))
+                            {
+                                view.CharacterAvatar.EquipmentEntities.Remove(ee);
+                                dirty = true;
+                            }
+                        }
+                    }*/
+                    if (characterSettings.hideCap)
+                    {
+                        foreach (var ee in view.CharacterAvatar.EquipmentEntities.ToArray())
+                        {
+                            if (ee.BodyParts.Exists((bodypart) => bodypart.Type == BodyPartType.Helmet) &&
+                                !view.ExtractEquipmentEntities(view.EntityData.Body.Head).Contains(ee))
+                            {
+                                view.CharacterAvatar.EquipmentEntities.Remove(ee);
+                                dirty = true;
+                            }
+                        }
+                    }
+                    if (characterSettings.overrideHelm != null && !characterSettings.hideHelmet)
+                    {
+                        if (!OverrideEquipment(view, view.EntityData.Body.Head, characterSettings.overrideHelm, ref dirty))
+                        {
+                            characterSettings.overrideHelm = null;
+                        }
+                    }
+                    /*            if (characterSettings.overrideCloak
+                     *            != null && !characterSettings.hideItemCloak)
+                                {
+                                    if (!OverrideEquipment(view, view.EntityData.Body.Shoulders, characterSettings.overrideCloak, ref dirty))
+                                    {
+                                        characterSettings.overrideCloak = null;
+                                    }
+                                }*/
+                    if (characterSettings.overrideArmor != null && !characterSettings.hideArmor)
+                    {
+                        if (!OverrideEquipment(view, view.EntityData.Body.Armor, characterSettings.overrideArmor, ref dirty))
+                        {
+                            characterSettings.overrideArmor = null;
+                        }
+                    }
+                    if (characterSettings.overrideBracers != null && !characterSettings.hideBracers)
+                    {
+                        if (!OverrideEquipment(view, view.EntityData.Body.Wrist, characterSettings.overrideBracers, ref dirty))
+                        {
+                            characterSettings.overrideBracers = null;
+                        }
+                    }
+                    if (characterSettings.overrideGloves != null && !characterSettings.hideGloves)
+                    {
+                        if (!OverrideEquipment(view, view.EntityData.Body.Gloves, characterSettings.overrideGloves, ref dirty))
+                        {
+                            characterSettings.overrideGloves = null;
+                        }
+                    }
+                    if (characterSettings.overrideBoots != null && !characterSettings.hideBoots)
+                    {
+                        if (!OverrideEquipment(view, view.EntityData.Body.Feet, characterSettings.overrideBoots, ref dirty))
+                        {
+                            characterSettings.overrideBoots = null;
+                        }
+                    }
+                    if (characterSettings.overrideGlasses != null && !characterSettings.hideGlasses)
+                    {
+                        if (!OverrideEquipment(view, view.EntityData.Body.Glasses, characterSettings.overrideGlasses, ref dirty))
+                        {
+                            characterSettings.overrideGlasses = null;
+                        }
+                    }
+                    if (characterSettings.overrideShirt != null && !characterSettings.hideShirt)
+                    {
+                        if (!OverrideEquipment(view, view.EntityData.Body.Shirt, characterSettings.overrideShirt, ref dirty))
+                        {
+                            characterSettings.overrideShirt = null;
+                        }
+                    }
+                    if (characterSettings.overrideTattoo != null)
+                    {
+                        foreach (var assetId in EquipmentResourcesManager.Tattoos.Keys)
+                        {
+                            var ee = ResourcesLibrary.TryGetResource<EquipmentEntity>(assetId);
+                            if (ee != null) view.CharacterAvatar.RemoveEquipmentEntity(ee);
+                        }
+                        var tattoo = ResourcesLibrary.TryGetResource<EquipmentEntity>(characterSettings.overrideTattoo);
+                        if (tattoo != null) view.CharacterAvatar.AddEquipmentEntity(tattoo);
+                    }
+                    /*if (view.EntityData.Descriptor.Progression?.GetEquipmentClass().Name == "Ranger")
+                    {
+                        FixRangerCloak(view);
+                    }*/
+                    view.CharacterAvatar.IsDirty = dirty;
                 }
-            }
-            if (characterSettings.overrideHelm != null && !characterSettings.hideHelmet)
-            {
-                if (!OverrideEquipment(view, view.EntityData.Body.Head, characterSettings.overrideHelm, ref dirty))
-                {
-                    characterSettings.overrideHelm = null;
-                }
-            }
-            if (characterSettings.overrideCloak != null && !characterSettings.hideItemCloak)
-            {
-                if (!OverrideEquipment(view, view.EntityData.Body.Shoulders, characterSettings.overrideCloak, ref dirty))
-                {
-                    characterSettings.overrideCloak = null;
-                }
-            }
-            if (characterSettings.overrideArmor != null && !characterSettings.hideArmor)
-            {
-                if (!OverrideEquipment(view, view.EntityData.Body.Armor, characterSettings.overrideArmor, ref dirty))
-                {
-                    characterSettings.overrideArmor = null;
-                }
-            }
-            if (characterSettings.overrideBracers != null && !characterSettings.hideBracers)
-            {
-                if (!OverrideEquipment(view, view.EntityData.Body.Wrist, characterSettings.overrideBracers, ref dirty))
-                {
-                    characterSettings.overrideBracers = null;
-                }
-            }
-            if (characterSettings.overrideGloves != null && !characterSettings.hideGloves)
-            {
-                if (!OverrideEquipment(view, view.EntityData.Body.Gloves, characterSettings.overrideGloves, ref dirty))
-                {
-                    characterSettings.overrideGloves = null;
-                }
-            }
-            if (characterSettings.overrideBoots != null && !characterSettings.hideBoots)
-            {
-                if (!OverrideEquipment(view, view.EntityData.Body.Feet, characterSettings.overrideBoots, ref dirty))
-                {
-                    characterSettings.overrideBoots = null;
-                }
-            }
-            if (characterSettings.overrideTattoo != null)
-            {
-                foreach(var assetId in EquipmentResourcesManager.Tattoos.Keys)
-                {
-                    var ee = ResourcesLibrary.TryGetResource<EquipmentEntity>(assetId);
-                    if (ee != null) view.CharacterAvatar.RemoveEquipmentEntity(ee);
-                }
-                var tattoo = ResourcesLibrary.TryGetResource<EquipmentEntity>(characterSettings.overrideTattoo);
-                if(tattoo != null) view.CharacterAvatar.AddEquipmentEntity(tattoo);
-            }
-            if (view.EntityData.Descriptor.Progression?.GetEquipmentClass().Name == "Ranger")
-            {
-                FixRangerCloak(view);
-            }
-            view.CharacterAvatar.IsDirty = dirty;
-        }
         /*
          * Called by CheatsSilly.UpdatePartyNoArmor and OnDataAttached
          * Applies all EquipmentEntities from item Slots for NonBaked avatars
@@ -412,7 +427,7 @@ namespace VisualAdjustments
                 try
                 {
                     if (!Main.enabled) return;
-                    UpdateModel(__instance);
+                UpdateModel(__instance);
                 }
                 catch (Exception ex)
                 {
@@ -458,52 +473,52 @@ namespace VisualAdjustments
                     switch (characterSettings.classOutfit)
                     {
                         case "Alchemist":
-                            __result = (BlueprintCharacterClass)ResourcesLibrary.LibraryObject.BlueprintsByAssetId["0937bec61c0dabc468428f496580c721"];
+                            __result = (BlueprintCharacterClass)ResourcesLibrary.TryGetBlueprint<BlueprintCharacterClass>("0937bec61c0dabc468428f496580c721");
                             break;
                         case "Barbarian":
-                            __result = (BlueprintCharacterClass)ResourcesLibrary.LibraryObject.BlueprintsByAssetId["f7d7eb166b3dd594fb330d085df41853"];
+                            __result = (BlueprintCharacterClass)ResourcesLibrary.TryGetBlueprint<BlueprintCharacterClass>("f7d7eb166b3dd594fb330d085df41853");
                             break;
                         case "Bard":
-                            __result = (BlueprintCharacterClass)ResourcesLibrary.LibraryObject.BlueprintsByAssetId["772c83a25e2268e448e841dcd548235f"];
+                            __result = (BlueprintCharacterClass)ResourcesLibrary.TryGetBlueprint<BlueprintCharacterClass>("772c83a25e2268e448e841dcd548235f");
                             break;
                         case "Cleric":
-                            __result = (BlueprintCharacterClass)ResourcesLibrary.LibraryObject.BlueprintsByAssetId["67819271767a9dd4fbfd4ae700befea0"];
+                            __result = (BlueprintCharacterClass)ResourcesLibrary.TryGetBlueprint<BlueprintCharacterClass>("67819271767a9dd4fbfd4ae700befea0");
                             break;
                         case "Druid":
-                            __result = (BlueprintCharacterClass)ResourcesLibrary.LibraryObject.BlueprintsByAssetId["610d836f3a3a9ed42a4349b62f002e96"];
+                            __result = (BlueprintCharacterClass)ResourcesLibrary.TryGetBlueprint<BlueprintCharacterClass>("610d836f3a3a9ed42a4349b62f002e96");
                             break;
                         case "Fighter":
-                            __result = (BlueprintCharacterClass)ResourcesLibrary.LibraryObject.BlueprintsByAssetId["48ac8db94d5de7645906c7d0ad3bcfbd"];
+                            __result = (BlueprintCharacterClass)ResourcesLibrary.TryGetBlueprint<BlueprintCharacterClass>("48ac8db94d5de7645906c7d0ad3bcfbd");
                             break;
                         case "Inquisitor":
-                            __result = (BlueprintCharacterClass)ResourcesLibrary.LibraryObject.BlueprintsByAssetId["f1a70d9e1b0b41e49874e1fa9052a1ce"];
+                            __result = (BlueprintCharacterClass)ResourcesLibrary.TryGetBlueprint<BlueprintCharacterClass>("f1a70d9e1b0b41e49874e1fa9052a1ce");
                             break;
                         case "Kineticist":
-                            __result = (BlueprintCharacterClass)ResourcesLibrary.LibraryObject.BlueprintsByAssetId["42a455d9ec1ad924d889272429eb8391"];
+                            __result = (BlueprintCharacterClass)ResourcesLibrary.TryGetBlueprint<BlueprintCharacterClass>("42a455d9ec1ad924d889272429eb8391");
                             break;
                         case "Magus":
-                            __result = (BlueprintCharacterClass)ResourcesLibrary.LibraryObject.BlueprintsByAssetId["45a4607686d96a1498891b3286121780"];
+                            __result = (BlueprintCharacterClass)ResourcesLibrary.TryGetBlueprint<BlueprintCharacterClass>("45a4607686d96a1498891b3286121780");
                             break;
                         case "Monk":
-                            __result = (BlueprintCharacterClass)ResourcesLibrary.LibraryObject.BlueprintsByAssetId["e8f21e5b58e0569468e420ebea456124"];
+                            __result = (BlueprintCharacterClass)ResourcesLibrary.TryGetBlueprint<BlueprintCharacterClass>("e8f21e5b58e0569468e420ebea456124");
                             break;
                         case "Paladin":
-                            __result = (BlueprintCharacterClass)ResourcesLibrary.LibraryObject.BlueprintsByAssetId["bfa11238e7ae3544bbeb4d0b92e897ec"];
+                            __result = (BlueprintCharacterClass)ResourcesLibrary.TryGetBlueprint<BlueprintCharacterClass>("bfa11238e7ae3544bbeb4d0b92e897ec");
                             break;
                         case "Ranger":
-                            __result = (BlueprintCharacterClass)ResourcesLibrary.LibraryObject.BlueprintsByAssetId["cda0615668a6df14eb36ba19ee881af6"];
+                            __result = (BlueprintCharacterClass)ResourcesLibrary.TryGetBlueprint<BlueprintCharacterClass>("cda0615668a6df14eb36ba19ee881af6");
                             break;
                         case "Rogue":
-                            __result = (BlueprintCharacterClass)ResourcesLibrary.LibraryObject.BlueprintsByAssetId["299aa766dee3cbf4790da4efb8c72484"];
+                            __result = (BlueprintCharacterClass)ResourcesLibrary.TryGetBlueprint<BlueprintCharacterClass>("299aa766dee3cbf4790da4efb8c72484");
                             break;
                         case "Slayer":
-                            __result = (BlueprintCharacterClass)ResourcesLibrary.LibraryObject.BlueprintsByAssetId["c75e0971973957d4dbad24bc7957e4fb"];
+                            __result = (BlueprintCharacterClass)ResourcesLibrary.TryGetBlueprint<BlueprintCharacterClass>("c75e0971973957d4dbad24bc7957e4fb");
                             break;
                         case "Sorcerer":
-                            __result = (BlueprintCharacterClass)ResourcesLibrary.LibraryObject.BlueprintsByAssetId["b3a505fb61437dc4097f43c3f8f9a4cf"];
+                            __result = (BlueprintCharacterClass)ResourcesLibrary.TryGetBlueprint<BlueprintCharacterClass>("b3a505fb61437dc4097f43c3f8f9a4cf");
                             break;
                         case "Wizard":
-                            __result = (BlueprintCharacterClass)ResourcesLibrary.LibraryObject.BlueprintsByAssetId["ba34257984f4c41408ce1dc2004e342e"];
+                            __result = (BlueprintCharacterClass)ResourcesLibrary.TryGetBlueprint<BlueprintCharacterClass>("ba34257984f4c41408ce1dc2004e342e");
                             break;
                         default:
                             return true;
@@ -551,13 +566,13 @@ namespace VisualAdjustments
             var race = blueprintRace?.RaceId ?? Race.Human;
             var gender = unit.Gender;
             TryPreloadKEE(characterSettings.overrideHelm, gender, race);
-            TryPreloadKEE(characterSettings.overrideCloak, gender, race);
+            TryPreloadKEE(characterSettings.overrideShirt, gender, race);
             TryPreloadKEE(characterSettings.overrideArmor, gender, race);
             TryPreloadKEE(characterSettings.overrideBracers, gender, race);
             TryPreloadKEE(characterSettings.overrideGloves, gender, race);
             TryPreloadKEE(characterSettings.overrideBoots, gender, race);
             TryPreloadEE(characterSettings.overrideTattoo, gender, race);
-            foreach(var kv in characterSettings.overrideWeapons)
+            foreach (var kv in characterSettings.overrideWeapons)
             {
                 TryPreloadWeapon(kv.Value, gender, race);
             }
@@ -565,7 +580,7 @@ namespace VisualAdjustments
             {
                 ResourcesLibrary.PreloadResource<GameObject>(characterSettings.overrideView);
             }
-            if(characterSettings.classOutfit == "None")
+            if (characterSettings.classOutfit == "None")
             {
                 var clothes = gender == Gender.Male ? BlueprintRoot.Instance.CharGen.MaleClothes : BlueprintRoot.Instance.CharGen.FemaleClothes;
                 foreach (var clothing in clothes) clothing.Preload();
@@ -589,27 +604,27 @@ namespace VisualAdjustments
                 }
             }
         }
-        [HarmonyPatch(typeof(Game), "OnAreaLoaded")]
-        static class Game_OnAreaLoaded_Patch
-        {
-            static void Postfix()
-            {
-                try
-                {
-                    if (!Main.enabled) return;
-                    if (!Main.settings.rebuildCharacters) return;
-                    Main.Log("Rebuilding characters");
-                    foreach (var character in Game.Instance.Player.ControllableCharacters)
-                    {
-                        RebuildCharacter(character);
-                        UpdateModel(character.View);
-                        character.View.HandsEquipment.UpdateAll();
-                    }
-                } catch(Exception ex)
-                {
-                    Main.Error(ex);
-                }
-            }
-        }
-    }
+       [HarmonyPatch(typeof(Game), "OnAreaLoaded")]
+       static class Game_OnAreaLoaded_Patch
+       {
+           static void Postfix()
+           {
+               try
+               {
+                   if (!Main.enabled) return;
+                   if (!Main.settings.rebuildCharacters) return;
+                   Main.Log("Rebuilding characters");
+                   foreach (var character in Game.Instance.Player.Party)
+                   {
+                       RebuildCharacter(character);
+                       UpdateModel(character.View);
+                       character.View.HandsEquipment.UpdateAll();
+                   }
+               } catch(Exception ex)
+               {
+                   Main.Error(ex);
+               }
+           }
+       }
+   }
 }

@@ -66,9 +66,9 @@ namespace VisualAdjustments
         }
         static private void Init()
         {
-            var races = ResourcesLibrary.GetBlueprints<BlueprintRace>();
-            var racePresets = ResourcesLibrary.GetBlueprints<BlueprintRaceVisualPreset>();
-            var classes = ResourcesLibrary.GetBlueprints<BlueprintCharacterClass>();
+            var races = BluePrintThing.GetBlueprints<BlueprintRace>();
+            var racePresets = BluePrintThing.GetBlueprints<BlueprintRaceVisualPreset>();
+            var classes = BluePrintThing.GetBlueprints<BlueprintCharacterClass>();
             foreach (var race in races)
             {
                 foreach (var gender in new Gender[] { Gender.Male, Gender.Female })
@@ -101,7 +101,9 @@ namespace VisualAdjustments
                     }
                 }
             }
-            foreach(var bp in ResourcesLibrary.GetBlueprints<BlueprintPortrait>())
+#pragma warning disable CS0103 // The name 'BluePrintThing' does not exist in the current context
+            foreach(var bp in BluePrintThing.GetBlueprints<BlueprintPortrait>())
+#pragma warning restore CS0103 // The name 'BluePrintThing' does not exist in the current context
             {
                 //Note there are two wolf portraits
                 if (bp == BlueprintRoot.Instance.CharGen.CustomPortrait || bp.Data.IsCustom)
@@ -111,7 +113,9 @@ namespace VisualAdjustments
                 if (!portraits.ContainsKey(bp.name)) portraits.Add(bp.name, bp);
             }
             customPortraits.AddRange(CustomPortraitsManager.Instance.GetExistingCustomPortraitIds());
-            foreach (var bp in ResourcesLibrary.GetBlueprints<BlueprintUnitAsksList>())
+#pragma warning disable CS0103 // The name 'BluePrintThing' does not exist in the current context
+            foreach (var bp in BluePrintThing.GetBlueprints<BlueprintUnitAsksList>())
+#pragma warning restore CS0103 // The name 'BluePrintThing' does not exist in the current context
             {
                 var component = bp.GetComponent<UnitAsksComponent>();
                 if (component == null) continue;
@@ -154,7 +158,8 @@ namespace VisualAdjustments
             CharacterManager.disableEquipmentClassPatch = false;
             dollState.SetGender(dollData.Gender);
             dollState.SetRacePreset(dollData.RacePreset);
-            dollState.SetLeftHanded(dollData.LeftHanded);
+            unitEntityData.Descriptor.LeftHandedOverride = true;
+
             dollState.SetEquipColors(dollData.ClothesPrimaryIndex, dollData.ClothesSecondaryIndex);
             foreach(var assetID in dollData.EquipmentEntityIds)
             {

@@ -1,4 +1,4 @@
-﻿using Harmony12;
+﻿using HarmonyLib;
 using Kingmaker.Blueprints;
 using Kingmaker.Blueprints.Facts;
 using Kingmaker.Blueprints.Items.Ecnchantments;
@@ -124,7 +124,7 @@ namespace VisualAdjustments
         [HarmonyPatch(typeof(UnitViewHandSlotData), "UpdateWeaponEnchantmentFx")]
         static class UnitViewHandSlotData_UpdateWeaponEnchantmentFx_Patch
         {
-            static void Postfix(UnitViewHandSlotData __instance, bool isVisible, ref List<ItemEnchantment> ___m_VisibleEnchantments, UnitViewHandsEquipment ___m_Equipment)
+            static void Postfix(UnitViewHandSlotData __instance, bool isVisible)
             {
                 try {
                     if (!Main.enabled) return;
@@ -157,12 +157,12 @@ namespace VisualAdjustments
                 {
                     Main.Error(ex);
                 }
-    }
+            }
         }
         [HarmonyPatch(typeof(UnitViewHandSlotData), "DestroyModel")]
         static class UnitViewHandSlotData_DestroyModel_Patch
         {
-            static void Postfix(UnitViewHandSlotData __instance, ref List<ItemEnchantment> ___m_VisibleEnchantments, UnitViewHandsEquipment ___m_Equipment)
+            static void Postfix(UnitViewHandSlotData __instance)
             {
                 try
                 {
@@ -187,7 +187,7 @@ namespace VisualAdjustments
         [HarmonyPatch(typeof(UnitViewHandSlotData), "RecreateModel")]
         static class UnitViewHandSlotData_RecreateModel_Patch
         {
-            static void Postfix(UnitViewHandSlotData __instance, ref List<ItemEnchantment> ___m_VisibleEnchantments, UnitViewHandsEquipment ___m_Equipment)
+            static void Postfix(UnitViewHandSlotData __instance)
             {
                 try
                 {
@@ -198,7 +198,7 @@ namespace VisualAdjustments
                     if (__instance.Slot.MaybeItem == null) return;
                     if (characterSettings.hideWeaponEnchantments)
                     {
-                        ___m_VisibleEnchantments.Clear();
+
                     }
                 }
                 catch (Exception ex)

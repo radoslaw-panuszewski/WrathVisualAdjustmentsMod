@@ -6,7 +6,7 @@
   "ManagerVersion": "0.14.1",
   "Requirements": [],
   "AssemblyName": "VisualAdjustments.dll",
-  "EntryMethod": "VisualAdjustments.Main.Load",
+    "EntryMethod": "VisualAdjustments.Main.Load",
   "HomePage": "https://www.nexusmods.com/pathfinderkingmaker/mods/35",
   "Repository": "https://raw.githubusercontent.com/spacehamster/KingmakerVisualAdjustmentsMod/master/VisualAdjustments/Repository.json"
 }

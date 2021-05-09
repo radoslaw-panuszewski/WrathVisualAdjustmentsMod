@@ -34,9 +34,13 @@ namespace VisualAdjustments
             public bool hideWeapons = false;
             public bool hideBeltSlots = false;
             public bool hideQuiver = false;
+            public bool hideGlasses = false;
+            public bool hideShirt = false;
+            public bool ReloadStuff = false;
 
             public BlueprintRef overrideHelm = null;
-            public BlueprintRef overrideCloak = null;
+            public BlueprintRef overrideShirt = null;
+            public BlueprintRef overrideGlasses = null;
             public BlueprintRef overrideArmor = null;
             public BlueprintRef overrideBracers = null;
             public BlueprintRef overrideGloves = null;
