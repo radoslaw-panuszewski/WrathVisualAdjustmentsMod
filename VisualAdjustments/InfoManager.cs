@@ -541,7 +541,7 @@ namespace VisualAdjustments
             {
                 buffIndex = buffIndex >= blueprintBuffs.Length - 1 ? blueprintBuffs.Length - 1 : buffIndex + 1;
             }
-            GUILayout.Label($"{blueprintBuffs[buffIndex].Name}, {blueprintBuffs[buffIndex].name}");
+            GUILayout.Label($"{blueprintBuffs[buffIndex].Name}, {blueprintBuffs[buffIndex].name}", GUILayout.Width(300));
             if (GUILayout.Button("Apply", GUILayout.Width(200f)))
             {
                 GameHelper.ApplyBuff(unitEntityData, blueprintBuffs[buffIndex]);
@@ -550,7 +550,7 @@ namespace VisualAdjustments
             foreach(var buff in unitEntityData.Buffs)
             {
                 GUILayout.BeginHorizontal();
-                GUILayout.Label($"{buff.Blueprint.name}, {buff.Name}");
+                GUILayout.Label($"{buff.Blueprint.name}, {buff.Name}", GUILayout.Width(300));
                 if (GUILayout.Button("Remove", GUILayout.Width(200f)))
                 {
                     GameHelper.RemoveBuff(unitEntityData, buff.Blueprint);   

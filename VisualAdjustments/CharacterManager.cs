@@ -252,10 +252,10 @@ namespace VisualAdjustments
                     {
                         HideSlot(view, view.EntityData.Body.Head, ref dirty);
                     }
-                    if (characterSettings.hideItemCloak)
+                   /* if (characterSettings.hideItemCloak)
                     {
                         HideSlot(view, view.EntityData.Body.Shoulders, ref dirty);
-                    }
+                    }*/
                     if (characterSettings.hideArmor)
                     {
                         HideSlot(view, view.EntityData.Body.Armor, ref dirty);
@@ -294,20 +294,20 @@ namespace VisualAdjustments
                             }
                         }
                     }
-                   /* if (characterSettings.hideClassCloak || characterSettings.overrideCloak != null)
+                    if (characterSettings.hideClassCloak)
                     {
                         foreach (var ee in view.CharacterAvatar.EquipmentEntities.ToArray())
                         {
                             if (ee.OutfitParts.Exists((outfit) => {
-                                return outfit.Special == EquipmentEntity.OutfitPartSpecialType.Cloak ||
-                                    outfit.Special == EquipmentEntity.OutfitPartSpecialType.CloakSquashed;
+                                return outfit.Special == EquipmentEntity.OutfitPartSpecialType.Backpack ||
+                                    outfit.Special == EquipmentEntity.OutfitPartSpecialType.Backpack;
                             }) && !view.ExtractEquipmentEntities(view.EntityData.Body.Shoulders).Contains(ee))
                             {
                                 view.CharacterAvatar.EquipmentEntities.Remove(ee);
                                 dirty = true;
                             }
                         }
-                    }*/
+                    }
                     if (characterSettings.hideCap)
                     {
                         foreach (var ee in view.CharacterAvatar.EquipmentEntities.ToArray())

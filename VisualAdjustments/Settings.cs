@@ -22,7 +22,7 @@ namespace VisualAdjustments
             public bool hideCap = false;
             public bool hideClassCloak = false;
             public bool hideHelmet = false;
-            public bool hideItemCloak = false;
+           /// public bool hideItemCloak = false;
             public bool hideArmor = false;
             public bool hideBracers = false;
             public bool hideGloves = false;
