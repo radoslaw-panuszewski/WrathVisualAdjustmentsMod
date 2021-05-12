@@ -216,7 +216,7 @@ namespace VisualAdjustments
                 var key = unitEntityData.Descriptor.UISettings.CustomPortraitRaw.CustomId;
                 var currentIndex = DollResourcesManager.CustomPortraits.IndexOf(key);
                 GUILayout.BeginHorizontal();
-                GUILayout.Label("Portrait:  ", GUILayout.Width(DefaultLabelWidth));
+                GUILayout.Label("Portrait  ", GUILayout.Width(DefaultLabelWidth));
                 var newIndex = (int)Math.Round(GUILayout.HorizontalSlider(currentIndex, 0, DollResourcesManager.CustomPortraits.Count, GUILayout.Width(DefaultSliderWidth)), 0);
                 if (GUILayout.Button("Prev", GUILayout.Width(45)) && currentIndex >= 0)
                 {
