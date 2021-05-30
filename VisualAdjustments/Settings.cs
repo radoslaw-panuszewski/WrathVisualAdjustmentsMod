@@ -62,7 +62,7 @@ namespace VisualAdjustments
 #if (DEBUG)
             public bool showInfo = false;
 #endif
-            public string classOutfit = "Default";
+            public CharInfo classOutfit;
             public int companionPrimary = -1;
             public int companionSecondary = -1;
         }

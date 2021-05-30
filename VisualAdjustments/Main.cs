@@ -19,12 +19,18 @@ using Kingmaker.Blueprints.Root;
 using Kingmaker.Utility;
 using Kingmaker.Blueprints.Classes;
 using HarmonyLib;
+using Kingmaker.Cheats;
 
 namespace VisualAdjustments
 {
 #if DEBUG
     [EnableReloading]
 #endif
+    public class CharInfo
+    {
+        public string GUID;
+        public string Name;
+    }
     public class Main
     {
         const float DefaultLabelWidth = 200f;
@@ -46,7 +52,10 @@ namespace VisualAdjustments
         public static bool enabled;
         public static Settings settings;
         public static UnityModManager.ModEntry ModEntry;
-        public static string[] classes = new string[] {
+        /// public static ReferenceArrayProxy<BlueprintCharacterClass,BlueprintCharacterClassReference> classes = Game.Instance.BlueprintRoot.Progression.CharacterClasses;
+        /// public static string[] classes;
+        public static List<CharInfo> classes = new List<CharInfo> {};
+        /*public static string[] classes = new string[] {
             "Default",
             "Alchemist",
             "Barbarian",
@@ -65,7 +74,7 @@ namespace VisualAdjustments
             "Sorcerer",
             "Wizard",
             "None"
-        };
+        };*/
         static bool Load(UnityModManager.ModEntry modEntry)
         {
             try
@@ -81,7 +90,6 @@ namespace VisualAdjustments
 #if DEBUG
                 modEntry.OnUnload = Unload;
 #endif
-
             }
             catch (Exception e)
             {
@@ -105,11 +113,60 @@ namespace VisualAdjustments
             enabled = value;
             return true; // Permit or not.
         }
+        public static void Asd()
+        {
+            if(classes.Count == 0)
+            {
+                Main.logger.Log("bru");
+                foreach (BlueprintCharacterClass c in Utilities.GetScriptableObjects<BlueprintCharacterClass>())
+                {
+                    if (!c.PrestigeClass && c.ComponentsArray.Length != 0 && !c.IsMythic && !c.ToString().Contains("Mythic") && !c.ToString().Contains("Animal") && !c.ToString().Contains("Scion"))
+                    {
+                        try
+                        {
+                            var charinfo = new CharInfo();
+                            charinfo.Name = c.Name;
+                            charinfo.GUID = c.AssetGuid;
+                            if (classes.Count == 0)
+                            {
+                                var charinf = new CharInfo();
+                                charinf.Name = "None";
+                                var charinf2 = new CharInfo();
+                                charinf2.Name = "Default";
+                                classes.Add(charinf);
+                                classes.Add(charinf2);
+                            }
+                            else
+                            {
+                                if (!classes.Any(asd => asd.Name == charinfo.Name))
+                                {
+                                    classes.Add(charinfo);
+                                }
+                            }
+                            /*if(!classes.Contains(c.ToString()))
+                            { */
+                            /*classes.AddItem(c.ToString());
+                            Main.logger.Log(c.ToString());*/
+                            ///}
+                        }
+                        catch (Exception e) { Main.logger.Log(e.ToString()); }
+                    }
+                }
+            }
+        }
         public static void OnGUI(UnityModManager.ModEntry modEntry)
         {
             try
             {
                 if (!enabled) return;
+                Asd();
+                Main.logger.Log("joe bidän");
+                Main.logger.Log(classes.Count.ToString());
+                foreach(CharInfo s in classes)
+                {
+                    Main.logger.Log(s.Name + s.GUID);
+                }
+
                 if (Game.Instance.Player.PartyCharacters != null)
                 {
                     foreach (UnitEntityData unitEntityData in Game.Instance.Player.PartyCharacters)
@@ -192,15 +249,13 @@ namespace VisualAdjustments
             GUILayout.BeginHorizontal();
             foreach (var _class in classes)
             {
-                if (_class == "Magus")
+                if (_class.Name == "Magus")
                 {
                     GUILayout.EndHorizontal();
                     GUILayout.BeginHorizontal();
                 }
-                if (_class == "Kineticist")
-                    continue;
                 var style = characterSettings.classOutfit == _class ? focusedStyle : GUI.skin.button;
-                if (GUILayout.Button(_class, style, GUILayout.Width(100f)))
+                if (GUILayout.Button(_class.Name, style, GUILayout.Width(100f)))
                 {
                     characterSettings.classOutfit = _class;
                     CharacterManager.RebuildCharacter(unitEntityData);
@@ -263,7 +318,7 @@ namespace VisualAdjustments
                 {
                     newIndex = currentIndex + 1;
                 }
-                if (GUILayout.Button("Use Custom", GUILayout.ExpandWidth(false)))
+                if (GUILayout.Button("Use Custom", GUILayout.Width(DefaultLabelWidth)))
                 {
                     unitEntityData.Descriptor.UISettings.SetPortrait(CustomPortraitsManager.Instance.CreateNewOrLoadDefault());
                     EventBus.RaiseEvent<IUnitPortraitChangedHandler>(delegate (IUnitPortraitChangedHandler h)
@@ -550,6 +605,7 @@ namespace VisualAdjustments
             }
             void onWeaponChanged()
             {
+               /// if(unitEntityData.View.HandsEquipment.GetWeaponModel(false). != characterSettings.overrideWeapons)
                 unitEntityData.View.HandsEquipment.UpdateAll();
             }
             ChooseToggle("Hide Cap", ref characterSettings.hideCap, onHideEquipment);

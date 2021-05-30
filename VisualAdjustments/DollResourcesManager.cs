@@ -101,9 +101,7 @@ namespace VisualAdjustments
                     }
                 }
             }
-#pragma warning disable CS0103 // The name 'BluePrintThing' does not exist in the current context
             foreach(var bp in BluePrintThing.GetBlueprints<BlueprintPortrait>())
-#pragma warning restore CS0103 // The name 'BluePrintThing' does not exist in the current context
             {
                 //Note there are two wolf portraits
                 if (bp == BlueprintRoot.Instance.CharGen.CustomPortrait || bp.Data.IsCustom)
@@ -113,9 +111,7 @@ namespace VisualAdjustments
                 if (!portraits.ContainsKey(bp.name)) portraits.Add(bp.name, bp);
             }
             customPortraits.AddRange(CustomPortraitsManager.Instance.GetExistingCustomPortraitIds());
-#pragma warning disable CS0103 // The name 'BluePrintThing' does not exist in the current context
             foreach (var bp in BluePrintThing.GetBlueprints<BlueprintUnitAsksList>())
-#pragma warning restore CS0103 // The name 'BluePrintThing' does not exist in the current context
             {
                 var component = bp.GetComponent<UnitAsksComponent>();
                 if (component == null) continue;

@@ -26,12 +26,12 @@ namespace VisualAdjustments
         // Token: 0x06000053 RID: 83 RVA: 0x000039A0 File Offset: 0x00001BA0
         public static TBlueprint[] GetBlueprints<TBlueprint>() where TBlueprint : BlueprintScriptableObject
         {
-          return  Utilities.GetScriptableObjects<BlueprintScriptableObject>().OfType<TBlueprint>().ToArray();
+          return  Utilities.GetScriptableObjects<TBlueprint>().ToArray();
         }
     }
     public class EquipmentResourcesManager
     {
-        public static UnorderedList<BlueprintRef, string> Helm
+        public static Dictionary<BlueprintRef, string> Helm
         {
             get
             {
@@ -39,13 +39,13 @@ namespace VisualAdjustments
                 return m_Helm;
             }
         }
-        public static UnorderedList<BlueprintRef, string> Glasses {
+        public static Dictionary<BlueprintRef, string> Glasses {
             get {
                 if (!loaded) Init();
                 return m_Glasses;
             }
         }
-        public static UnorderedList<BlueprintRef, string> Shirt 
+        public static Dictionary<BlueprintRef, string> Shirt 
             {
             get
             {
@@ -53,7 +53,7 @@ namespace VisualAdjustments
                 return m_Shirt;
             }
         }
-        public static UnorderedList<BlueprintRef, string> Armor
+        public static Dictionary<BlueprintRef, string> Armor
         {
             get
             {
@@ -61,7 +61,7 @@ namespace VisualAdjustments
                 return m_Armor;
             }
         }
-        public static UnorderedList<BlueprintRef, string> Bracers
+        public static Dictionary<BlueprintRef, string> Bracers
         {
             get
             {
@@ -69,7 +69,7 @@ namespace VisualAdjustments
                 return m_Bracers;
             }
         }
-        public static UnorderedList<BlueprintRef, string> Gloves
+        public static Dictionary<BlueprintRef, string> Gloves
         {
             get
             {
@@ -77,7 +77,7 @@ namespace VisualAdjustments
                 return m_Gloves;
             }
         }
-        public static UnorderedList<BlueprintRef, string> Boots
+        public static Dictionary<BlueprintRef, string> Boots
         {
             get
             {
@@ -85,7 +85,7 @@ namespace VisualAdjustments
                 return m_Boots;
             }
         }
-        public static UnorderedList<ResourceRef, string> Units
+        public static Dictionary<ResourceRef, string> Units
         {
             get
             {
@@ -93,7 +93,7 @@ namespace VisualAdjustments
                 return m_Units; ;
             }
         }
-        public static SortedList<string, UnorderedList<BlueprintRef, string>> Weapons
+        public static Dictionary<string, Dictionary<BlueprintRef, string>> Weapons
         {
             get
             {
@@ -101,7 +101,7 @@ namespace VisualAdjustments
                 return m_Weapons;
             }
         }
-        public static UnorderedList<BlueprintRef, string> WeaponEnchantments
+        public static Dictionary<BlueprintRef, string> WeaponEnchantments
         {
             get
             {
@@ -109,7 +109,7 @@ namespace VisualAdjustments
                 return m_WeaponEnchantments;
             }
         }
-        public static UnorderedList<ResourceRef, string> Tattoos
+        public static Dictionary<ResourceRef, string> Tattoos
         {
             get
             {
@@ -123,17 +123,17 @@ namespace VisualAdjustments
                 return m_Tattoo;
             }
         }
-        private static UnorderedList<BlueprintRef, string> m_Helm = new UnorderedList<BlueprintRef, string>();
-        private static UnorderedList<BlueprintRef, string> m_Shirt = new UnorderedList<BlueprintRef, string>();
-        private static UnorderedList<BlueprintRef, string> m_Glasses = new UnorderedList<BlueprintRef, string>();
-        private static UnorderedList<BlueprintRef, string> m_Armor = new UnorderedList<BlueprintRef, string>();
-        private static UnorderedList<BlueprintRef, string> m_Bracers = new UnorderedList<BlueprintRef, string>();
-        private static UnorderedList<BlueprintRef, string> m_Gloves = new UnorderedList<BlueprintRef, string>();
-        private static UnorderedList<BlueprintRef, string> m_Boots = new UnorderedList<BlueprintRef, string>();
-        private static UnorderedList<ResourceRef, string> m_Tattoo = new UnorderedList<ResourceRef, string>();
-        private static UnorderedList<ResourceRef, string> m_Units = new UnorderedList<ResourceRef, string>();
-        private static UnorderedList<BlueprintRef, string> m_WeaponEnchantments = new UnorderedList<BlueprintRef, string>();
-        private static SortedList<string, UnorderedList<BlueprintRef, string>> m_Weapons = new SortedList<string, UnorderedList<BlueprintRef, string>>();
+        private static Dictionary<BlueprintRef, string> m_Helm = new Dictionary<BlueprintRef, string>();
+        private static Dictionary<BlueprintRef, string> m_Shirt = new Dictionary<BlueprintRef, string>();
+        private static Dictionary<BlueprintRef, string> m_Glasses = new Dictionary<BlueprintRef, string>();
+        private static Dictionary<BlueprintRef, string> m_Armor = new Dictionary<BlueprintRef, string>();
+        private static Dictionary<BlueprintRef, string> m_Bracers = new Dictionary<BlueprintRef, string>();
+        private static Dictionary<BlueprintRef, string> m_Gloves = new Dictionary<BlueprintRef, string>();
+        private static Dictionary<BlueprintRef, string> m_Boots = new Dictionary<BlueprintRef, string>();
+        private static Dictionary<ResourceRef, string> m_Tattoo = new Dictionary<ResourceRef, string>();
+        private static Dictionary<ResourceRef, string> m_Units = new Dictionary<ResourceRef, string>();
+        private static Dictionary<BlueprintRef, string> m_WeaponEnchantments = new Dictionary<BlueprintRef, string>();
+        private static Dictionary<string, Dictionary<BlueprintRef, string>> m_Weapons = new Dictionary<string, Dictionary<BlueprintRef, string>>();
         private static bool loaded = false;
         static void BuildEquipmentLookup()
         {
@@ -185,10 +185,10 @@ namespace VisualAdjustments
                 var visualParameters = bp.VisualParameters;
                 var animationStyle = visualParameters.AnimStyle.ToString();
                 if (bp.VisualParameters.Model == null) continue;
-                UnorderedList<BlueprintRef, string> eeList = null;
+                Dictionary<BlueprintRef, string> eeList = null;
                 if (!m_Weapons.ContainsKey(animationStyle))
                 {
-                    eeList = new UnorderedList<BlueprintRef, string>();
+                    eeList = new Dictionary<BlueprintRef, string>();
                     m_Weapons[animationStyle] = eeList;
                 }
                 else

@@ -40,10 +40,10 @@ namespace VisualAdjustments
                 return m_lookup;
             }
         }
-        private static UnorderedList<string, string> m_OrphanedKingmakerEquipment;
+        private static Dictionary<string, string> m_OrphanedKingmakerEquipment;
         private static string selectedKingmakerOrphanedEquipment = "";
-        private static UnorderedList<string, string> m_OrphanedMaleEquipment;
-        private static UnorderedList<string, string> m_OrphanedFemaleEquipment;
+        private static Dictionary<string, string> m_OrphanedMaleEquipment;
+        private static Dictionary<string, string> m_OrphanedFemaleEquipment;
         private static string selectedOrphanedEquipment = "";
         static BlueprintBuff[] blueprintBuffs = new BlueprintBuff[] { };
         static bool showWeapons = false;
@@ -219,7 +219,7 @@ namespace VisualAdjustments
                 using (StreamReader sr = new StreamReader(maleFilepath))
                 using (JsonTextReader reader = new JsonTextReader(sr))
                 {
-                    var result = serializer.Deserialize<UnorderedList<string, string>>(reader);
+                    var result = serializer.Deserialize<Dictionary<string, string>>(reader);
                     m_OrphanedMaleEquipment = result;
                     if(m_OrphanedMaleEquipment == null) Main.Log($"Error loading {maleFilepath}");
                 }
@@ -231,7 +231,7 @@ namespace VisualAdjustments
                 using (StreamReader sr = new StreamReader(femaleFilepath))
                 using (JsonTextReader reader = new JsonTextReader(sr))
                 {
-                    var result = serializer.Deserialize<UnorderedList<string, string>>(reader);
+                    var result = serializer.Deserialize<Dictionary<string, string>>(reader);
                     m_OrphanedFemaleEquipment = result;
                     if (m_OrphanedFemaleEquipment == null) Main.Log($"Error loading {femaleFilepath}");
                 }
@@ -262,8 +262,8 @@ namespace VisualAdjustments
                     }
                 }
 
-                m_OrphanedMaleEquipment = new UnorderedList<string, string>();
-                m_OrphanedFemaleEquipment = new UnorderedList<string, string>();
+                m_OrphanedMaleEquipment = new Dictionary<string, string>();
+                m_OrphanedFemaleEquipment = new Dictionary<string, string>();
                 foreach (var kv in LibraryThing.GetResourceGuidMap().OrderBy(kv => kv.Value))
                 {
                     if (eeBlacklist.Contains(kv.Key)) continue;
@@ -297,7 +297,7 @@ namespace VisualAdjustments
         }
         static void BuildOrphenedKingmakerEquipment()
         {
-            m_OrphanedKingmakerEquipment = new UnorderedList<string, string>();
+            m_OrphanedKingmakerEquipment = new Dictionary<string, string>();
             var itemLinks = EquipmentResourcesManager.Helm.Keys
                             .Concat(EquipmentResourcesManager.Shirt.Keys)
                             .Concat(EquipmentResourcesManager.Armor.Keys)

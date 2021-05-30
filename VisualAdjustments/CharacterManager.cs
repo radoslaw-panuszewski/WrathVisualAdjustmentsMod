@@ -4,6 +4,7 @@ using Kingmaker.Blueprints;
 using Kingmaker.Blueprints.Classes;
 using Kingmaker.Blueprints.Items.Equipment;
 using Kingmaker.Blueprints.Root;
+using Kingmaker.Cheats;
 using Kingmaker.EntitySystem.Entities;
 using Kingmaker.Items.Slots;
 using Kingmaker.PubSubSystem;
@@ -243,11 +244,11 @@ namespace VisualAdjustments
                     Settings.CharacterSettings characterSettings = Main.settings.GetCharacterSettings(view.EntityData);
                     if (characterSettings == null) return;
                     bool dirty = view.CharacterAvatar.IsDirty;
-                    if (view.EntityData.Descriptor.Doll == null && characterSettings.classOutfit != "Default")
+                    if (view.EntityData.Descriptor.Doll == null && characterSettings.classOutfit.Name != "Default")
                     {
                         ChangeCompanionOutfit(view, characterSettings);
                     }
-                    if (characterSettings.classOutfit == "None") NoClassOutfit(view);
+                    if (characterSettings.classOutfit.Name == "None") NoClassOutfit(view);
                     if (characterSettings.hideHelmet)
                     {
                         HideSlot(view, view.EntityData.Body.Head, ref dirty);
@@ -406,7 +407,7 @@ namespace VisualAdjustments
                 try
                 {
                     if (!Main.enabled) return;
-                    UpdateModel(__instance);
+                    ///UpdateModel(__instance);
                 }
                 catch (Exception ex)
                 {
@@ -470,7 +471,9 @@ namespace VisualAdjustments
                     if (!__instance.Owner.IsPlayerFaction) return true;
                     var characterSettings = Main.settings.GetCharacterSettings(__instance.Owner.Unit);
                     if (characterSettings == null) return true;
-                    switch (characterSettings.classOutfit)
+                    ///__result = Utilities.GetBlueprintByName<BlueprintCharacterClass>(characterSettings.classOutfit+"Class");
+                    __result = Utilities.GetBlueprintByGuid<BlueprintCharacterClass>(characterSettings.classOutfit.GUID);
+                    /*switch (characterSettings.classOutfit.Name)
                     {
                         case "Alchemist":
                             __result = (BlueprintCharacterClass)ResourcesLibrary.TryGetBlueprint<BlueprintCharacterClass>("0937bec61c0dabc468428f496580c721");
@@ -480,6 +483,9 @@ namespace VisualAdjustments
                             break;
                         case "Bard":
                             __result = (BlueprintCharacterClass)ResourcesLibrary.TryGetBlueprint<BlueprintCharacterClass>("772c83a25e2268e448e841dcd548235f");
+                            break;
+                        case "Cavalier":
+                            __result = (BlueprintCharacterClass)ResourcesLibrary.TryGetBlueprint<BlueprintCharacterClass>("3adc3439f98cb534ba98df59838f02c7");
                             break;
                         case "Cleric":
                             __result = (BlueprintCharacterClass)ResourcesLibrary.TryGetBlueprint<BlueprintCharacterClass>("67819271767a9dd4fbfd4ae700befea0");
@@ -502,6 +508,9 @@ namespace VisualAdjustments
                         case "Monk":
                             __result = (BlueprintCharacterClass)ResourcesLibrary.TryGetBlueprint<BlueprintCharacterClass>("e8f21e5b58e0569468e420ebea456124");
                             break;
+                        case "Oracle":
+                            __result = (BlueprintCharacterClass)ResourcesLibrary.TryGetBlueprint<BlueprintCharacterClass>("20ce9bf8af32bee4c8557a045ab499b1");
+                            break;
                         case "Paladin":
                             __result = (BlueprintCharacterClass)ResourcesLibrary.TryGetBlueprint<BlueprintCharacterClass>("bfa11238e7ae3544bbeb4d0b92e897ec");
                             break;
@@ -510,6 +519,12 @@ namespace VisualAdjustments
                             break;
                         case "Rogue":
                             __result = (BlueprintCharacterClass)ResourcesLibrary.TryGetBlueprint<BlueprintCharacterClass>("299aa766dee3cbf4790da4efb8c72484");
+                            break;
+                        case "Shaman":
+                            __result = (BlueprintCharacterClass)ResourcesLibrary.TryGetBlueprint<BlueprintCharacterClass>("145f1d3d360a7ad48bd95d392c81b38e");
+                            break;
+                        case "Skald":
+                            __result = (BlueprintCharacterClass)ResourcesLibrary.TryGetBlueprint<BlueprintCharacterClass>("6afa347d804838b48bda16acb0573dc0");
                             break;
                         case "Slayer":
                             __result = (BlueprintCharacterClass)ResourcesLibrary.TryGetBlueprint<BlueprintCharacterClass>("c75e0971973957d4dbad24bc7957e4fb");
@@ -522,7 +537,7 @@ namespace VisualAdjustments
                             break;
                         default:
                             return true;
-                    }
+                    }*/
                     if (__result == null) return true;
                     return false;
                 }
@@ -580,7 +595,7 @@ namespace VisualAdjustments
             {
                 ResourcesLibrary.PreloadResource<GameObject>(characterSettings.overrideView);
             }
-            if (characterSettings.classOutfit == "None")
+            if (characterSettings.classOutfit.Name == "None")
             {
                 var clothes = gender == Gender.Male ? BlueprintRoot.Instance.CharGen.MaleClothes : BlueprintRoot.Instance.CharGen.FemaleClothes;
                 foreach (var clothing in clothes) clothing.Preload();
