@@ -114,7 +114,7 @@ namespace VisualAdjustments
                             }
                         }
                     }
-                } catch(Exception ex)
+                } catch (Exception ex)
                 {
                     Main.Error(ex);
                 }
@@ -153,7 +153,7 @@ namespace VisualAdjustments
                             WeaponEnchantments[__instance.Slot.MaybeItem].Add(fxObject);
                         }
                     }
-                } catch(Exception ex)
+                } catch (Exception ex)
                 {
                     Main.Error(ex);
                 }
@@ -178,7 +178,7 @@ namespace VisualAdjustments
                     }
                     WeaponEnchantments[__instance.Slot.MaybeItem].Clear();
                     WeaponEnchantments.Remove(__instance.Slot.MaybeItem);
-                } catch(Exception ex)
+                } catch (Exception ex)
                 {
                     Main.Error(ex);
                 }
@@ -196,10 +196,10 @@ namespace VisualAdjustments
                     var characterSettings = Main.settings.GetCharacterSettings(__instance.Owner);
                     if (characterSettings == null) return;
                     if (__instance.Slot.MaybeItem == null) return;
-                    if (characterSettings.hideWeaponEnchantments)
-                    {
-
-                    }
+                     if (characterSettings.hideWeaponEnchantments)
+                     {
+                            __instance.VisibleItem.Enchantments.Clear();
+                     }
                 }
                 catch (Exception ex)
                 {
@@ -207,5 +207,17 @@ namespace VisualAdjustments
                 }
             }
         }
+      /*  [HarmonyPatch(typeof(UnitViewHandSlotData), "UpdateWeaponEnchantmentFx")]
+        static class UnitViewHandSlotData_UpdateWeaponEnchantmentFx_Patch
+        {
+            static void Postfix(UnitViewHandSlotData __instance, ref List<ItemEnchantment> ___m_VisibleEnchantments)
+            {
+                try
+                {
+
+                }
+                catch(Exception e) { Main.logger.Log(e.ToString()); }
+            }
+        }*/
     }
 }

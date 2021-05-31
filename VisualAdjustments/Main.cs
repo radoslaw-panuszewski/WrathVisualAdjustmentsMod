@@ -117,7 +117,7 @@ namespace VisualAdjustments
         {
             if(classes.Count == 0)
             {
-                Main.logger.Log("bru");
+                ///Main.logger.Log("bru");
                 foreach (BlueprintCharacterClass c in Utilities.GetScriptableObjects<BlueprintCharacterClass>())
                 {
                     if (!c.PrestigeClass && c.ComponentsArray.Length != 0 && !c.IsMythic && !c.ToString().Contains("Mythic") && !c.ToString().Contains("Animal") && !c.ToString().Contains("Scion"))
@@ -160,12 +160,11 @@ namespace VisualAdjustments
             {
                 if (!enabled) return;
                 Asd();
-                Main.logger.Log("joe bidän");
-                Main.logger.Log(classes.Count.ToString());
-                foreach(CharInfo s in classes)
+                ///Main.logger.Log(classes.Count.ToString());
+                /*foreach(CharInfo s in classes)
                 {
                     Main.logger.Log(s.Name + s.GUID);
-                }
+                }*/
 
                 if (Game.Instance.Player.PartyCharacters != null)
                 {
@@ -176,6 +175,10 @@ namespace VisualAdjustments
                         {
                             characterSettings = new CharacterSettings();
                             characterSettings.characterName = unitEntityData.CharacterName;
+                            var chinf = new CharInfo();
+                            chinf.Name = "Default";
+                            chinf.GUID = unitEntityData.Descriptor.Progression.GetEquipmentClass().AssetGuid;
+                            characterSettings.classOutfit = chinf;
                             settings.AddCharacterSettings(unitEntityData, characterSettings);
                         }
                         GUILayout.Space(4f);

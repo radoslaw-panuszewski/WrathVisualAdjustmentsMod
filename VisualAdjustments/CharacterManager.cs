@@ -50,7 +50,7 @@ namespace VisualAdjustments
                 doll.ApplyRampIndices(character);
                 Traverse.Create(unitEntityData.View).Field("m_EquipmentClass").SetValue(null); //UpdateClassEquipment won't update if the class doesn't change
                 //Adds Armor
-               unitEntityData.View.UpdateBodyEquipmentModel();
+                unitEntityData.View.UpdateBodyEquipmentModel();
                 unitEntityData.View.UpdateClassEquipment();
             } 
             else
@@ -407,7 +407,7 @@ namespace VisualAdjustments
                 try
                 {
                     if (!Main.enabled) return;
-                    ///UpdateModel(__instance);
+                    UpdateModel(__instance);
                 }
                 catch (Exception ex)
                 {
@@ -428,7 +428,7 @@ namespace VisualAdjustments
                 try
                 {
                     if (!Main.enabled) return;
-                UpdateModel(__instance);
+                    UpdateModel(__instance);
                 }
                 catch (Exception ex)
                 {
@@ -608,8 +608,12 @@ namespace VisualAdjustments
             {
                 try
                 {
-                    foreach (UnitEntityData unitEntityData in Game.Instance.State.Units)
+                    foreach (UnitEntityData unitEntityData in Game.Instance.Player.AllCharacters)
                     {
+                        if(Main.settings.GetCharacterSettings(unitEntityData).classOutfit != null)
+                        {
+                            Main.settings.GetCharacterSettings(unitEntityData).classOutfit.Name = "Default";
+                        }
                         PreloadUnit(unitEntityData.View);
                     }
                 }
@@ -629,7 +633,7 @@ namespace VisualAdjustments
                    if (!Main.enabled) return;
                    if (!Main.settings.rebuildCharacters) return;
                    Main.Log("Rebuilding characters");
-                   foreach (var character in Game.Instance.Player.Party)
+                   foreach (UnitEntityData character in Game.Instance.Player.AllCharacters)
                    {
                        RebuildCharacter(character);
                        UpdateModel(character.View);
