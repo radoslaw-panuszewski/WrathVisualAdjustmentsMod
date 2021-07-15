@@ -1,12 +1,15 @@
-﻿using Kingmaker.Blueprints;
+﻿using HarmonyLib;
+using Kingmaker.Blueprints;
 using Kingmaker.Blueprints.CharGen;
 using Kingmaker.Blueprints.Classes;
 using Kingmaker.Blueprints.Root;
+using Kingmaker.Cheats;
 using Kingmaker.EntitySystem.Entities;
 using Kingmaker.ResourceLinks;
 using Kingmaker.UnitLogic.Class.LevelUp;
 using Kingmaker.Visual.Sound;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace VisualAdjustments
 {
@@ -66,9 +69,12 @@ namespace VisualAdjustments
         }
         static private void Init()
         {
-            var races = BluePrintThing.GetBlueprints<BlueprintRace>();
+            var races = Utilities.GetScriptableObjects<BlueprintRace>();
+            var racePresets = Utilities.GetScriptableObjects<BlueprintRaceVisualPreset>();
+            var classes = Utilities.GetScriptableObjects<BlueprintCharacterClass>();
+           /* var races = BluePrintThing.GetBlueprints<BlueprintRace>();
             var racePresets = BluePrintThing.GetBlueprints<BlueprintRaceVisualPreset>();
-            var classes = BluePrintThing.GetBlueprints<BlueprintCharacterClass>();
+            var classes = BluePrintThing.GetBlueprints<BlueprintCharacterClass>();*/
             foreach (var race in races)
             {
                 foreach (var gender in new Gender[] { Gender.Male, Gender.Female })
@@ -101,7 +107,8 @@ namespace VisualAdjustments
                     }
                 }
             }
-            foreach(var bp in BluePrintThing.GetBlueprints<BlueprintPortrait>())
+            ///foreach(var bp in BluePrintThing.GetBlueprints<BlueprintPortrait>())
+            foreach(var bp in Utilities.GetScriptableObjects<BlueprintPortrait>())
             {
                 //Note there are two wolf portraits
                 if (bp == BlueprintRoot.Instance.CharGen.CustomPortrait || bp.Data.IsCustom)
@@ -111,7 +118,8 @@ namespace VisualAdjustments
                 if (!portraits.ContainsKey(bp.name)) portraits.Add(bp.name, bp);
             }
             customPortraits.AddRange(CustomPortraitsManager.Instance.GetExistingCustomPortraitIds());
-            foreach (var bp in BluePrintThing.GetBlueprints<BlueprintUnitAsksList>())
+            ///foreach (var bp in BluePrintThing.GetBlueprints<BlueprintUnitAsksList>())
+            foreach(var bp in Utilities.GetScriptableObjects<BlueprintUnitAsksList>())
             {
                 var component = bp.GetComponent<UnitAsksComponent>();
                 if (component == null) continue;
@@ -143,17 +151,22 @@ namespace VisualAdjustments
             if (classOutfits.ContainsKey(assetID)) return "ClassOutfit";
             return "Unknown";
         }
-        static private DollState CreateDollState(UnitEntityData unitEntityData)
+        static public DollState CreateDollState(UnitEntityData unitEntityData)
         {
-            var dollState = new DollState();
+            var asd = Utilities.GetScriptableObjects<BlueprintRaceVisualPreset>().ToArray().FirstOrDefault(a => a.RaceId == unitEntityData.Progression.Race.RaceId);
             var dollData = unitEntityData.Descriptor.Doll;
-            dollState.SetRace(unitEntityData.Descriptor.Progression.Race); //Race must be set before class
+            var dollState = new DollState
+            {
+                RacePreset = asd,
+            };
+            dollState.SetupFromUnit(unitEntityData);
+            dollState.SetRace(unitEntityData.Progression.Race); //Race must be set before class
             //This is a hack to work around harmony not allowing calls to the unpatched method
             CharacterManager.disableEquipmentClassPatch = true; 
             dollState.SetClass(unitEntityData.Descriptor.Progression.GetEquipmentClass());
             CharacterManager.disableEquipmentClassPatch = false;
             dollState.SetGender(dollData.Gender);
-            dollState.SetRacePreset(dollData.RacePreset);
+            dollState.SetRacePreset(asd);
             unitEntityData.Descriptor.LeftHandedOverride = true;
 
             dollState.SetEquipColors(dollData.ClothesPrimaryIndex, dollData.ClothesSecondaryIndex);

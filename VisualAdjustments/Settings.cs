@@ -1,4 +1,5 @@
-﻿using Kingmaker.EntitySystem.Entities;
+﻿using Kingmaker.Blueprints.Classes;
+using Kingmaker.EntitySystem.Entities;
 using Kingmaker.Enums;
 using Newtonsoft.Json;
 using System;
@@ -12,9 +13,11 @@ namespace VisualAdjustments
     public class Settings : UnityModManager.ModSettings
     {
         public bool rebuildCharacters = true;
+        public bool AllPortraits = false;
         public class CharacterSettings
         {
             public string characterName = "";
+            public string uniqueid = "";
             public bool showClassSelection = false;
             public bool showDollSelection = false;
             public bool showEquipmentSelection = false;
@@ -37,6 +40,16 @@ namespace VisualAdjustments
             public bool hideGlasses = false;
             public bool hideShirt = false;
             public bool ReloadStuff = false;
+            public int RaceIndex = -1;
+            public int Face = -1;
+            public int Hair = -1;
+            public int Beards = -1;
+            public int HairColor = -1;
+            public int SkinColor = -1;
+            public int Horns = -1;
+            public int HornsColor = -1;
+            public int PrimaryColor = -1;
+            public int SecondaryColor = -1;
 
             public BlueprintRef overrideHelm = null;
             public BlueprintRef overrideShirt = null;
@@ -67,7 +80,7 @@ namespace VisualAdjustments
             public int companionSecondary = -1;
         }
         [JsonProperty]
-        private Dictionary<string, CharacterSettings> characterSettings = new Dictionary<string, CharacterSettings>();
+        public Dictionary<string, CharacterSettings> characterSettings = new Dictionary<string, CharacterSettings>();
         public override void Save(UnityModManager.ModEntry modEntry)
         {
             var filepath = Path.Combine(modEntry.Path, "Settings.json");

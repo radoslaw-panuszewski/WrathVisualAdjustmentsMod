@@ -34,7 +34,7 @@ namespace VisualAdjustments
             {"5a791c1b0bacee3459d7f5137fa0bd5f", "BuffWingsDraconicSilver"},
             {"381a168acd79cd54baf87a17ca861d9b", "BuffWingsDraconicWhite"},
         };
-        [HarmonyPatch(typeof(Buff), "SpawnParticleEffect")]
+        [HarmonyPatch(typeof(Buff), "TrySpawnParticleEffect")]
         static class Buff_SpawnParticleEffect_Patch
         {
             static bool Prefix(Buff __instance)
@@ -184,8 +184,46 @@ namespace VisualAdjustments
                 }
             }
         }
-        [HarmonyPatch(typeof(UnitViewHandSlotData), "RecreateModel")]
-        static class UnitViewHandSlotData_RecreateModel_Patch
+        [HarmonyPatch(typeof(UnitViewHandSlotData), "UpdateWeaponEnchantmentFx")]
+        static class UpdateWeaponEnchantmentFx_Patch
+        {
+            static bool Prefix(UnitViewHandSlotData __instance, ref bool isVisible)
+            {
+                try
+                {
+                    if (Main.enabled)
+                    {
+                        if (__instance.Owner.IsPlayerFaction)
+                        {
+                            var characterSettings = Main.settings.GetCharacterSettings(__instance.Owner);
+                            if (characterSettings != null)
+                            {
+                                if (characterSettings.hideWeaponEnchantments)
+                                {
+                                    __instance.Slot.FxSnapMap = null;
+                                    foreach (ItemEnchantment e in __instance.VisibleItem.Enchantments)
+                                    {
+
+                                        e.DestroyFx();
+                                    }
+                                    return false;
+                                }
+                                else return true;
+                            }
+                            else return true;
+                        }
+                        else return true;
+                    }
+                    else return true;
+                }
+                catch (Exception ex)
+                {
+                    Main.Error(ex);
+                    return true;
+                }
+            }
+        }
+        /*static class UnitViewHandSlotData_RecreateModel_Patch
         {
             static void Postfix(UnitViewHandSlotData __instance)
             {
@@ -198,7 +236,7 @@ namespace VisualAdjustments
                     if (__instance.Slot.MaybeItem == null) return;
                      if (characterSettings.hideWeaponEnchantments)
                      {
-                            __instance.VisibleItem.Enchantments.Clear();
+
                      }
                 }
                 catch (Exception ex)
@@ -206,7 +244,7 @@ namespace VisualAdjustments
                     Main.Error(ex);
                 }
             }
-        }
+        }*/
       /*  [HarmonyPatch(typeof(UnitViewHandSlotData), "UpdateWeaponEnchantmentFx")]
         static class UnitViewHandSlotData_UpdateWeaponEnchantmentFx_Patch
         {

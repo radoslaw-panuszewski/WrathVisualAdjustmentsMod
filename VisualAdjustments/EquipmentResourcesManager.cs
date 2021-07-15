@@ -8,6 +8,7 @@ using static Kingmaker.UI.Common.ItemsFilter;
 using Kingmaker.BundlesLoading;
 using UnityEngine;
 using Kingmaker.Cheats;
+using Kingmaker.Visual.CharacterSystem;
 
 namespace VisualAdjustments
 {
@@ -137,7 +138,54 @@ namespace VisualAdjustments
         private static bool loaded = false;
         static void BuildEquipmentLookup()
         {
-            var blueprints = BluePrintThing.GetBlueprints<BlueprintItemEquipment>()
+            var blueprints = Utilities.GetScriptableObjects<KingmakerEquipmentEntity>().OrderBy(bp => bp.name);
+            /// var blueprints = BluePrintThing.GetBlueprints<BlueprintItemEquipment>()
+            foreach (var bp in blueprints)
+            {
+                if(bp.name.Contains("Goggles"))
+                {
+                    if (!m_Glasses.ContainsKey(bp.AssetGuid))
+                    m_Glasses[bp.AssetGuid] = bp.name;
+                }
+                else if (bp.name.Contains("Helmet"))
+                {
+                    if (!m_Helm.ContainsKey(bp.AssetGuid))
+                        m_Helm[bp.AssetGuid] = bp.name;
+                }
+                else if (bp.name.Contains("Shirt") || bp.name.Contains("Robe")||bp.name.Contains("Tabard"))
+                {
+                    if (!m_Shirt.ContainsKey(bp.AssetGuid))
+                        m_Shirt[bp.AssetGuid] = bp.name;
+                }
+                else if (bp.name.Contains("Armor"))
+                {
+                    if (!m_Armor.ContainsKey(bp.AssetGuid))
+                        m_Armor[bp.AssetGuid] = bp.name;
+                    if (!m_Glasses.ContainsKey(bp.AssetGuid))
+                        m_Glasses[bp.AssetGuid] = bp.name;
+                }
+                else if (bp.name.Contains("Bracers"))
+                {
+                    if (!m_Bracers.ContainsKey(bp.AssetGuid))
+                        m_Bracers[bp.AssetGuid] = bp.name;
+                }
+                else if (bp.name.Contains("Gloves"))
+                {
+                    if (!m_Gloves.ContainsKey(bp.AssetGuid))
+                        m_Gloves[bp.AssetGuid] = bp.name;
+                }
+                else if (bp.name.Contains("Boots"))
+                {
+                    if (!m_Boots.ContainsKey(bp.AssetGuid))
+                        m_Boots[bp.AssetGuid] = bp.name;
+                }
+            }
+        }
+            static void BuildEquipmentLookupOld()
+            {
+            var bp2 = Utilities.GetScriptableObjects<KingmakerEquipmentEntity>().OrderBy(bp => bp.name);
+           /// var blueprints = BluePrintThing.GetBlueprints<BlueprintItemEquipment>()
+           var blueprints = Utilities.GetScriptableObjects<BlueprintItemEquipment>()
                 .Where(bp => bp.EquipmentEntity != null)
                 .OrderBy(bp => bp.EquipmentEntity.name);
             foreach (var bp in blueprints)
@@ -179,7 +227,8 @@ namespace VisualAdjustments
         }
         static void BuildWeaponLookup()
         {
-            var weapons = BluePrintThing.GetBlueprints<BlueprintItemEquipmentHand>().OrderBy((bp) => bp.name);
+            ///var weapons = BluePrintThing.GetBlueprints<BlueprintItemEquipmentHand>().OrderBy((bp) => bp.name);
+            var weapons = Utilities.GetScriptableObjects<BlueprintItemEquipmentHand>().OrderBy((bp) => bp.name);
             foreach (var bp in weapons)
             {
                 var visualParameters = bp.VisualParameters;
@@ -204,7 +253,8 @@ namespace VisualAdjustments
         }
         static void BuildWeaponEnchantmentLookup()
         {
-            var enchantments = BluePrintThing.GetBlueprints<BlueprintWeaponEnchantment>()
+            ///var enchantments = BluePrintThing.GetBlueprints<BlueprintWeaponEnchantment>()
+            var enchantments = Utilities.GetScriptableObjects<BlueprintWeaponEnchantment>()
                     .Where(bp => bp.WeaponFxPrefab != null)
                     .OrderBy(bp => bp.WeaponFxPrefab.name);
             HashSet<int> seen = new HashSet<int>();
@@ -221,11 +271,13 @@ namespace VisualAdjustments
         {
             string getViewName(BlueprintUnit bp)
             {
+                return bp.NameForAcronym;
                 if (!LibraryThing.GetResourceGuidMap().ContainsKey(bp.Prefab.AssetId)) return "NULL";
                 var path = LibraryThing.GetResourceGuidMap()[bp.Prefab.AssetId].Split('/');
                 return path[path.Length - 1];
             }
-            var units = BluePrintThing.GetBlueprints<BlueprintUnit>().OrderBy(getViewName);
+            var units = Utilities.GetScriptableObjects<BlueprintUnit>().OrderBy(getViewName);
+            ///var units = BluePrintThing.GetBlueprints<BlueprintUnit>().OrderBy(getViewName);
             foreach (var bp in units)
             {
                 if (bp.Prefab.AssetId == "") continue;
