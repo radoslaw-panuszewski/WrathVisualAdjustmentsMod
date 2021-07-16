@@ -9,7 +9,9 @@ using Kingmaker.Designers;
 using Kingmaker.EntitySystem.Entities;
 using Kingmaker.Items.Slots;
 using Kingmaker.ResourceLinks;
+using Kingmaker.UnitLogic;
 using Kingmaker.UnitLogic.Buffs.Blueprints;
+using Kingmaker.UnitLogic.Parts;
 using Kingmaker.View;
 using Kingmaker.View.Equipment;
 using Kingmaker.Visual.CharacterSystem;
@@ -86,9 +88,9 @@ namespace VisualAdjustments
             /*var races = BluePrintThing.GetBlueprints<BlueprintRace>();
             var racePresets = BluePrintThing.GetBlueprints<BlueprintRaceVisualPreset>();
             var classes = BluePrintThing.GetBlueprints<BlueprintCharacterClass>();*/
-            var races = Utilities.GetScriptableObjects<BlueprintRace>();
-            var racePresets = Utilities.GetScriptableObjects<BlueprintRaceVisualPreset>();
-            var classes = Utilities.GetScriptableObjects<BlueprintCharacterClass>();
+            var races = Main.blueprints.OfType<BlueprintRace>();
+            var racePresets = Main.blueprints.OfType<BlueprintRaceVisualPreset>();
+            var classes = Main.blueprints.OfType<BlueprintCharacterClass>();
 
             foreach (var race in races)
             {
@@ -121,7 +123,7 @@ namespace VisualAdjustments
                 }
             }
             ///var gear = BluePrintThing.GetBlueprints<KingmakerEquipmentEntity>();
-            var gear = Utilities.GetScriptableObjects<KingmakerEquipmentEntity>();
+            var gear = Main.blueprints.OfType<KingmakerEquipmentEntity>();
             foreach (var race in races)
             {
                 foreach (var gender in new Gender[] { Gender.Male, Gender.Female })
@@ -133,7 +135,7 @@ namespace VisualAdjustments
                 }
             }
             ///blueprintBuffs = BluePrintThing.GetBlueprints<BlueprintBuff>().ToArray();
-            blueprintBuffs = Utilities.GetScriptableObjects<BlueprintBuff>().ToArray();
+            blueprintBuffs = Main.blueprints.OfType<BlueprintBuff>().ToArray();
         }
             public static void ShowInfo(UnitEntityData unitEntityData)
                 {;
@@ -252,7 +254,7 @@ namespace VisualAdjustments
                     foreach (var race in BlueprintRoot.Instance.Progression.CharacterRaces)
                     {
                         ///var armorLinks = BluePrintThing.GetBlueprints<KingmakerEquipmentEntity>()
-                        var armorLinks = Utilities.GetScriptableObjects<KingmakerEquipmentEntity>()
+                        var armorLinks = Main.blueprints.OfType<KingmakerEquipmentEntity>()
                             .SelectMany(kee => kee.GetLinks(gender, race.RaceId));
                         var options = gender == Gender.Male ? race.MaleOptions : race.FemaleOptions;
                         var links = race.Presets
@@ -315,11 +317,11 @@ namespace VisualAdjustments
                             .Distinct()
                             .ToDictionary(key => key);
             ///foreach (var kee in BluePrintThing.GetBlueprints<KingmakerEquipmentEntity>())
-            foreach(var kee in Utilities.GetScriptableObjects<KingmakerEquipmentEntity>())
+            foreach(var kee in Main.blueprints.OfType<KingmakerEquipmentEntity>())
             {
-                if (!itemLinks.ContainsKey(kee.AssetGuid))
+                if (!itemLinks.ContainsKey(kee.AssetGuidThreadSafe))
                 {
-                    m_OrphanedKingmakerEquipment[kee.AssetGuid] = kee.name;
+                    m_OrphanedKingmakerEquipment[kee.AssetGuidThreadSafe] = kee.name;
                 }
             }
         }
@@ -456,7 +458,7 @@ namespace VisualAdjustments
             GUILayout.Label($"Current Asks: {asks?.name}, Display: {asks?.DisplayName}", GUILayout.Width(200f));
             GUILayout.Label($"Current CustomAsks: {customAsks?.name}, Display: {customAsks?.DisplayName}", GUILayout.Width(200f));
             GUILayout.Label($"Current OverrideAsks: {overrideAsks?.name}, Display: {overrideAsks?.DisplayName}", GUILayout.Width(200f));
-            foreach (var blueprint in Utilities.GetScriptableObjects<BlueprintUnitAsksList>())
+            foreach (var blueprint in Main.blueprints.OfType<BlueprintUnitAsksList>())
             {
                 GUILayout.Label($"Asks: {blueprint}, Display: {blueprint.DisplayName}", GUILayout.Width(200f));
             }
@@ -569,8 +571,9 @@ namespace VisualAdjustments
         }
         static void ShowDollInfo(UnitEntityData unitEntityData)
         {
-            var doll = unitEntityData.Descriptor.Doll;
-            if(doll == null)
+            ///var doll = unitEntityData.Descriptor.m_LoadedDollData;
+            var doll = unitEntityData.Parts.Get<UnitPartDollData>().ActiveDoll;
+            if (doll == null)
             {
                 GUILayout.Label("No Doll", GUILayout.Width(200f));
                 return;

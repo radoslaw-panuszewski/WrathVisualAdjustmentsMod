@@ -27,7 +27,7 @@ namespace VisualAdjustments
         // Token: 0x06000053 RID: 83 RVA: 0x000039A0 File Offset: 0x00001BA0
         public static TBlueprint[] GetBlueprints<TBlueprint>() where TBlueprint : BlueprintScriptableObject
         {
-          return  Utilities.GetScriptableObjects<TBlueprint>().ToArray();
+          return  Main.blueprints.OfType<TBlueprint>().ToArray();
         }
     }
     public class EquipmentResourcesManager
@@ -38,6 +38,14 @@ namespace VisualAdjustments
             {
                 if (!loaded) Init();
                 return m_Helm;
+            }
+        }
+        public static Dictionary<BlueprintRef, string> Cloak
+        {
+            get
+            {
+                if (!loaded) Init();
+                return m_Cloak;
             }
         }
         public static Dictionary<BlueprintRef, string> Glasses {
@@ -124,6 +132,7 @@ namespace VisualAdjustments
                 return m_Tattoo;
             }
         }
+        private static Dictionary<BlueprintRef, string> m_Cloak = new Dictionary<BlueprintRef, string>();
         private static Dictionary<BlueprintRef, string> m_Helm = new Dictionary<BlueprintRef, string>();
         private static Dictionary<BlueprintRef, string> m_Shirt = new Dictionary<BlueprintRef, string>();
         private static Dictionary<BlueprintRef, string> m_Glasses = new Dictionary<BlueprintRef, string>();
@@ -138,54 +147,59 @@ namespace VisualAdjustments
         private static bool loaded = false;
         static void BuildEquipmentLookup()
         {
-            var blueprints = Utilities.GetScriptableObjects<KingmakerEquipmentEntity>().OrderBy(bp => bp.name);
+            var blueprints = Main.blueprints.OfType<KingmakerEquipmentEntity>().OrderBy(bp => bp.name);
             /// var blueprints = BluePrintThing.GetBlueprints<BlueprintItemEquipment>()
             foreach (var bp in blueprints)
             {
                 if(bp.name.Contains("Goggles"))
                 {
-                    if (!m_Glasses.ContainsKey(bp.AssetGuid))
-                    m_Glasses[bp.AssetGuid] = bp.name;
+                    if (!m_Glasses.ContainsKey(bp.AssetGuidThreadSafe))
+                    m_Glasses[bp.AssetGuidThreadSafe] = bp.name;
                 }
-                else if (bp.name.Contains("Helmet"))
+                else if (bp.name.Contains("Helmet") || bp.name.Contains("Headband"))
                 {
-                    if (!m_Helm.ContainsKey(bp.AssetGuid))
-                        m_Helm[bp.AssetGuid] = bp.name;
+                    if (!m_Helm.ContainsKey(bp.AssetGuidThreadSafe))
+                        m_Helm[bp.AssetGuidThreadSafe] = bp.name;
                 }
                 else if (bp.name.Contains("Shirt") || bp.name.Contains("Robe")||bp.name.Contains("Tabard"))
                 {
-                    if (!m_Shirt.ContainsKey(bp.AssetGuid))
-                        m_Shirt[bp.AssetGuid] = bp.name;
+                    if (!m_Shirt.ContainsKey(bp.AssetGuidThreadSafe))
+                        m_Shirt[bp.AssetGuidThreadSafe] = bp.name;
                 }
                 else if (bp.name.Contains("Armor"))
                 {
-                    if (!m_Armor.ContainsKey(bp.AssetGuid))
-                        m_Armor[bp.AssetGuid] = bp.name;
-                    if (!m_Glasses.ContainsKey(bp.AssetGuid))
-                        m_Glasses[bp.AssetGuid] = bp.name;
+                    if (!m_Armor.ContainsKey(bp.AssetGuidThreadSafe))
+                        m_Armor[bp.AssetGuidThreadSafe] = bp.name;
+                    if (!m_Glasses.ContainsKey(bp.AssetGuidThreadSafe))
+                        m_Glasses[bp.AssetGuidThreadSafe] = bp.name;
                 }
                 else if (bp.name.Contains("Bracers"))
                 {
-                    if (!m_Bracers.ContainsKey(bp.AssetGuid))
-                        m_Bracers[bp.AssetGuid] = bp.name;
+                    if (!m_Bracers.ContainsKey(bp.AssetGuidThreadSafe))
+                        m_Bracers[bp.AssetGuidThreadSafe] = bp.name;
                 }
                 else if (bp.name.Contains("Gloves"))
                 {
-                    if (!m_Gloves.ContainsKey(bp.AssetGuid))
-                        m_Gloves[bp.AssetGuid] = bp.name;
+                    if (!m_Gloves.ContainsKey(bp.AssetGuidThreadSafe))
+                        m_Gloves[bp.AssetGuidThreadSafe] = bp.name;
                 }
                 else if (bp.name.Contains("Boots"))
                 {
-                    if (!m_Boots.ContainsKey(bp.AssetGuid))
-                        m_Boots[bp.AssetGuid] = bp.name;
+                    if (!m_Boots.ContainsKey(bp.AssetGuidThreadSafe))
+                        m_Boots[bp.AssetGuidThreadSafe] = bp.name;
+                }
+                else if(bp.name.Contains("Cape"))
+                {
+                    if (!m_Cloak.ContainsKey(bp.AssetGuidThreadSafe))
+                        m_Cloak[bp.AssetGuidThreadSafe] = bp.name;
                 }
             }
         }
             static void BuildEquipmentLookupOld()
             {
-            var bp2 = Utilities.GetScriptableObjects<KingmakerEquipmentEntity>().OrderBy(bp => bp.name);
+            var bp2 = Main.blueprints.OfType<KingmakerEquipmentEntity>().OrderBy(bp => bp.name);
            /// var blueprints = BluePrintThing.GetBlueprints<BlueprintItemEquipment>()
-           var blueprints = Utilities.GetScriptableObjects<BlueprintItemEquipment>()
+           var blueprints = Main.blueprints.OfType<BlueprintItemEquipment>()
                 .Where(bp => bp.EquipmentEntity != null)
                 .OrderBy(bp => bp.EquipmentEntity.name);
             foreach (var bp in blueprints)
@@ -193,32 +207,32 @@ namespace VisualAdjustments
                 switch (bp.ItemType)
                 {
                     case ItemType.Glasses:
-                        if (m_Helm.ContainsKey(bp.EquipmentEntity.AssetGuid)) break;
-                        m_Glasses[bp.EquipmentEntity.AssetGuid] = bp.EquipmentEntity.name;
+                        if (m_Helm.ContainsKey(bp.EquipmentEntity.AssetGuidThreadSafe)) break;
+                        m_Glasses[bp.EquipmentEntity.AssetGuidThreadSafe] = bp.EquipmentEntity.name;
                         break;
                     case ItemType.Head:
-                        if (m_Helm.ContainsKey(bp.EquipmentEntity.AssetGuid)) break;
-                        m_Helm[bp.EquipmentEntity.AssetGuid] = bp.EquipmentEntity.name;
+                        if (m_Helm.ContainsKey(bp.EquipmentEntity.AssetGuidThreadSafe)) break;
+                        m_Helm[bp.EquipmentEntity.AssetGuidThreadSafe] = bp.EquipmentEntity.name;
                         break;
                     case ItemType.Shirt:
-                        if (m_Shirt.ContainsKey(bp.EquipmentEntity.AssetGuid)) break;
-                        m_Shirt[bp.EquipmentEntity.AssetGuid] = bp.EquipmentEntity.name;
+                        if (m_Shirt.ContainsKey(bp.EquipmentEntity.AssetGuidThreadSafe)) break;
+                        m_Shirt[bp.EquipmentEntity.AssetGuidThreadSafe] = bp.EquipmentEntity.name;
                         break;
                     case ItemType.Armor:
-                        if (m_Armor.ContainsKey(bp.EquipmentEntity.AssetGuid)) break;
-                        m_Armor[bp.EquipmentEntity.AssetGuid] = bp.EquipmentEntity.name;
+                        if (m_Armor.ContainsKey(bp.EquipmentEntity.AssetGuidThreadSafe)) break;
+                        m_Armor[bp.EquipmentEntity.AssetGuidThreadSafe] = bp.EquipmentEntity.name;
                         break;
                     case ItemType.Wrist:
-                        if (m_Bracers.ContainsKey(bp.EquipmentEntity.AssetGuid)) break;
-                        m_Bracers[bp.EquipmentEntity.AssetGuid] = bp.EquipmentEntity.name;
+                        if (m_Bracers.ContainsKey(bp.EquipmentEntity.AssetGuidThreadSafe)) break;
+                        m_Bracers[bp.EquipmentEntity.AssetGuidThreadSafe] = bp.EquipmentEntity.name;
                         break;
                     case ItemType.Gloves:
-                        if (m_Gloves.ContainsKey(bp.EquipmentEntity.AssetGuid)) break;
-                        m_Gloves[bp.EquipmentEntity.AssetGuid] = bp.EquipmentEntity.name;
+                        if (m_Gloves.ContainsKey(bp.EquipmentEntity.AssetGuidThreadSafe)) break;
+                        m_Gloves[bp.EquipmentEntity.AssetGuidThreadSafe] = bp.EquipmentEntity.name;
                         break;
                     case ItemType.Feet:
-                        if (m_Boots.ContainsKey(bp.EquipmentEntity.AssetGuid)) break;
-                        m_Boots[bp.EquipmentEntity.AssetGuid] = bp.EquipmentEntity.name;
+                        if (m_Boots.ContainsKey(bp.EquipmentEntity.AssetGuidThreadSafe)) break;
+                        m_Boots[bp.EquipmentEntity.AssetGuidThreadSafe] = bp.EquipmentEntity.name;
                         break;
                     default:
                         break;
@@ -228,7 +242,7 @@ namespace VisualAdjustments
         static void BuildWeaponLookup()
         {
             ///var weapons = BluePrintThing.GetBlueprints<BlueprintItemEquipmentHand>().OrderBy((bp) => bp.name);
-            var weapons = Utilities.GetScriptableObjects<BlueprintItemEquipmentHand>().OrderBy((bp) => bp.name);
+            var weapons = Main.blueprints.OfType<BlueprintItemEquipmentHand>().OrderBy((bp) => bp.name);
             foreach (var bp in weapons)
             {
                 var visualParameters = bp.VisualParameters;
@@ -244,17 +258,17 @@ namespace VisualAdjustments
                 {
                     eeList = m_Weapons[animationStyle];
                 }
-                if (eeList.ContainsKey(bp.AssetGuid))
+                if (eeList.ContainsKey(bp.AssetGuidThreadSafe))
                 {
                     continue;
                 }
-                eeList[bp.AssetGuid] = bp.name;
+                eeList[bp.AssetGuidThreadSafe] = bp.name;
             }
         }
         static void BuildWeaponEnchantmentLookup()
         {
             ///var enchantments = BluePrintThing.GetBlueprints<BlueprintWeaponEnchantment>()
-            var enchantments = Utilities.GetScriptableObjects<BlueprintWeaponEnchantment>()
+            var enchantments = Main.blueprints.OfType<BlueprintWeaponEnchantment>()
                     .Where(bp => bp.WeaponFxPrefab != null)
                     .OrderBy(bp => bp.WeaponFxPrefab.name);
             HashSet<int> seen = new HashSet<int>();
@@ -264,7 +278,7 @@ namespace VisualAdjustments
                 seen.Add(enchantment.WeaponFxPrefab.GetInstanceID());
                 var name = enchantment.WeaponFxPrefab.name.Replace("00_WeaponBuff", "");
                 name = name.TrimEnd('_');
-                m_WeaponEnchantments[enchantment.AssetGuid] = name;
+                m_WeaponEnchantments[enchantment.AssetGuidThreadSafe] = name;
             }
         }
         static void BuildViewLookup()
@@ -276,7 +290,7 @@ namespace VisualAdjustments
                 var path = LibraryThing.GetResourceGuidMap()[bp.Prefab.AssetId].Split('/');
                 return path[path.Length - 1];
             }
-            var units = Utilities.GetScriptableObjects<BlueprintUnit>().OrderBy(getViewName);
+            var units = Main.blueprints.OfType<BlueprintUnit>().OrderBy(getViewName);
             ///var units = BluePrintThing.GetBlueprints<BlueprintUnit>().OrderBy(getViewName);
             foreach (var bp in units)
             {

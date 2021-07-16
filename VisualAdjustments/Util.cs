@@ -1,4 +1,7 @@
-﻿using Kingmaker.ResourceLinks;
+﻿using HarmonyLib;
+using Kingmaker.Blueprints;
+using Kingmaker.Blueprints.JsonSystem;
+using Kingmaker.ResourceLinks;
 using Kingmaker.Visual.CharacterSystem;
 using System;
 using System.Collections.Generic;
@@ -68,6 +71,16 @@ namespace VisualAdjustments
         public static void AddEquipmentEntities(this Character character, IEnumerable<EquipmentEntityLink> links, bool saved = false)
         {
             foreach (var eel in links) character.AddEquipmentEntity(eel);
+        }
+        /// thx to Vek17
+        public static SimpleBlueprint[] GetBlueprints()
+        {
+
+            var blueprints = (Dictionary<BlueprintGuid, BlueprintsCache.BlueprintCacheEntry>)AccessTools
+            .Field(typeof(BlueprintsCache), "m_LoadedBlueprints")
+            .GetValue(ResourcesLibrary.BlueprintsCache);
+            var keys = blueprints.Keys.ToArray();
+            return keys.Select(k => ResourcesLibrary.TryGetBlueprint(k)).ToArray();
         }
     }
 }

@@ -6,7 +6,9 @@ using Kingmaker.Blueprints.Root;
 using Kingmaker.Cheats;
 using Kingmaker.EntitySystem.Entities;
 using Kingmaker.ResourceLinks;
+using Kingmaker.UnitLogic;
 using Kingmaker.UnitLogic.Class.LevelUp;
+using Kingmaker.UnitLogic.Parts;
 using Kingmaker.Visual.Sound;
 using System.Collections.Generic;
 using System.Linq;
@@ -69,9 +71,9 @@ namespace VisualAdjustments
         }
         static private void Init()
         {
-            var races = Utilities.GetScriptableObjects<BlueprintRace>();
-            var racePresets = Utilities.GetScriptableObjects<BlueprintRaceVisualPreset>();
-            var classes = Utilities.GetScriptableObjects<BlueprintCharacterClass>();
+            var races = Main.blueprints.OfType<BlueprintRace>();
+            var racePresets = Main.blueprints.OfType<BlueprintRaceVisualPreset>();
+            var classes = Main.blueprints.OfType<BlueprintCharacterClass>();
            /* var races = BluePrintThing.GetBlueprints<BlueprintRace>();
             var racePresets = BluePrintThing.GetBlueprints<BlueprintRaceVisualPreset>();
             var classes = BluePrintThing.GetBlueprints<BlueprintCharacterClass>();*/
@@ -108,7 +110,7 @@ namespace VisualAdjustments
                 }
             }
             ///foreach(var bp in BluePrintThing.GetBlueprints<BlueprintPortrait>())
-            foreach(var bp in Utilities.GetScriptableObjects<BlueprintPortrait>())
+            foreach(var bp in Main.blueprints.OfType<BlueprintPortrait>())
             {
                 //Note there are two wolf portraits
                 if (bp == BlueprintRoot.Instance.CharGen.CustomPortrait || bp.Data.IsCustom)
@@ -119,7 +121,7 @@ namespace VisualAdjustments
             }
             customPortraits.AddRange(CustomPortraitsManager.Instance.GetExistingCustomPortraitIds());
             ///foreach (var bp in BluePrintThing.GetBlueprints<BlueprintUnitAsksList>())
-            foreach(var bp in Utilities.GetScriptableObjects<BlueprintUnitAsksList>())
+            foreach(var bp in Main.blueprints.OfType<BlueprintUnitAsksList>())
             {
                 var component = bp.GetComponent<UnitAsksComponent>();
                 if (component == null) continue;
@@ -131,7 +133,8 @@ namespace VisualAdjustments
         static public DollState GetDoll(UnitEntityData unitEntityData)
         {
             if (!loaded) Init();
-            if (unitEntityData.Descriptor.Doll == null) return null;
+            var doll = unitEntityData.Parts.Get<UnitPartDollData>().ActiveDoll;
+            if (doll == null) return null;
             if (!characterDolls.ContainsKey(unitEntityData.CharacterName))
             {
                 characterDolls[unitEntityData.CharacterName] = CreateDollState(unitEntityData);
@@ -153,8 +156,8 @@ namespace VisualAdjustments
         }
         static public DollState CreateDollState(UnitEntityData unitEntityData)
         {
-            var asd = Utilities.GetScriptableObjects<BlueprintRaceVisualPreset>().ToArray().FirstOrDefault(a => a.RaceId == unitEntityData.Progression.Race.RaceId);
-            var dollData = unitEntityData.Descriptor.Doll;
+            var asd = Main.blueprints.OfType<BlueprintRaceVisualPreset>().ToArray().FirstOrDefault(a => a.RaceId == unitEntityData.Progression.Race.RaceId);
+            var dollData = unitEntityData.Parts.Get<UnitPartDollData>().Default;
             var dollState = new DollState
             {
                 RacePreset = asd,

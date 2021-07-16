@@ -27,7 +27,7 @@ namespace VisualAdjustments
         public string assetId;
         public BlueprintRef(BlueprintScriptableObject blueprint)
         {
-            this.assetId = blueprint.AssetGuid;
+            this.assetId = blueprint.AssetGuidThreadSafe;
         }
         public BlueprintRef(string assetId)
         {

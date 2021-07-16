@@ -88,12 +88,16 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\RespecModRepo\RespecWrath\bin\Debug\0Harmony.dll</HintPath>
     </Reference>
+    <Reference Include="Assembly-CSharp, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>B:\Games\Steam\steamapps\common\Pathfinder Second Adventure Demo\Wrath_Data\Managed\Assembly-CSharp.dll</HintPath>
+    </Reference>
     <Reference Include="Assembly-CSharp-firstpass, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>B:\Games\Steam\steamapps\common\Pathfinder Second Adventure Demo\Wrath_Data\Managed\Assembly-CSharp-firstpass.dll</HintPath>
     </Reference>
     <Reference Include="Assembly-CSharp_public">
-      <HintPath>..\..\RespecModRepo\RespecWrath\lib\Assembly-CSharp_public.dll</HintPath>
+      <HintPath>..\lib\Assembly-CSharp_public.dll</HintPath>
     </Reference>
     <Reference Include="Aze.Publicise.MSBuild.Task, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>

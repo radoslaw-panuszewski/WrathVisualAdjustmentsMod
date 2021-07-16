@@ -10,6 +10,7 @@ using Kingmaker.Items.Slots;
 using Kingmaker.PubSubSystem;
 using Kingmaker.ResourceLinks;
 using Kingmaker.UnitLogic;
+using Kingmaker.UnitLogic.Parts;
 using Kingmaker.View;
 using Kingmaker.Visual.CharacterSystem;
 using System;
@@ -30,7 +31,8 @@ namespace VisualAdjustments
         public static void RebuildCharacter(UnitEntityData unitEntityData)
         {
             var Settings = Main.settings.GetCharacterSettings(unitEntityData);
-            if (unitEntityData.Descriptor.Doll == null && Settings.classOutfit.Name == "Default")
+            var doll = DollResourcesManager.GetDoll(unitEntityData).CreateData();
+            if (doll == null && Settings.classOutfit.Name == "Default")
             {
                 unitEntityData.Descriptor.ForcceUseClassEquipment = false;
                 Traverse.Create(unitEntityData.Descriptor).Field("UseClassEquipment").SetValue(false);
@@ -38,11 +40,10 @@ namespace VisualAdjustments
                 var character = unitEntityData.View.CharacterAvatar;
             ///Traverse.Create(unitEntityData.Descriptor).Field("UseClassEquipment").SetValue(true);
             if (character == null) return; // Happens when overriding view
-            if (unitEntityData.Descriptor.Doll != null)
+            if (doll != null)
             {
                 unitEntityData.Descriptor.ForcceUseClassEquipment = true;
                 Traverse.Create(unitEntityData.Descriptor).Field("UseClassEquipment").SetValue(true);
-                var doll = unitEntityData.Descriptor.Doll;
                 var savedEquipment = true;
               character.RemoveAllEquipmentEntities(savedEquipment);
                 if (doll.RacePreset != null)
@@ -107,7 +108,7 @@ namespace VisualAdjustments
             __instance.EntityData.Progression.Classes.Where(a => a.CharacterClass.HasEquipmentEntities()).Do(a => asd = a.CharacterClass.Name);
             ///Main.logger.Log(asd);
             FilterOutfit(asd);
-           /* switch (__instance.EntityData.Blueprint.AssetGuid)
+           /* switch (__instance.EntityData.Blueprint.AssetGuidThreadSafe)
             {
                 case "77c11edb92ce0fd408ad96b40fd27121": //"Linzi",
                     FilterOutfit("Bard");
@@ -202,7 +203,7 @@ namespace VisualAdjustments
             ///var _class = __instance.EntityData.Descriptor.Progression.GetEquipmentClass();
             var _class = ResourcesLibrary.TryGetBlueprint<BlueprintCharacterClass>(characterSettings.classOutfit.GUID);
             var gender = __instance.EntityData.Descriptor.Gender;
-            var race = __instance.EntityData.Progression.Race.RaceId;/// Descriptor.Doll.RacePreset.RaceId;
+            var race = __instance.EntityData.Progression.Race.RaceId;/// Descriptor.m_LoadedDollData.RacePreset.RaceId;
             var ees = _class.LoadClothes(gender, race);
             __instance.CharacterAvatar.AddEquipmentEntities(ees);
             foreach (var ee in ees)
@@ -248,7 +249,8 @@ namespace VisualAdjustments
         {
             var classOutfit = view.EntityData.Descriptor.Progression.GetEquipmentClass();
             Settings.CharacterSettings characterSettings = Main.settings.GetCharacterSettings(view.EntityData);
-            var oldClothes = classOutfit.LoadClothes(view.EntityData.Descriptor.Gender, view.EntityData.Descriptor.Doll.RacePreset.RaceId);
+            var doll = DollResourcesManager.GetDoll(view.Data);
+            var oldClothes = classOutfit.LoadClothes(view.EntityData.Descriptor.Gender, doll.RacePreset.RaceId);
             view.CharacterAvatar.RemoveEquipmentEntities(oldClothes);
             var newClothes = BlueprintRoot.Instance.CharGen.LoadClothes(view.EntityData.Descriptor.Gender);
             view.CharacterAvatar.AddEquipmentEntities(newClothes);
@@ -259,8 +261,9 @@ namespace VisualAdjustments
                     if (!view.EntityData.IsPlayerFaction) return;
                     Settings.CharacterSettings characterSettings = Main.settings.GetCharacterSettings(view.EntityData);
                     if (characterSettings == null) return;
+                    var doll = DollResourcesManager.GetDoll(view.EntityData);
                     bool dirty = view.CharacterAvatar.IsDirty;
-                    if (view.EntityData.Descriptor.Doll == null && characterSettings.classOutfit.Name != "Default" && view.m_EquipmentClass != ResourcesLibrary.TryGetBlueprint<BlueprintCharacterClass>(characterSettings.classOutfit.GUID))
+                    if (doll == null && characterSettings.classOutfit.Name != "Default" && view.m_EquipmentClass != ResourcesLibrary.TryGetBlueprint<BlueprintCharacterClass>(characterSettings.classOutfit.GUID))
                     {
                         ChangeCompanionOutfit(view, characterSettings);
                     }
@@ -269,10 +272,10 @@ namespace VisualAdjustments
                     {
                         HideSlot(view, view.EntityData.Body.Head, ref dirty);
                     }
-                   /* if (characterSettings.hideItemCloak)
+                    if (characterSettings.hideItemCloak)
                     {
                         HideSlot(view, view.EntityData.Body.Shoulders, ref dirty);
-                    }*/
+                    }
                     if (characterSettings.hideArmor)
                     {
                         HideSlot(view, view.EntityData.Body.Armor, ref dirty);
@@ -344,14 +347,14 @@ namespace VisualAdjustments
                             characterSettings.overrideHelm = null;
                         }
                     }
-                    /*            if (characterSettings.overrideCloak
-                     *            != null && !characterSettings.hideItemCloak)
+                                if (characterSettings.overrideCloak
+                                 != null && !characterSettings.hideItemCloak)
                                 {
                                     if (!OverrideEquipment(view, view.EntityData.Body.Shoulders, characterSettings.overrideCloak, ref dirty))
                                     {
                                         characterSettings.overrideCloak = null;
                                     }
-                                }*/
+                                }
                     if (characterSettings.overrideArmor != null && !characterSettings.hideArmor)
                     {
                         if (!OverrideEquipment(view, view.EntityData.Body.Armor, characterSettings.overrideArmor, ref dirty))
@@ -640,13 +643,13 @@ namespace VisualAdjustments
             }
             var race = blueprintRace.RaceId;
             var gender = unit.Gender;
-            TryPreloadKEE(characterSettings.overrideHelm, gender, race);
-            TryPreloadKEE(characterSettings.overrideShirt, gender, race);
-            TryPreloadKEE(characterSettings.overrideArmor, gender, race);
-            TryPreloadKEE(characterSettings.overrideBracers, gender, race);
-            TryPreloadKEE(characterSettings.overrideGloves, gender, race);
-            TryPreloadKEE(characterSettings.overrideBoots, gender, race);
-            TryPreloadEE(characterSettings.overrideTattoo, gender, race);
+            if(characterSettings.overrideHelm != null)TryPreloadKEE(characterSettings.overrideHelm, gender, race);
+            if (characterSettings.overrideShirt != null)TryPreloadKEE(characterSettings.overrideShirt, gender, race);
+            if (characterSettings.overrideArmor != null)TryPreloadKEE(characterSettings.overrideArmor, gender, race);
+            if (characterSettings.overrideBracers != null)TryPreloadKEE(characterSettings.overrideBracers, gender, race);
+            if (characterSettings.overrideGloves != null)TryPreloadKEE(characterSettings.overrideGloves, gender, race);
+            if (characterSettings.overrideBoots != null)TryPreloadKEE(characterSettings.overrideBoots, gender, race);
+            if (characterSettings.overrideTattoo != null)TryPreloadEE(characterSettings.overrideTattoo, gender, race);
             foreach (var kv in characterSettings.overrideWeapons)
             {
                 TryPreloadWeapon(kv.Value, gender, race);
@@ -731,7 +734,8 @@ namespace VisualAdjustments
                     }
                     foreach (var character in Game.Instance.State.Units)
                     {
-                        Main.SetEELs(character, DollResourcesManager.GetDoll(character));
+                        var doll = DollResourcesManager.GetDoll(character);
+                        Main.SetEELs(character,doll);
                         ///character.View.UpdateClassEquipment();
                         
                         RebuildCharacter(character);

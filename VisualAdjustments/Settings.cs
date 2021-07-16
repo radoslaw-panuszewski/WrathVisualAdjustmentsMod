@@ -25,7 +25,7 @@ namespace VisualAdjustments
             public bool hideCap = false;
             public bool hideClassCloak = false;
             public bool hideHelmet = false;
-           /// public bool hideItemCloak = false;
+            public bool hideItemCloak = false;
             public bool hideArmor = false;
             public bool hideBracers = false;
             public bool hideGloves = false;
@@ -52,6 +52,7 @@ namespace VisualAdjustments
             public int SecondaryColor = -1;
 
             public BlueprintRef overrideHelm = null;
+            public BlueprintRef overrideCloak = null;
             public BlueprintRef overrideShirt = null;
             public BlueprintRef overrideGlasses = null;
             public BlueprintRef overrideArmor = null;

@@ -45,7 +45,7 @@ namespace VisualAdjustments
                     if (!__instance.Owner.IsPlayerFaction) return true;
                     var characterSettings = Main.settings.GetCharacterSettings(__instance.Owner.Unit);
                     if (characterSettings == null) return true;
-                    if (characterSettings.hideWings && WingsLookup.ContainsKey(__instance.Blueprint.AssetGuid))
+                    if (characterSettings.hideWings && WingsLookup.ContainsKey(__instance.Blueprint.AssetGuidThreadSafe))
                     {
                         return false;
                     }
