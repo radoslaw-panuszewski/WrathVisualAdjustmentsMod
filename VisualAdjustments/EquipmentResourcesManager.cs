@@ -156,7 +156,7 @@ namespace VisualAdjustments
                     if (!m_Glasses.ContainsKey(bp.AssetGuidThreadSafe))
                     m_Glasses[bp.AssetGuidThreadSafe] = bp.name;
                 }
-                else if (bp.name.Contains("Helmet") || bp.name.Contains("Headband"))
+                else if (bp.name.Contains("Helmet") || bp.name.Contains("Headband") || bp.name.Contains("Mask"))
                 {
                     if (!m_Helm.ContainsKey(bp.AssetGuidThreadSafe))
                         m_Helm[bp.AssetGuidThreadSafe] = bp.name;

@@ -176,6 +176,10 @@ namespace VisualAdjustments
                     {
                         unitEntityData.View.HandsEquipment.UpdateAll();
                     }
+                    if (GUILayout.Button("Set EEL's",GUILayout.Width(175f)))
+                    {
+                        Main.SetEELs(unitEntityData,DollResourcesManager.GetDoll(unitEntityData));
+                    }
                     GUILayout.EndHorizontal();
                     GUILayout.BeginHorizontal();
                     if (GUILayout.Button("Toggle Stance",GUILayout.Width(175f)))

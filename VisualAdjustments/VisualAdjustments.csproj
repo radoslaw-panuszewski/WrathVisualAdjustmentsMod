@@ -70,6 +70,9 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ResourceInfo.cs" />
     <Compile Include="Settings.cs" />
+    <Compile Include="SpacehamsterUnlock\DisplayInfo.cs" />
+    <Compile Include="SpacehamsterUnlock\Main.cs" />
+    <Compile Include="SpacehamsterUnlock\Settings.cs" />
     <Compile Include="UnorderedList.cs" />
     <Compile Include="Util.cs" />
     <Compile Include="ViewManager.cs" />
@@ -87,10 +90,6 @@
     <Reference Include="0Harmony, Version=2.0.2.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\RespecModRepo\RespecWrath\bin\Debug\0Harmony.dll</HintPath>
-    </Reference>
-    <Reference Include="Assembly-CSharp, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>B:\Games\Steam\steamapps\common\Pathfinder Second Adventure Demo\Wrath_Data\Managed\Assembly-CSharp.dll</HintPath>
     </Reference>
     <Reference Include="Assembly-CSharp-firstpass, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
@@ -131,6 +130,10 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\RespecModRepo\RespecWrath\bin\Debug\UnityEngine.AssetBundleModule.dll</HintPath>
     </Reference>
+    <Reference Include="UnityEngine.ClothModule, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>B:\Games\Steam\steamapps\common\Pathfinder Second Adventure Demo\Wrath_Data\Managed\UnityEngine.ClothModule.dll</HintPath>
+    </Reference>
     <Reference Include="UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\RespecModRepo\RespecWrath\bin\Debug\UnityEngine.CoreModule.dll</HintPath>
@@ -156,6 +159,7 @@
       <HintPath>..\..\RespecModRepo\RespecWrath\bin\Debug\UnityModManager.dll</HintPath>
     </Reference>
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
     <PropertyGroup>

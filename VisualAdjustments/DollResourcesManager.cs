@@ -133,7 +133,8 @@ namespace VisualAdjustments
         static public DollState GetDoll(UnitEntityData unitEntityData)
         {
             if (!loaded) Init();
-            var doll = unitEntityData.Parts.Get<UnitPartDollData>().ActiveDoll;
+            if (unitEntityData.Parts.Get<UnitPartDollData>() == null) return null;
+            var doll = unitEntityData.Parts.Get<UnitPartDollData>().Default;
             if (doll == null) return null;
             if (!characterDolls.ContainsKey(unitEntityData.CharacterName))
             {

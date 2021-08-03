@@ -31,7 +31,8 @@ namespace VisualAdjustments
         public static void RebuildCharacter(UnitEntityData unitEntityData)
         {
             var Settings = Main.settings.GetCharacterSettings(unitEntityData);
-            var doll = DollResourcesManager.GetDoll(unitEntityData).CreateData();
+            DollData doll = null;
+            if(DollResourcesManager.GetDoll(unitEntityData) != null) doll = DollResourcesManager.GetDoll(unitEntityData).CreateData();
             if (doll == null && Settings.classOutfit.Name == "Default")
             {
                 unitEntityData.Descriptor.ForcceUseClassEquipment = false;
@@ -45,7 +46,7 @@ namespace VisualAdjustments
                 unitEntityData.Descriptor.ForcceUseClassEquipment = true;
                 Traverse.Create(unitEntityData.Descriptor).Field("UseClassEquipment").SetValue(true);
                 var savedEquipment = true;
-              character.RemoveAllEquipmentEntities(savedEquipment);
+                character.RemoveAllEquipmentEntities(savedEquipment);
                 if (doll.RacePreset != null)
                 {
                     character.Skeleton = (doll.Gender != Gender.Male) ? doll.RacePreset.FemaleSkeleton : doll.RacePreset.MaleSkeleton;
@@ -73,6 +74,7 @@ namespace VisualAdjustments
                     new Func<ItemSlot, IEnumerable<EquipmentEntity>>(unitEntityData.View.ExtractEquipmentEntities));
                 character.AddEquipmentEntities(bodyEquipment, false);
             }
+            Main.SetEELs(unitEntityData,DollResourcesManager.GetDoll(unitEntityData),false);
             //Add Kineticist Tattoos
             EventBus.RaiseEvent<IUnitViewAttachedHandler>(unitEntityData, delegate (IUnitViewAttachedHandler h)
             {
@@ -225,8 +227,9 @@ namespace VisualAdjustments
         {
             var kee = ResourcesLibrary.TryGetBlueprint<KingmakerEquipmentEntity>(assetId);
             if (kee == null) return false;
-            var ee = kee.Load(__instance.EntityData.Descriptor.Gender, __instance.EntityData.Descriptor.Progression.Race.RaceId);
-            if (ee == null) return false;
+            var doll = DollResourcesManager.GetDoll(__instance.EntityData);
+            var ee = kee.Load(__instance.EntityData.Descriptor.Gender, doll.Race.RaceId);
+            if (ee == null) return false; 
             HideSlot(__instance, slot, ref dirty);
             __instance.CharacterAvatar.AddEquipmentEntities(ee);
             dirty = true;
@@ -235,7 +238,7 @@ namespace VisualAdjustments
         /*
          * Fix "bug" where Male Ranger Cape would hide hair and ears         * 
          */
-      /*  static void FixRangerCloak(UnitEntityView view)
+        static void FixRangerCloak(UnitEntityView view)
         {
             foreach (var ee in view.CharacterAvatar.EquipmentEntities)
             {
@@ -244,7 +247,7 @@ namespace VisualAdjustments
                     ee.HideBodyParts &= ~(BodyPartType.Hair | BodyPartType.Ears);
                 }
             }
-        }*/
+        }
         public static void NoClassOutfit(UnitEntityView view)
         {
             var classOutfit = view.EntityData.Descriptor.Progression.GetEquipmentClass();
@@ -256,7 +259,7 @@ namespace VisualAdjustments
             view.CharacterAvatar.AddEquipmentEntities(newClothes);
         }
         public static void UpdateModel(UnitEntityView view)
-                {
+        {
                     if (view.CharacterAvatar == null || view.EntityData == null) return;
                     if (!view.EntityData.IsPlayerFaction) return;
                     Settings.CharacterSettings characterSettings = Main.settings.GetCharacterSettings(view.EntityData);
@@ -272,10 +275,75 @@ namespace VisualAdjustments
                     {
                         HideSlot(view, view.EntityData.Body.Head, ref dirty);
                     }
+                    var equipmentClass = view.EntityData.Progression.GetEquipmentClass();
                     if (characterSettings.hideItemCloak)
                     {
+                     /*   if(equipmentClass.NameForAcronym.Contains("Ranger") || equipmentClass.NameForAcronym.Contains("Rogue") || equipmentClass.NameForAcronym.Contains("Inquisitor"))
+                        {
+                          /// var j = view.CharacterAvatar.EquipmentEntities.Select(a => a.OutfitParts.Where(b => b.ToString().Contains("Cloak") || b.ToString().Contains("Cape")).First()).First();
+                           var containscape = view.CharacterAvatar.EquipmentEntities.First(n => n.OutfitParts.Any(b => b.ToString().Contains("Cloak") || b.ToString().Contains("Cape")));
+                           EquipmentEntity.OutfitPart jo = null;
+                           if(containscape != null) jo = containscape.OutfitParts.First(c => c.ToString().Contains("Cloak") || c.ToString().Contains("Cape"));
+                           if(jo != null)
+                           {
+                             if(Main.CapeOutfitParts[equipmentClass.NameForAcronym] == null)
+                             {
+                                Main.CapeOutfitParts.Add(equipmentClass.NameForAcronym,jo);
+                             }
+                           }
+                           var outfitpart = containscape.OutfitParts.First(a => a.ToString().Contains("Cape") || a.ToString().Contains("Cloak"));
+                           if(outfitpart != null)
+                           {
+                            containscape.OutfitParts.Remove(outfitpart);
+                           }
+                        }*/
+                        if(equipmentClass.NameForAcronym.Contains("Ranger") || equipmentClass.NameForAcronym.Contains("Rogue") || equipmentClass.NameForAcronym.Contains("Inquisitor"))
+                        { 
+                        var asd = view.CharacterAvatar.EquipmentEntities.Where(a => a.OutfitParts.Any(c => c.ToString().Contains("Cape") || c.ToString().Contains("Cloak"))).Where(a => new[] { "Inquisitor", "Rogue", "Ranger" }.Any(c => a.name.Contains(c)));
+                        if(asd.ToArray().Length > 0)
+                        { 
+                           foreach(var a in asd)
+                           {
+                             var part = a.OutfitParts.Where(b => b.ToString().Contains("Cloak") || b.ToString().Contains("Cape")).FirstOrDefault();
+                             if(!Main.CapeOutfitParts.ContainsKey(a.name))
+                             {
+                               Main.CapeOutfitParts.Add(a.name,part);
+                             }
+                             a.OutfitParts.Remove(part);
+                           }
+                        }
+                        }
+                        var thingstoremove = view.CharacterAvatar.EquipmentEntities.Where(a => a.name.Contains("Cape") || a.name.Contains("Cloak")).ToList();
+                        view.CharacterAvatar.RemoveEquipmentEntities(thingstoremove);
                         HideSlot(view, view.EntityData.Body.Shoulders, ref dirty);
                     }
+                    else if(characterSettings.overrideCloak == null && !view.EntityData.Body.Shoulders.HasItem && !characterSettings.hideItemCloak)
+                    {
+                      if(equipmentClass.NameForAcronym.Contains("Ranger") || equipmentClass.NameForAcronym.Contains("Rogue") || equipmentClass.NameForAcronym.Contains("Inquisitor"))
+                      {
+                        if(!view.CharacterAvatar.EquipmentEntities.Any(a => a.OutfitParts.Any(b => b.ToString().Contains("Cape") || b.ToString().Contains("Cape"))))
+                        if(view.CharacterAvatar.EquipmentEntities.Any(a => Main.CapeOutfitParts.Keys.Contains(a.name)))
+                        { 
+                          var ad = view.CharacterAvatar.EquipmentEntities.Where(c => Main.CapeOutfitParts.Keys.Contains(c.name));
+                          if(ad.ToArray().Length > 0)
+                          {
+                            foreach(var ads in ad)
+                            {
+                            if(Main.CapeOutfitParts.Keys.Contains(ads.name))
+                            ads.OutfitParts.Add(Main.CapeOutfitParts[ads.name]);
+                            }
+                          }
+                        }
+                      }
+                    }
+                    /*else 
+                    if(equipmentClass.NameForAcronym.Contains("Ranger") || equipmentClass.NameForAcronym.Contains("Rogue") || equipmentClass.NameForAcronym.Contains("Inquisitor"))
+                    {
+                      if(!view.CharacterAvatar.EquipmentEntities.Any(a => a.OutfitParts.Any(b => b.ToString().Contains("Cloak") || b.ToString().Contains("Cape"))))
+                      {
+                        view.CharacterAvatar.EquipmentEntities.First(b => b.name.Contains("Ranger_") || b.name.Contains("Rogue_") || b.name.Contains("Inquisitor_")).OutfitParts.Add(Main.CapeOutfitParts[equipmentClass.NameForAcronym]);
+                      }
+                    }*/
                     if (characterSettings.hideArmor)
                     {
                         HideSlot(view, view.EntityData.Body.Armor, ref dirty);
@@ -320,7 +388,7 @@ namespace VisualAdjustments
                         {
                             if (ee.OutfitParts.Exists((outfit) => {
                                 return outfit.Special == EquipmentEntity.OutfitPartSpecialType.Backpack ||
-                                    outfit.Special == EquipmentEntity.OutfitPartSpecialType.Backpack;
+                                    outfit.Special == EquipmentEntity.OutfitPartSpecialType.Backpack ;
                             }) && !view.ExtractEquipmentEntities(view.EntityData.Body.Shoulders).Contains(ee))
                             {
                                 view.CharacterAvatar.EquipmentEntities.Remove(ee);
@@ -347,14 +415,15 @@ namespace VisualAdjustments
                             characterSettings.overrideHelm = null;
                         }
                     }
-                                if (characterSettings.overrideCloak
-                                 != null && !characterSettings.hideItemCloak)
-                                {
+
+                    if (characterSettings.overrideCloak
+                       != null && !characterSettings.hideItemCloak)
+                          {
                                     if (!OverrideEquipment(view, view.EntityData.Body.Shoulders, characterSettings.overrideCloak, ref dirty))
                                     {
                                         characterSettings.overrideCloak = null;
                                     }
-                                }
+                          }
                     if (characterSettings.overrideArmor != null && !characterSettings.hideArmor)
                     {
                         if (!OverrideEquipment(view, view.EntityData.Body.Armor, characterSettings.overrideArmor, ref dirty))
@@ -407,15 +476,16 @@ namespace VisualAdjustments
                         var tattoo = ResourcesLibrary.TryGetResource<EquipmentEntity>(characterSettings.overrideTattoo);
                         if (tattoo != null) view.CharacterAvatar.AddEquipmentEntity(tattoo);
                     }
-                    /*if (view.EntityData.Descriptor.Progression?.GetEquipmentClass().Name == "Ranger")
+                    if (view.EntityData.Descriptor.Progression?.GetEquipmentClass().Name == "Ranger")
                     {
                         FixRangerCloak(view);
-                    }*/
+                    }
                     if(view.CharacterAvatar.IsDirty != dirty)
                     {
                       view.CharacterAvatar.IsDirty = dirty;
                     }
-                }
+                   /// Main.SetEELs(view.EntityData, DollResourcesManager.GetDoll(view.EntityData));
+        }
         /*
          * Called by CheatsSilly.UpdatePartyNoArmor and OnDataAttached
          * Applies all EquipmentEntities from item Slots for NonBaked avatars
@@ -458,6 +528,7 @@ namespace VisualAdjustments
                     {
                         if (__instance.EntityData.Body.CurrentEquipmentSlots.Contains(slot))
                         {
+                            ///DollResourcesManager.GetDoll(__instance.EntityData).Updated();
                             UpdateModel(__instance);
                         }
                     }
@@ -631,7 +702,7 @@ namespace VisualAdjustments
             var characterSettings = Main.settings.GetCharacterSettings(unit);
             if (characterSettings == null) return;
             var races = BlueprintRoot.Instance.Progression.CharacterRaces.ToArray<BlueprintRace>();
-            var blueprintRace = new BlueprintRace();
+            BlueprintRace blueprintRace;
             if (characterSettings.RaceIndex != -1)
             {
                 blueprintRace = races[characterSettings.RaceIndex];
@@ -732,7 +803,7 @@ namespace VisualAdjustments
                     {
                         Main.GetClasses();
                     }
-                    foreach (var character in Game.Instance.State.Units)
+                    foreach (var character in Game.Instance.Player.AllCharacters)
                     {
                         var doll = DollResourcesManager.GetDoll(character);
                         Main.SetEELs(character,doll);

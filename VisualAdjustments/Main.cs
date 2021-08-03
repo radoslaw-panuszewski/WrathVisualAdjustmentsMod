@@ -23,6 +23,7 @@ using Kingmaker.Cheats;
 using Kingmaker.UI.MVVM._PCView.CharGen.Phases.Common;
 using Kingmaker.Blueprints.JsonSystem;
 using Kingmaker.UnitLogic.Parts;
+using Kingmaker.Visual.CharacterSystem;
 
 namespace VisualAdjustments
 {
@@ -53,9 +54,11 @@ namespace VisualAdjustments
         {
             if (logger != null) logger.Log(msg);
         }
+        public static bool unlockcustomization;
         public static bool enabled;
         public static bool classesloaded = false;
         public static Settings settings;
+        public static Dictionary<string,EquipmentEntity.OutfitPart> CapeOutfitParts = new Dictionary<string, EquipmentEntity.OutfitPart>();
         public static UnityModManager.ModEntry ModEntry;
         /// public static ReferenceArrayProxy<BlueprintCharacterClass,BlueprintCharacterClassReference> classes = Game.Instance.BlueprintRoot.Progression.CharacterClasses;
         /// public static string[] classes;
@@ -95,6 +98,7 @@ namespace VisualAdjustments
 #if DEBUG
                 modEntry.OnUnload = Unload;
 #endif
+                HairUnlocker.Main.Load(modEntry);
             }
             catch (Exception e)
             {
@@ -165,6 +169,7 @@ namespace VisualAdjustments
             try
             {
                 if (!enabled) return;
+                HairUnlocker.Main.UnlockerGui();
                 ///Asd();
                 ///Main.logger.Log(classes.Count.ToString());
                 /*foreach(CharInfo s in classes)
@@ -172,6 +177,10 @@ namespace VisualAdjustments
                     Main.logger.Log(s.Name + s.GUID);
                 }*/
                 GUILayout.BeginHorizontal();
+                if(GUILayout.Button("unlock"))
+                {
+                    HairUnlocker.Main.Unlock();
+                }
                 settings.AllPortraits = GUILayout.Toggle(settings.AllPortraits, "Unlock all portraits");
                 GUILayout.EndHorizontal();
                 if (Game.Instance.Player.AllCharacters.Count > 0)
@@ -305,6 +314,7 @@ namespace VisualAdjustments
                         }
                         else
                         {
+                            GUILayout.Space(4f);
                             GUILayout.BeginHorizontal();
                             GUILayout.Label(string.Format("{0}", unitEntityData.CharacterName), "box", GUILayout.Width(DefaultLabelWidth));
                             characterSettings.showOverrideSelection = GUILayout.Toggle(characterSettings.showOverrideSelection, "Show Override Selection", GUILayout.ExpandWidth(false));
@@ -814,7 +824,7 @@ namespace VisualAdjustments
             {
                 var doll2 = DollResourcesManager.GetDoll(dat);
                 if (dat.IsStoryCompanion() && doll2 == null) return;
-                Main.logger.Log("triedgetindices");
+               /// Main.logger.Log("triedgetindices");
                 var doll = DollResourcesManager.GetDoll(dat);
                 var gender = dat.Gender;
                 var race = doll.Race;
@@ -884,25 +894,51 @@ namespace VisualAdjustments
                 Main.logger.Log(e.InnerException.Message);
             };
         }
-        public static void SetEELs(UnitEntityData dat, DollState doll)
+        public static void SetEELs(UnitEntityData dat, DollState doll, bool shouldRebuild = true)
         {
             try
             {
+                if (doll == null) return;
                 var Settings = settings.GetCharacterSettings(dat);
                 var gender = dat.Gender;
                 var races = BlueprintRoot.Instance.Progression.CharacterRaces.ToArray<BlueprintRace>();
-                var race = races[Settings.RaceIndex];
-                CustomizationOptions customizationOptions = gender != Gender.Male ? race.FemaleOptions : race.MaleOptions;
+                BlueprintRace race;
+                if (Settings.RaceIndex != -1)
+                { 
+                 race = races[Settings.RaceIndex]; 
+                }
+                else
+                {
+                    race = doll.Race;
+                }
                 doll.SetRace(race);
-                doll.SetHead(customizationOptions.Heads[Settings.Face]);
-                doll.SetHair(customizationOptions.Hair[Settings.Hair]);
-                if(customizationOptions.Beards.Length > 0)doll.SetBeard(customizationOptions.Beards[Settings.Beards]);
-                if (customizationOptions.Horns.Length > 0) doll.SetHorn(customizationOptions.Horns[Settings.Horns]);
-                doll.SetHairColor(Settings.HairColor);
-                doll.SetSkinColor(Settings.SkinColor);
-                if (customizationOptions.Horns.Length > 0) doll.SetHornsColor(Settings.HornsColor);
+                CustomizationOptions customizationOptions = gender != Gender.Male ? race.FemaleOptions : race.MaleOptions;
+                if (Settings.Face != -1)
+                {
+                    doll.SetHead(customizationOptions.Heads[Settings.Face]);
+                }
+                else
+                {
+                    doll.SetHead(customizationOptions.Heads[0]);
+                }
+                if (Settings.Hair != -1)
+                {
+                    doll.SetHair(customizationOptions.Hair[Settings.Hair]);
+                }
+                else
+                {
+                    doll.SetHair(customizationOptions.Hair[0]);
+                }
+                if(customizationOptions.Beards.Length > 0 && Settings.Beards != -1)doll.SetBeard(customizationOptions.Beards[Settings.Beards]);
+                if (customizationOptions.Horns.Length > 0 && Settings.Horns != -1) doll.SetHorn(customizationOptions.Horns[Settings.Horns]);
+                if(Settings.HairColor != -1)doll.SetHairColor(Settings.HairColor);
+                if(Settings.SkinColor != -1)doll.SetSkinColor(Settings.SkinColor);
+                if (customizationOptions.Horns.Length > 0 && Settings.HornsColor != -1) doll.SetHornsColor(Settings.HornsColor);
                 doll.SetEquipColors(Settings.PrimaryColor, Settings.SecondaryColor);
-                CharacterManager.RebuildCharacter(dat);
+                if (shouldRebuild)
+                {
+                    CharacterManager.RebuildCharacter(dat);
+                }
             }
             catch (Exception e) { Main.logger.Log(e.ToString()); }
         }
@@ -912,22 +948,49 @@ namespace VisualAdjustments
             {
                 if (!unitEntityData.IsMainCharacter && !unitEntityData.IsCustomCompanion() && GUILayout.Button("Destroy Doll", GUILayout.Width(DefaultLabelWidth)))
                 {
-                    Traverse.Create(unitEntityData.Parts.Get<UnitPartDollData>()).Field("ActiveDoll").SetValue(null);
-                    ///unitEntityData.Descriptor.Doll = null;
+                    unitEntityData.Parts.Get<UnitPartDollData>().ViewWillDetach();
+                    unitEntityData.Parts.Get<UnitPartDollData>().OnViewWillDetach();
+                    unitEntityData.Parts.Get<UnitPartDollData>().RemoveSelf();
+                    unitEntityData.Parts.Remove<UnitPartDollData>();
+                    unitEntityData.PostLoad();
+                    unitEntityData.Parts.PostLoad();
+                    unitEntityData.Descriptor.Doll = null;
+                    unitEntityData.Descriptor.m_LoadedDollData = null;
                     unitEntityData.Descriptor.ForcceUseClassEquipment = false;
+                    ///   unitEntityData.View.CharacterAvatar.LoadBakedCharacter();
+                    ///   unitEntityData.DetachView();
+                    /// unitEntityData.View.Destroy();
+                    /// unitEntityData.OnViewWillDetach();
+                    ///unitEntityData.AttachView(unitEntityData.CreateViewForData());
+                    /// unitEntityData.View.CharacterAvatarUpdated();
                     CharacterManager.RebuildCharacter(unitEntityData);
                 }
                 var Settings = settings.GetCharacterSettings(unitEntityData);
                 var races = BlueprintRoot.Instance.Progression.CharacterRaces.ToArray<BlueprintRace>();
                 var gender = unitEntityData.Gender;
                 BlueprintRace race;
-                if (unitEntityData.Descriptor.Progression.Race.name != "MongrelmanRace")
+                if (Settings.RaceIndex == -1)
                 {
-                    race = unitEntityData.Progression.Race;
+                    if (!unitEntityData.Descriptor.Progression.Race.NameForAcronym.Contains("Mongrel"))
+                    {
+                        race = unitEntityData.Progression.Race;
+                        if (Settings.RaceIndex == -1)
+                        {
+                            Settings.RaceIndex = races.IndexOf(race);
+                        }
+                    }
+                    else
+                    {
+                        race = (Utilities.GetBlueprint<BlueprintRace>("0a5d473ead98b0646b94495af250fdc4"));
+                        if (Settings.RaceIndex == -1)
+                        {
+                            Settings.RaceIndex = races.IndexOf(race);
+                        }
+                    }
                 }
                 else
                 {
-                    race = (Utilities.GetBlueprint<BlueprintRace>("0a5d473ead98b0646b94495af250fdc4"));
+                    race = races[Settings.RaceIndex];
                 }
                 ///var race = unitEntityData.Progression.Race;
                 CustomizationOptions customizationOptions = gender != Gender.Male ? race.FemaleOptions : race.MaleOptions;
@@ -935,11 +998,15 @@ namespace VisualAdjustments
                  {
                      GetIndices(unitEntityData,Settings, DollResourcesManager.GetDoll(unitEntityData), customizationOptions);
                  }*/
-                if (unitEntityData.Descriptor.Progression.Race.name != "MongrelmanRace")
+                /*if (!unitEntityData.Descriptor.Progression.Race.NameForAcronym.Contains("Mongrel"))
                 {
                     race = races.ElementAt(Settings.RaceIndex);
-                }
+                }*/
                 customizationOptions = gender != Gender.Male ? race.FemaleOptions : race.MaleOptions;
+                if(Main.unlockcustomization)
+                {
+                  
+                }
                 var doll2 = DollResourcesManager.GetDoll(unitEntityData);
                 /// var race = doll.Race;
                 doll2.SetRace(race);
@@ -979,33 +1046,53 @@ namespace VisualAdjustments
 
         static void ChooseCompanionColor(CharacterSettings characterSettings, UnitEntityData unitEntityData)
         {
-            if (GUILayout.Button("Create Doll", GUILayout.Width(DefaultLabelWidth)))
+            try
             {
-                var race = unitEntityData.Descriptor.Progression.Race;
-                var options = unitEntityData.Descriptor.Gender == Gender.Male ? race.MaleOptions : race.FemaleOptions;
-                var dollState = new DollState();
-                if (unitEntityData.Descriptor.Progression.Race.name != "MongrelmanRace")
+                if (GUILayout.Button("Create Doll", GUILayout.Width(DefaultLabelWidth)))
                 {
-                    dollState.SetRace(unitEntityData.Descriptor.Progression.Race); //Race must be set before class
-                                                                                   //This is a hack to work around harmony not allowing calls to the unpatched   
-                }
-                else
-                {
-                    dollState.SetRace(Utilities.GetBlueprint<BlueprintRace>("0a5d473ead98b0646b94495af250fdc4"));
-                }
-                CharacterManager.disableEquipmentClassPatch = true;
-                dollState.SetClass(unitEntityData.Descriptor.Progression.GetEquipmentClass());
-                CharacterManager.disableEquipmentClassPatch = false;
-                dollState.SetGender(unitEntityData.Descriptor.Gender);
-                dollState.SetRacePreset(race.Presets[0]);
-                unitEntityData.Descriptor.LeftHandedOverride = false;
-                if (options.Hair.Length > 0) dollState.SetHair(options.Hair[0]);
-                if (options.Heads.Length > 0) dollState.SetHead(options.Hair[0]);
-                if (options.Beards.Length > 0) dollState.SetBeard(options.Hair[0]);
-                dollState.Validate();
-                unitEntityData.Descriptor.Doll = dollState.CreateData();
-                unitEntityData.Descriptor.ForcceUseClassEquipment = true;
-                CharacterManager.RebuildCharacter(unitEntityData);
+                    var race = unitEntityData.Descriptor.Progression.Race;
+                    var options = unitEntityData.Descriptor.Gender == Gender.Male ? race.MaleOptions : race.FemaleOptions;
+                    var dollState = new DollState();
+                    if (unitEntityData.Descriptor.Progression.Race.name != "MongrelmanRace")
+                    {
+                        dollState.SetRace(unitEntityData.Descriptor.Progression.Race); //Race must be set before class
+                                                                                       //This is a hack to work around harmony not allowing calls to the unpatched   
+                    }
+                    else
+                    {
+                        dollState.SetRace(Utilities.GetBlueprint<BlueprintRace>("0a5d473ead98b0646b94495af250fdc4"));
+                    }
+                    CharacterManager.disableEquipmentClassPatch = true;
+                    dollState.SetClass(unitEntityData.Descriptor.Progression.GetEquipmentClass());
+                    CharacterManager.disableEquipmentClassPatch = false;
+                    dollState.SetGender(unitEntityData.Descriptor.Gender);
+                    dollState.SetRacePreset(race.Presets[0]);
+                    unitEntityData.Descriptor.LeftHandedOverride = false;
+                    if (options.Hair.Length > 0) dollState.SetHair(options.Hair[0]);
+                    if (options.Heads.Length > 0) dollState.SetHead(options.Hair[0]);
+                    if (options.Beards.Length > 0) dollState.SetBeard(options.Hair[0]);
+                    dollState.Validate();
+                    ///SetEELs(unitEntityData, dollState);
+                    unitEntityData.Descriptor.Doll = dollState.CreateData();
+                    unitEntityData.Parts.Add<UnitPartDollData>();
+                    unitEntityData.Parts.Get<UnitPartDollData>().Default = dollState.CreateData();
+                    // Traverse.Create(unitEntityData.Parts.Get<UnitPartDollData>()).Field("ActiveDoll").SetValue(dollState.CreateData()); 
+                    unitEntityData.Descriptor.ForcceUseClassEquipment = true;
+                    //CharacterManager.RebuildCharacter(unitEntityData);
+                    // SetEELs(unitEntityData,dollState);
+                    ///SetEELs(unitEntityData, dollState);
+                    CharacterManager.RebuildCharacter(unitEntityData);
+                    //SetEELs(unitEntityData, dollState);
+                    CharacterManager.UpdateModel(unitEntityData.View);
+                    // SetEELs(unitEntityData, dollState);
+                    //CharacterManager.RebuildCharacter(unitEntityData);
+                    // SetEELs(unitEntityData, dollState);
+                    SetEELs(unitEntityData, dollState, true);
+                }         
+            }
+            catch(Exception e)
+            {
+                Main.logger.Log(e.ToString());
             }
             GUILayout.Label("Note: Colors only applies to non-default outfits, the default companion custom voice is None");
             {
@@ -1066,8 +1153,8 @@ namespace VisualAdjustments
             ChooseToggle("Hide Helmet", ref characterSettings.hideHelmet, onHideEquipment);
             ChooseToggle("Hide Glasses", ref characterSettings.hideGlasses, onHideEquipment);
             ChooseToggle("Hide Shirt", ref characterSettings.hideShirt, onHideEquipment);
-            ChooseToggle("Hide Class Backpack", ref characterSettings.hideClassCloak, onHideEquipment);
-            ChooseToggle("Hide Item Cloak", ref characterSettings.hideItemCloak, onHideEquipment);
+            ChooseToggle("Hide Class Equipment", ref characterSettings.hideClassCloak, onHideEquipment);
+            ChooseToggle("Hide Cloak", ref characterSettings.hideItemCloak, onHideEquipment);
             ChooseToggle("Hide Armor", ref characterSettings.hideArmor, onHideEquipment);
             ChooseToggle("Hide Bracers", ref characterSettings.hideBracers, onHideEquipment);
             ChooseToggle("Hide Gloves", ref characterSettings.hideGloves, onHideEquipment);
@@ -1085,7 +1172,7 @@ namespace VisualAdjustments
          * m_Size is updated from GetSizeScale (EntityData.Descriptor.State.Size) and 
          * is with m_OriginalScale to adjust the transform.localScale 
          * Adjusting GetSizeScale will effect character corpulence and cause gameplay sideeffects
-         * Changing m_OriginalScale will effect ParticlesSnapMap.AdditionalScale
+         * Changing m_OriginalScale will effect ParticlesSnapMap.AdditionalScaleGUID
          */
         static void ChooseSizeAdditive(UnitEntityData unitEntityData, CharacterSettings characterSettings)
         {
