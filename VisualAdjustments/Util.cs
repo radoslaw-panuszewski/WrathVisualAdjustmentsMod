@@ -18,18 +18,18 @@ namespace VisualAdjustments
         {
             var currentIndex = currentItem == null ? -1 : Array.IndexOf(items.Keys.ToArray(), currentItem);
             GUILayout.BeginHorizontal();
-            GUILayout.Label(name + " ", GUILayout.Width(DefaultLabelWidth));
+            ModKit.UI.Label(name + " ", GUILayout.Width(DefaultLabelWidth));
             var newIndex = (int)Math.Round(GUILayout.HorizontalSlider(currentIndex, -1, items.Count - 1, GUILayout.Width(DefaultSliderWidth)), 0);
-            if (GUILayout.Button("Prev", GUILayout.Width(45)) && currentIndex >= 0)
+            if (GUILayout.Button("Prev", GUILayout.Width(55)) && currentIndex >= 0)
             {
                 newIndex = currentIndex - 1;
             }
-            if (GUILayout.Button("Next", GUILayout.Width(45)) && currentIndex < items.Count - 1)
+            if (GUILayout.Button("Next", GUILayout.Width(55)) && currentIndex < items.Count - 1)
             {
                 newIndex = currentIndex + 1;
             }
             var displayText = newIndex == -1 ? "None" : items.Values.ElementAt(newIndex);
-            GUILayout.Label(" " + displayText, GUILayout.ExpandWidth(true));
+            ModKit.UI.Label(" " + displayText, GUILayout.ExpandWidth(true));
             GUILayout.EndHorizontal();
             if (currentIndex != newIndex)
             {
@@ -42,7 +42,7 @@ namespace VisualAdjustments
             var currentItem = saved[savedIndex];
             var currentIndex = currentItem == null ? -1 : Array.IndexOf(items.Keys.ToArray(), currentItem);
             GUILayout.BeginHorizontal();
-            GUILayout.Label(name + " ", GUILayout.Width(DefaultLabelWidth));
+            ModKit.UI.Label(name + " ", GUILayout.Width(DefaultLabelWidth));
             var newIndex = (int)Math.Round(GUILayout.HorizontalSlider(currentIndex, -1, items.Count - 1, GUILayout.Width(DefaultSliderWidth)), 0);
             if (GUILayout.Button("Prev", GUILayout.Width(45)) && currentIndex >= 0)
             {
@@ -59,7 +59,7 @@ namespace VisualAdjustments
                 return;
             }
             var displayText = newIndex == -1 ? "None" : items.Values.ElementAt(newIndex);
-            GUILayout.Label(" " + displayText, GUILayout.ExpandWidth(true));
+            ModKit.UI.Label(" " + displayText, GUILayout.ExpandWidth(true));
             GUILayout.EndHorizontal();
             if (currentIndex != newIndex)
             {

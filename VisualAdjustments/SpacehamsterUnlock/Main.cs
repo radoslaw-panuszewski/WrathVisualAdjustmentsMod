@@ -32,7 +32,7 @@ namespace HairUnlocker
         static bool loaded = false;
         static bool enabled;
         static bool displayDebug = false;
-        static Settings settings;
+        public static Settings settings;
         static Dictionary<string, CustomizationOptions> originalOptions = new Dictionary<string, CustomizationOptions>();
         public static bool Load(UnityModManager.ModEntry modEntry)
         {

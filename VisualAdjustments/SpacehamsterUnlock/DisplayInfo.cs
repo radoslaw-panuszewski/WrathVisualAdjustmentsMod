@@ -39,7 +39,7 @@ namespace HairUnlocker
         {
             foreach(var link in links)
             {
-                GUILayout.Label(GetName(link));
+                ModKit.UI.Label(GetName(link));
             }
         }
         public static void ShowDoll()
@@ -48,26 +48,26 @@ namespace HairUnlocker
            // var chargen = dollRoom?.GetComponent<CharGenDollRoom>();
             if (dollRoom == null)
             {
-                GUILayout.Label("DollRoom: NULL");
+                ModKit.UI.Label("DollRoom: NULL");
                 return;
             }
             /*var controller = Game.Instance.UI.CharacterBuildController;
             if (!controller.IsShow)
             {
-                GUILayout.Label("CharacterBuildController: Not Visible");
+                ModKit.UI.Label("CharacterBuildController: Not Visible");
                 return;
             }
             var visible = Traverse.Create(dollRoom).Field("m_IsVisible").GetValue<bool>();
-            GUILayout.Label($"DollRoomVisible: {visible}");
+            ModKit.UI.Label($"DollRoomVisible: {visible}");
             if (controller.LevelUpController.Doll == null)
             {
-                GUILayout.Label("Doll: Null");
+                ModKit.UI.Label("Doll: Null");
             }
             var doll = controller.LevelUpController.Doll;
-            GUILayout.Label($"Hair: {GetName(doll.Hair)}");
-            GUILayout.Label($"Head: {GetName(doll.Head)}");
-            GUILayout.Label($"Eyebrows: {GetName(doll.Eyebrows)}");
-            GUILayout.Label($"Beard: {GetName(doll.Beard)}");*/
+            ModKit.UI.Label($"Hair: {GetName(doll.Hair)}");
+            ModKit.UI.Label($"Head: {GetName(doll.Head)}");
+            ModKit.UI.Label($"Eyebrows: {GetName(doll.Eyebrows)}");
+            ModKit.UI.Label($"Beard: {GetName(doll.Beard)}");*/
 
         }
         public static void ShowHair()
@@ -93,26 +93,26 @@ namespace HairUnlocker
             GUILayout.EndHorizontal();
             
             foreach (var race in races) {
-                GUILayout.Label(race.Name, "box");
+                ModKit.UI.Label(race.Name);
                 var options = gender == Gender.Male ? race.MaleOptions : race.FemaleOptions;
                 if (showHair)
                 {
-                    GUILayout.Label("Hair", "box");
+                    ModKit.UI.Label("Hair");
                     ShowEE(options.Hair);
                 }
                 if (showHead)
                 {
-                    GUILayout.Label("Heads", "box");
+                    ModKit.UI.Label("Heads");
                     ShowEE(options.Heads);
                 }
                 if (showEyebrows)
                 {
-                    GUILayout.Label("Eyebrows", "box");
+                    ModKit.UI.Label("Eyebrows");
                     ShowEE(options.Eyebrows);
                 }
                 if (showBeards)
                 {
-                    GUILayout.Label("Beards", "box");
+                    ModKit.UI.Label("Beards");
                     ShowEE(options.Beards);
                 }
             }

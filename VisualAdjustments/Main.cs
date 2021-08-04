@@ -56,9 +56,10 @@ namespace VisualAdjustments
         }
         public static bool unlockcustomization;
         public static bool enabled;
+        public static bool showsettings = false;
         public static bool classesloaded = false;
         public static Settings settings;
-        public static Dictionary<string,EquipmentEntity.OutfitPart> CapeOutfitParts = new Dictionary<string, EquipmentEntity.OutfitPart>();
+        public static Dictionary<string, EquipmentEntity.OutfitPart> CapeOutfitParts = new Dictionary<string, EquipmentEntity.OutfitPart>();
         public static UnityModManager.ModEntry ModEntry;
         /// public static ReferenceArrayProxy<BlueprintCharacterClass,BlueprintCharacterClassReference> classes = Game.Instance.BlueprintRoot.Progression.CharacterClasses;
         /// public static string[] classes;
@@ -93,7 +94,7 @@ namespace VisualAdjustments
                 var harmony = new Harmony(modEntry.Info.Id);
                 harmony.PatchAll(Assembly.GetExecutingAssembly());
                 modEntry.OnToggle = OnToggle;
-                modEntry.OnGUI = OnGUI;
+                modEntry.OnGUI = onGUI;
                 modEntry.OnSaveGUI = OnSaveGUI;
 #if DEBUG
                 modEntry.OnUnload = Unload;
@@ -164,25 +165,32 @@ namespace VisualAdjustments
                 }
             }
         }
-        public static void OnGUI(UnityModManager.ModEntry modEntry)
+        public static void onGUI(UnityModManager.ModEntry modEntry)
         {
             try
             {
                 if (!enabled) return;
-                HairUnlocker.Main.UnlockerGui();
+                ModKit.UI.DisclosureToggle("Settings",ref showsettings);
+                if(showsettings)
+                {
+                    GUILayout.BeginHorizontal();
+                    GUILayout.Space(20f);
+                    GUILayout.BeginVertical();
+                    ModKit.UI.Toggle("Unlock all Portraits", ref settings.AllPortraits);
+                    /*ModKit.UI.Toggle("Unlock Hair Options",ref HairUnlocker.Main.settings.UnlockHair);
+                    if (HairUnlocker.Main.settings.UnlockHair) ModKit.UI.Toggle("Unlock All Hair Options (Includes incompatible options)",ref HairUnlocker.Main.settings.UnlockAllHair);
+                    ModKit.UI.Toggle("Unlock Horns",ref HairUnlocker.Main.settings.UnlockHorns);
+                    ModKit.UI.Toggle("Unlock Tails",ref HairUnlocker.Main.settings.UnlockTail);
+                    ModKit.UI.Toggle("Unlock Female Dwarf Beards (Includes incompatible options",ref HairUnlocker.Main.settings.UnlockFemaleDwarfBeards);*/
+                    GUILayout.EndVertical();
+                    GUILayout.EndHorizontal();
+                }
                 ///Asd();
                 ///Main.logger.Log(classes.Count.ToString());
                 /*foreach(CharInfo s in classes)
                 {
                     Main.logger.Log(s.Name + s.GUID);
                 }*/
-                GUILayout.BeginHorizontal();
-                if(GUILayout.Button("unlock"))
-                {
-                    HairUnlocker.Main.Unlock();
-                }
-                settings.AllPortraits = GUILayout.Toggle(settings.AllPortraits, "Unlock all portraits");
-                GUILayout.EndHorizontal();
                 if (Game.Instance.Player.AllCharacters.Count > 0)
                 {
                     foreach (UnitEntityData unitEntityData in Game.Instance.Player.AllCharacters)
@@ -246,33 +254,17 @@ namespace VisualAdjustments
                                 characterSettings.classOutfit.Name = unitEntityData.Descriptor.Progression.GetEquipmentClass().Name;
                                 characterSettings.classOutfit.GUID = unitEntityData.Descriptor.Progression.GetEquipmentClass().AssetGuidThreadSafe;
                             }
-                            if (unitEntityData.IsPet)
-                            {
-                                GUILayout.BeginHorizontal();
-                                GUILayout.Label(string.Format("{0}", unitEntityData.CharacterName), "box", GUILayout.Width(DefaultLabelWidth));
-                                characterSettings.showOverrideSelection = GUILayout.Toggle(characterSettings.showOverrideSelection, "Show Override Selection", GUILayout.ExpandWidth(false));
-                                GUILayout.EndHorizontal();
-                                if (characterSettings.showOverrideSelection) ChooseEquipmentOverride(unitEntityData, characterSettings);
-                                continue;
-                            }
                             GUILayout.Space(4f);
                             GUILayout.BeginHorizontal();
-                            GUILayout.Label(string.Format("{0}", unitEntityData.CharacterName), "box", GUILayout.Width(DefaultLabelWidth));
-                            characterSettings.showClassSelection = GUILayout.Toggle(characterSettings.showClassSelection, "Select Outfit", GUILayout.ExpandWidth(false));
+                            ModKit.UI.Label(string.Format("{0}", unitEntityData.CharacterName), GUILayout.Width(DefaultLabelWidth));
+                            ModKit.UI.DisclosureToggle("Select Outfit",ref characterSettings.showClassSelection);
                             var doll = DollResourcesManager.GetDoll(unitEntityData);
-                            if (doll != null)
-                            {
-                                characterSettings.showDollSelection = GUILayout.Toggle(characterSettings.showDollSelection, "Select Doll", GUILayout.ExpandWidth(false));
-                            }
-                            else
-                            {
-                                characterSettings.showDollSelection = GUILayout.Toggle(characterSettings.showDollSelection, "Select Doll", GUILayout.ExpandWidth(false));
-                            }
-                            characterSettings.showEquipmentSelection = GUILayout.Toggle(characterSettings.showEquipmentSelection, "Select Equipment", GUILayout.ExpandWidth(false));
-                            characterSettings.showOverrideSelection = GUILayout.Toggle(characterSettings.showOverrideSelection, "Select Overrides", GUILayout.ExpandWidth(false));
+                            ModKit.UI.DisclosureToggle("Select Doll", ref characterSettings.showDollSelection);
+                            ModKit.UI.DisclosureToggle("Select Equipment", ref characterSettings.showEquipmentSelection);
+                            ModKit.UI.DisclosureToggle("Select Overrides",ref characterSettings.showOverrideSelection);
                             ///characterSettings.ReloadStuff = GUILayout.Toggle(characterSettings.ReloadStuff, "Reload", GUILayout.ExpandWidth(false));
 #if (DEBUG)
-                            characterSettings.showInfo = GUILayout.Toggle(characterSettings.showInfo, "Show Info", GUILayout.ExpandWidth(false));
+                          /*  characterSettings.showInfo = */ModKit.UI.DisclosureToggle("Show Info", ref characterSettings.showInfo);
 #endif
                             GUILayout.EndHorizontal();
                             if (characterSettings.ReloadStuff == true)
@@ -316,8 +308,8 @@ namespace VisualAdjustments
                         {
                             GUILayout.Space(4f);
                             GUILayout.BeginHorizontal();
-                            GUILayout.Label(string.Format("{0}", unitEntityData.CharacterName), "box", GUILayout.Width(DefaultLabelWidth));
-                            characterSettings.showOverrideSelection = GUILayout.Toggle(characterSettings.showOverrideSelection, "Show Override Selection", GUILayout.ExpandWidth(false));
+                            ModKit.UI.Label(string.Format("{0}", unitEntityData.CharacterName),  GUILayout.Width(DefaultLabelWidth));
+                            ModKit.UI.DisclosureToggle("Show Override Selection",ref characterSettings.showOverrideSelection);
                             GUILayout.EndHorizontal();
                             if (characterSettings.showOverrideSelection)
                             {
@@ -329,12 +321,11 @@ namespace VisualAdjustments
                     {
                         GUILayout.Space(20);
                         GUILayout.BeginHorizontal();
-                        GUILayout.Label(string.Format("{0}", "Remote Characters"), "box", GUILayout.Width(400f));
+                        ModKit.UI.Label(string.Format("{0}", "Remote Characters"), GUILayout.Width(400f));
                         GUILayout.EndHorizontal();
                         foreach (UnitEntityData unitEntityData in Game.Instance.Player.AllCharacters.Except(Game.Instance.Player.PartyAndPets))
                         {
                             var characterSettings = settings.GetCharacterSettings(unitEntityData);
-                            var doll = DollResourcesManager.GetDoll(unitEntityData);
                             if (!unitEntityData.IsPet)
                             {
                                 if (characterSettings.classOutfit == null)
@@ -343,32 +334,18 @@ namespace VisualAdjustments
                                     characterSettings.classOutfit.Name = unitEntityData.Descriptor.Progression.GetEquipmentClass().Name;
                                     characterSettings.classOutfit.GUID = unitEntityData.Descriptor.Progression.GetEquipmentClass().AssetGuidThreadSafe;
                                 }
-                                if (unitEntityData.IsPet)
-                                {
-                                    GUILayout.BeginHorizontal();
-                                    GUILayout.Label(string.Format("{0}", unitEntityData.CharacterName), "box", GUILayout.Width(DefaultLabelWidth));
-                                    characterSettings.showOverrideSelection = GUILayout.Toggle(characterSettings.showOverrideSelection, "Show Override Selection", GUILayout.ExpandWidth(false));
-                                    GUILayout.EndHorizontal();
-                                    if (characterSettings.showOverrideSelection) ChooseEquipmentOverride(unitEntityData, characterSettings);
-                                    continue;
-                                }
                                 GUILayout.Space(4f);
                                 GUILayout.BeginHorizontal();
-                                GUILayout.Label(string.Format("{0}", unitEntityData.CharacterName), "box", GUILayout.Width(DefaultLabelWidth));
-                                characterSettings.showClassSelection = GUILayout.Toggle(characterSettings.showClassSelection, "Select Outfit", GUILayout.ExpandWidth(false));
-                                if (doll != null)
-                                {
-                                    characterSettings.showDollSelection = GUILayout.Toggle(characterSettings.showDollSelection, "Select Doll", GUILayout.ExpandWidth(false));
-                                }
-                                else
-                                {
-                                    characterSettings.showDollSelection = GUILayout.Toggle(characterSettings.showDollSelection, "Select Doll", GUILayout.ExpandWidth(false));
-                                }
-                                characterSettings.showEquipmentSelection = GUILayout.Toggle(characterSettings.showEquipmentSelection, "Select Equipment", GUILayout.ExpandWidth(false));
-                                characterSettings.showOverrideSelection = GUILayout.Toggle(characterSettings.showOverrideSelection, "Select Overrides", GUILayout.ExpandWidth(false));
+                                ModKit.UI.Label(string.Format("{0}", unitEntityData.CharacterName), GUILayout.Width(DefaultLabelWidth));
+                                ModKit.UI.DisclosureToggle("Select Outfit", ref characterSettings.showClassSelection);
+                                var doll = DollResourcesManager.GetDoll(unitEntityData);
+                                ModKit.UI.DisclosureToggle("Select Doll", ref characterSettings.showDollSelection);
+                                ModKit.UI.DisclosureToggle("Select Equipment", ref characterSettings.showEquipmentSelection);
+                                ModKit.UI.DisclosureToggle("Select Overrides", ref characterSettings.showOverrideSelection);
                                 ///characterSettings.ReloadStuff = GUILayout.Toggle(characterSettings.ReloadStuff, "Reload", GUILayout.ExpandWidth(false));
 #if (DEBUG)
-                                characterSettings.showInfo = GUILayout.Toggle(characterSettings.showInfo, "Show Info", GUILayout.ExpandWidth(false));
+                                /*  characterSettings.showInfo = */
+                                ModKit.UI.DisclosureToggle("Show Info", ref characterSettings.showInfo);
 #endif
                                 GUILayout.EndHorizontal();
                                 if (characterSettings.ReloadStuff == true)
@@ -410,9 +387,10 @@ namespace VisualAdjustments
                             }
                             else
                             {
+                                GUILayout.Space(4f);
                                 GUILayout.BeginHorizontal();
-                                GUILayout.Label(string.Format("{0}", unitEntityData.CharacterName), "box", GUILayout.Width(DefaultLabelWidth));
-                                characterSettings.showOverrideSelection = GUILayout.Toggle(characterSettings.showOverrideSelection, "Show Override Selection", GUILayout.ExpandWidth(false));
+                                ModKit.UI.Label(string.Format("{0}", unitEntityData.CharacterName), GUILayout.Width(DefaultLabelWidth));
+                                ModKit.UI.DisclosureToggle("Show Override Selection", ref characterSettings.showOverrideSelection);
                                 GUILayout.EndHorizontal();
                                 if (characterSettings.showOverrideSelection)
                                 {
@@ -458,17 +436,17 @@ namespace VisualAdjustments
                 var key = unitEntityData.Descriptor.UISettings.CustomPortraitRaw.CustomId;
                 var currentIndex = DollResourcesManager.CustomPortraits.IndexOf(key);
                 GUILayout.BeginHorizontal();
-                GUILayout.Label("Portrait  ", GUILayout.Width(DefaultLabelWidth));
+                ModKit.UI.Label("Portrait  ", GUILayout.Width(DefaultLabelWidth));
                 var newIndex = (int)Math.Round(GUILayout.HorizontalSlider(currentIndex, 0, DollResourcesManager.CustomPortraits.Count, GUILayout.Width(DefaultSliderWidth)), 0);
-                if (GUILayout.Button("Prev", GUILayout.Width(45)) && currentIndex >= 0)
+                if (GUILayout.Button("Prev", GUILayout.Width(55)) && currentIndex >= 0)
                 {
                     newIndex = currentIndex - 1;
                 }
-                if (GUILayout.Button("Next", GUILayout.Width(45)) && currentIndex < DollResourcesManager.CustomPortraits.Count - 1)
+                if (GUILayout.Button("Next", GUILayout.Width(55)) && currentIndex < DollResourcesManager.CustomPortraits.Count - 1)
                 {
                     newIndex = currentIndex + 1;
                 }
-                if (GUILayout.Button("Use Normal", GUILayout.Width(DefaultLabelWidth)))
+                if (GUILayout.Button("Use Normal", GUILayout.Width(125)))
                 {
                     unitEntityData.Descriptor.UISettings.SetPortrait(ResourcesLibrary.TryGetBlueprint<BlueprintPortrait>("621ada02d0b4bf64387babad3a53067b"));
                     EventBus.RaiseEvent<IUnitPortraitChangedHandler>(delegate (IUnitPortraitChangedHandler h)
@@ -478,7 +456,7 @@ namespace VisualAdjustments
                     return;
                 }
                 var value = newIndex >= 0 && newIndex < DollResourcesManager.CustomPortraits.Count ? DollResourcesManager.CustomPortraits[newIndex] : null;
-                GUILayout.Label(" " + value, GUILayout.ExpandWidth(false));
+                ModKit.UI.Label(" " + value, GUILayout.ExpandWidth(false));
 
                 GUILayout.EndHorizontal();
                 if (newIndex != currentIndex && value != null)
@@ -495,17 +473,17 @@ namespace VisualAdjustments
                 var key = unitEntityData.Descriptor.UISettings.PortraitBlueprint?.name;
                 var currentIndex = DollResourcesManager.Portrait.IndexOfKey(key ?? "");
                 GUILayout.BeginHorizontal();
-                GUILayout.Label("Portrait ", GUILayout.Width(DefaultLabelWidth));
+                ModKit.UI.Label("Portrait ", GUILayout.Width(DefaultLabelWidth));
                 var newIndex = (int)Math.Round(GUILayout.HorizontalSlider(currentIndex, 0, DollResourcesManager.Portrait.Count, GUILayout.Width(DefaultSliderWidth)), 0);
-                if (GUILayout.Button("Prev", GUILayout.Width(45)) && currentIndex >= 0)
+                if (GUILayout.Button("Prev", GUILayout.Width(55)) && currentIndex >= 0)
                 {
                     newIndex = currentIndex - 1;
                 }
-                if (GUILayout.Button("Next", GUILayout.Width(45)) && currentIndex < DollResourcesManager.Portrait.Count - 1)
+                if (GUILayout.Button("Next", GUILayout.Width(55)) && currentIndex < DollResourcesManager.Portrait.Count - 1)
                 {
                     newIndex = currentIndex + 1;
                 }
-                if (GUILayout.Button("Use Custom", GUILayout.Width(DefaultLabelWidth)))
+                if (GUILayout.Button("Use Custom", GUILayout.Width(125f)))
                 {
                     unitEntityData.Descriptor.UISettings.SetPortrait(CustomPortraitsManager.Instance.CreateNewOrLoadDefault());
                     EventBus.RaiseEvent<IUnitPortraitChangedHandler>(delegate (IUnitPortraitChangedHandler h)
@@ -515,7 +493,7 @@ namespace VisualAdjustments
                     return;
                 }
                 var value = newIndex >= 0 && newIndex < DollResourcesManager.Portrait.Count ? DollResourcesManager.Portrait.Values[newIndex] : null;
-                GUILayout.Label(" " + value, GUILayout.ExpandWidth(false));
+                ModKit.UI.Label(" " + value, GUILayout.ExpandWidth(false));
 
                 GUILayout.EndHorizontal();
                 if (newIndex != currentIndex && value != null)
@@ -536,13 +514,13 @@ namespace VisualAdjustments
                 currentIndex = DollResourcesManager.Asks.IndexOfKey(unitEntityData.Descriptor.CustomAsks.name);
             }
             GUILayout.BeginHorizontal();
-            GUILayout.Label("Custom Voice ", GUILayout.Width(DefaultLabelWidth));
+            ModKit.UI.Label("Custom Voice ", GUILayout.Width(DefaultLabelWidth));
             var newIndex = (int)Math.Round(GUILayout.HorizontalSlider(currentIndex, -1, DollResourcesManager.Asks.Count - 1, GUILayout.Width(DefaultSliderWidth)), 0);
-            if (GUILayout.Button("Prev", GUILayout.Width(45)) && currentIndex >= 0)
+            if (GUILayout.Button("Prev", GUILayout.Width(55)) && currentIndex >= 0)
             {
                 newIndex = currentIndex - 1;
             }
-            if (GUILayout.Button("Next", GUILayout.Width(45)) && currentIndex < DollResourcesManager.Asks.Count)
+            if (GUILayout.Button("Next", GUILayout.Width(55)) && currentIndex < DollResourcesManager.Asks.Count)
             {
                 newIndex = currentIndex + 1;
             }
@@ -560,7 +538,7 @@ namespace VisualAdjustments
                     AkSoundEngine.PostEvent(bark.AkEvent, unitEntityData.View.gameObject);
                 }
             }
-            GUILayout.Label(" " + (value?.name ?? "None"), GUILayout.ExpandWidth(false));
+            ModKit.UI.Label(" " + (value?.name ?? "None"), GUILayout.ExpandWidth(false));
 
 
             GUILayout.EndHorizontal();
@@ -574,9 +552,11 @@ namespace VisualAdjustments
         {
             if (list.Count == 0) return;
             GUILayout.BeginHorizontal();
-            GUILayout.Label(label + " ", GUILayout.Width(DefaultLabelWidth));
+            ModKit.UI.Label(label + " ", GUILayout.Width(DefaultLabelWidth));
             var newIndex = (int)Math.Round(GUILayout.HorizontalSlider(currentIndex, 0, list.Count - 1, GUILayout.Width(DefaultSliderWidth)), 0);
-            GUILayout.Label(" " + newIndex, GUILayout.ExpandWidth(false));
+            ModKit.UI.Label(" " + newIndex, GUILayout.ExpandWidth(false));
+            if (GUILayout.Button("Prev",GUILayout.Width(55f)) && newIndex > 0) newIndex--;
+            if (GUILayout.Button("Next",GUILayout.Width(55f)) && newIndex < list.Count - 1) newIndex++;
             GUILayout.EndHorizontal();
             if (newIndex != currentIndex && newIndex < list.Count)
             {
@@ -588,9 +568,9 @@ namespace VisualAdjustments
         {
             if (list.Count == 0) return;
             ///GUILayout.BeginHorizontal();
-            GUILayout.Label(label + " ", GUILayout.Width(DefaultLabelWidth));
+            ModKit.UI.Label(label + " ", GUILayout.Width(DefaultLabelWidth));
             var newIndex = (int)Math.Round(GUILayout.HorizontalSlider(currentIndex, 0, list.Count - 1, GUILayout.Width(DefaultSliderWidth)), 0);
-            GUILayout.Label(" " + newIndex, GUILayout.ExpandWidth(false));
+            ModKit.UI.Label(" " + newIndex, GUILayout.ExpandWidth(false));
             if (newIndex != currentIndex && newIndex < list.Count)
             {
                 currentIndex = newIndex;
@@ -603,7 +583,7 @@ namespace VisualAdjustments
             var settings = Main.settings.GetCharacterSettings(unitEntityData);
             if (links.Length == 0)
             {
-                GUILayout.Label($"Missing equipment for {label}");
+                ModKit.UI.Label($"Missing equipment for {label}");
             }
             var index = setting;
             ///var index = links.ToList().FindIndex((eel) => eel != null && eel.AssetId == link?.AssetId);
@@ -625,7 +605,7 @@ namespace VisualAdjustments
         {
             if (links.Length == 0)
             {
-                GUILayout.Label($"Missing equipment for {label}");
+                ModKit.UI.Label($"Missing equipment for {label}");
             }
             var index = links.ToList().FindIndex((eel) => eel != null && eel.AssetId == link?.AssetId); ///var index = setting;
             ChooseFromList(label, links, ref index, () =>
@@ -641,11 +621,13 @@ namespace VisualAdjustments
         }
         static void ChooseRamp(ref int setting, UnitEntityData unitEntityData, DollState doll, string label, List<Texture2D> textures, int currentRamp, Action<int> setter)
         {
+            GUILayout.BeginHorizontal();
             ChooseFromList(label, textures, ref currentRamp, () =>
             {
                 SetEELs(unitEntityData, doll);
                 setter(currentRamp);
                 var DollPart = unitEntityData.Parts.Get<UnitPartDollData>();
+                DollPart.Default = doll.CreateData();
                 Traverse.Create(DollPart).Field("ActiveDoll").SetValue(doll.CreateData());
                /// unitEntityData.Parts.Get<UnitPartDollData>().ActiveDoll = doll.CreateData();
                 CharacterManager.RebuildCharacter(unitEntityData);
@@ -654,6 +636,7 @@ namespace VisualAdjustments
             {
                 setting = currentRamp;
             }
+            GUILayout.EndHorizontal();
         }
         static void ChooseRamp(UnitEntityData unitEntityData, DollState doll, string label, List<Texture2D> textures, int currentRamp, Action<int> setter)
         {
@@ -744,8 +727,8 @@ namespace VisualAdjustments
            /// var index = Array.FindIndex(racelist, (race) => race == currentRace);
            /// Main.logger.Log(index.ToString());
            var newindex = (int)Math.Round(GUILayout.HorizontalSlider(index, (float)0.0, (float)racelist.Count() - (float)1, GUILayout.Width(DefaultSliderWidth)), 1);
-            GUILayout.Label(" " + index, GUILayout.ExpandWidth(false));
-            GUILayout.Label(" " + newindex, GUILayout.ExpandWidth(false));
+            ModKit.UI.Label(" " + index, GUILayout.ExpandWidth(false));
+            ModKit.UI.Label(" " + newindex, GUILayout.ExpandWidth(false));
             GUILayout.BeginHorizontal();
 
             ChooseFromList("Race", racelist,ref index, () => {
@@ -753,7 +736,7 @@ namespace VisualAdjustments
                 unitEntityData.Descriptor.m_LoadedDollData = doll.CreateData();
                 CharacterManager.RebuildCharacter(unitEntityData);
             });
-            GUILayout.Label(" " + racelist[index].Name);
+            ModKit.UI.Label(" " + racelist[index].Name);
             GUILayout.EndHorizontal();
         }*/
         /*static void ChooseRace(UnitEntityData unitEntityData, DollState doll)
@@ -774,7 +757,7 @@ namespace VisualAdjustments
                 unitEntityData.Descriptor.m_LoadedDollData = doll.CreateData();
                 CharacterManager.RebuildCharacter(unitEntityData);
             });
-            GUILayout.Label(" " + races[sus].Name);
+            ModKit.UI.Label(" " + races[sus].Name);
             if(sus != index)
             {
                 sus = index;
@@ -793,11 +776,13 @@ namespace VisualAdjustments
             }
             var initindx = Settings.RaceIndex;
             GUILayout.BeginHorizontal();
-            GUILayout.Label("Race" + " ", GUILayout.Width(DefaultLabelWidth));
+            ModKit.UI.Label("Race" + " ", GUILayout.Width(DefaultLabelWidth));
             Settings.RaceIndex = (int)Math.Round(GUILayout.HorizontalSlider((float)Settings.RaceIndex, 0, races.Length - 1, GUILayout.Width(DefaultSliderWidth)));
-            /// GUILayout.Label(asdd.ToString()+ " " + races[asdd].Name);
-            GUILayout.Label(" " + Settings.RaceIndex, GUILayout.ExpandWidth(false));
-            GUILayout.Label(" " + races[Settings.RaceIndex].Name, GUILayout.ExpandWidth(false));
+            /// ModKit.UI.Label(asdd.ToString()+ " " + races[asdd].Name);
+            ModKit.UI.Label(" " + Settings.RaceIndex, GUILayout.ExpandWidth(false));
+            ModKit.UI.Label(" " + races[Settings.RaceIndex].Name, GUILayout.ExpandWidth(false));
+            if (GUILayout.Button("Prev", GUILayout.Width(55f)) && Settings.RaceIndex > 0) Settings.RaceIndex--;
+            if (GUILayout.Button("Next", GUILayout.Width(55f)) && Settings.RaceIndex < races.Length - 1) Settings.RaceIndex++;
             GUILayout.EndHorizontal();
             if (Settings.RaceIndex != initindx && Settings.RaceIndex < races.Count())
             {
@@ -872,7 +857,7 @@ namespace VisualAdjustments
                 if (customizationOptions.Horns.Count() > 0) charsettings.Horns = Array.IndexOf(customizationOptions.Horns, doll.Horn.m_Link);
 
                 /// Main.logger.Log("hornpassed");
-                if (customizationOptions.Hair.Count() > 0) charsettings.HairColor = doll.Hair.m_Entity.ForcedPrimaryIndex;
+                if (customizationOptions.Hair.Count() > 0) charsettings.HairColor = doll.HairRampIndex;
                 /// Main.logger.Log("haircolorpassed");
                 charsettings.SkinColor = doll.SkinRampIndex;
                 ///charsettings.SkinColor = 1;
@@ -884,7 +869,7 @@ namespace VisualAdjustments
                 charsettings.RaceIndex = Array.IndexOf(BlueprintRoot.Instance.Progression.CharacterRaces.ToArray<BlueprintRace>(), doll.Race);
 
 
-                Main.logger.Log("Got Indices");
+                ///Main.logger.Log("Got Indices");
             }
             catch (Exception e)
             {
@@ -1039,6 +1024,7 @@ namespace VisualAdjustments
                     unitEntityData.View.HandsEquipment.HandleEquipmentSetChanged();
                 }*/
                 ChoosePortrait(unitEntityData);
+                ChooseAsks(unitEntityData);
                 if (unitEntityData.IsMainCharacter || unitEntityData.IsCustomCompanion()) ChooseAsks(unitEntityData);
             }
             catch (Exception e) { Main.logger.Log(e.ToString()); }
@@ -1094,12 +1080,12 @@ namespace VisualAdjustments
             {
                 Main.logger.Log(e.ToString());
             }
-            GUILayout.Label("Note: Colors only applies to non-default outfits, the default companion custom voice is None");
+            ModKit.UI.Label("Note: Colors only applies to non-default outfits, the default companion custom voice is None");
             {
                 GUILayout.BeginHorizontal();
-                GUILayout.Label("Primary Outfit Color ", GUILayout.Width(DefaultLabelWidth));
+                ModKit.UI.Label("Primary Outfit Color ", GUILayout.Width(DefaultLabelWidth));
                 var newIndex = (int)Math.Round(GUILayout.HorizontalSlider(characterSettings.companionPrimary, -1, 35, GUILayout.Width(DefaultSliderWidth)), 0);
-                GUILayout.Label(" " + newIndex, GUILayout.ExpandWidth(false));
+                ModKit.UI.Label(" " + newIndex, GUILayout.ExpandWidth(false));
                 GUILayout.EndHorizontal();
                 if (newIndex != characterSettings.companionPrimary)
                 {
@@ -1109,9 +1095,9 @@ namespace VisualAdjustments
             }
             {
                 GUILayout.BeginHorizontal();
-                GUILayout.Label("Secondary Outfit Color ", GUILayout.Width(DefaultLabelWidth));
+                ModKit.UI.Label("Secondary Outfit Color ", GUILayout.Width(DefaultLabelWidth));
                 var newIndex = (int)Math.Round(GUILayout.HorizontalSlider(characterSettings.companionSecondary, -1, 35, GUILayout.Width(DefaultSliderWidth)), 0);
-                GUILayout.Label(" " + newIndex, GUILayout.ExpandWidth(false));
+                ModKit.UI.Label(" " + newIndex, GUILayout.ExpandWidth(false));
                 GUILayout.EndHorizontal();
                 if (newIndex != characterSettings.companionSecondary)
                 {
@@ -1124,10 +1110,11 @@ namespace VisualAdjustments
         }
         static void ChooseToggle(string label, ref bool currentValue, Action onChoose)
         {
-            bool newValue = GUILayout.Toggle(currentValue, label, GUILayout.ExpandWidth(false));
-            if (newValue != currentValue)
+            bool temp = currentValue;
+            ModKit.UI.Toggle(label, ref temp);
+            if (temp != currentValue)
             {
-                currentValue = newValue;
+                currentValue = temp;
                 onChoose();
             }
         }
@@ -1177,34 +1164,34 @@ namespace VisualAdjustments
         static void ChooseSizeAdditive(UnitEntityData unitEntityData, CharacterSettings characterSettings)
         {
             GUILayout.BeginHorizontal();
-            GUILayout.Label("Additive Scale Factor", GUILayout.Width(300));
+            ModKit.UI.Label("Additive Scale Factor", GUILayout.Width(300));
             var sizeModifier = GUILayout.HorizontalSlider(characterSettings.additiveScaleFactor, -4, 4, GUILayout.Width(DefaultSliderWidth));
             if (!characterSettings.overrideScaleFloatMode) sizeModifier = (int)sizeModifier;
             characterSettings.additiveScaleFactor = sizeModifier;
             var sign = sizeModifier >= 0 ? "+" : "";
-            GUILayout.Label($" {sign}{sizeModifier:0.##}", GUILayout.ExpandWidth(false));
+            ModKit.UI.Label($" {sign}{sizeModifier:0.##}", GUILayout.ExpandWidth(false));
             GUILayout.EndHorizontal();
         }
         static void ChooseSizeOverride(UnitEntityData unitEntityData, CharacterSettings characterSettings)
         {
             GUILayout.BeginHorizontal();
-            GUILayout.Label("Override Scale Factor", GUILayout.Width(300));
+            ModKit.UI.Label("Override Scale Factor", GUILayout.Width(300));
             var sizeModifier = GUILayout.HorizontalSlider(characterSettings.overrideScaleFactor, 0, 8, GUILayout.Width(DefaultSliderWidth));
             if (!characterSettings.overrideScaleFloatMode) sizeModifier = (int)sizeModifier;
             characterSettings.overrideScaleFactor = sizeModifier;
-            GUILayout.Label($" {(Size)(sizeModifier)}", GUILayout.ExpandWidth(false));
+            ModKit.UI.Label($" {(Size)(sizeModifier)}", GUILayout.ExpandWidth(false));
             GUILayout.EndHorizontal();
         }
         static void ChooseEquipmentOverridePet(UnitEntityData unitEntityData, CharacterSettings characterSettings)
         {
-            GUILayout.Label("View", "box", GUILayout.Width(DefaultLabelWidth));
+            ModKit.UI.Label("View",  GUILayout.Width(DefaultLabelWidth));
             void onView() => ViewManager.ReplaceView(unitEntityData, characterSettings.overrideView);
             Util.ChooseSlider("Override View", EquipmentResourcesManager.Units, ref characterSettings.overrideView, onView);
             void onChooseScale()
             {
                 Traverse.Create(unitEntityData.View).Field("m_Scale").SetValue(unitEntityData.View.GetSizeScale() + 0.01f);
             }
-            GUILayout.Label("Scale", "box", GUILayout.Width(DefaultLabelWidth));
+            ModKit.UI.Label("Scale",  GUILayout.Width(DefaultLabelWidth));
             GUILayout.BeginHorizontal();
             ChooseToggle("Enable Override Scale", ref characterSettings.overrideScale, onChooseScale);
             ChooseToggle("Restrict to polymorph", ref characterSettings.overrideScaleShapeshiftOnly, onChooseScale);
@@ -1215,7 +1202,7 @@ namespace VisualAdjustments
             GUILayout.EndHorizontal();
             if (characterSettings.overrideScale && characterSettings.overrideScaleAdditive) ChooseSizeAdditive(unitEntityData, characterSettings);
             if (characterSettings.overrideScale && !characterSettings.overrideScaleAdditive) ChooseSizeOverride(unitEntityData, characterSettings);
-            GUILayout.Label("Portrait/Voice", GUILayout.Width(DefaultLabelWidth));
+            ModKit.UI.Label("Portrait/Voice", GUILayout.Width(DefaultLabelWidth));
             ChoosePortrait(unitEntityData);
             ChooseAsks(unitEntityData);
         }
@@ -1226,7 +1213,7 @@ namespace VisualAdjustments
                 CharacterManager.RebuildCharacter(unitEntityData);
                 CharacterManager.UpdateModel(unitEntityData.View);
             }
-            GUILayout.Label("Equipment", "box", GUILayout.Width(DefaultLabelWidth));
+            ModKit.UI.Label("Equipment",  GUILayout.Width(DefaultLabelWidth));
             void onView() => ViewManager.ReplaceView(unitEntityData, characterSettings.overrideView);
             Util.ChooseSlider("Override Helm", EquipmentResourcesManager.Helm, ref characterSettings.overrideHelm, onEquipment);
             Util.ChooseSlider("Override Cloak", EquipmentResourcesManager.Cloak, ref characterSettings.overrideCloak, onEquipment);
@@ -1237,7 +1224,7 @@ namespace VisualAdjustments
             Util.ChooseSlider("Override Gloves", EquipmentResourcesManager.Gloves, ref characterSettings.overrideGloves, onEquipment);
             Util.ChooseSlider("Override Boots", EquipmentResourcesManager.Boots, ref characterSettings.overrideBoots, onEquipment);
             Util.ChooseSlider("Override Tattoos", EquipmentResourcesManager.Tattoos, ref characterSettings.overrideTattoo, onEquipment);
-            GUILayout.Label("Weapons", "box", GUILayout.Width(DefaultLabelWidth));
+            ModKit.UI.Label("Weapons",  GUILayout.Width(DefaultLabelWidth));
             foreach (var kv in EquipmentResourcesManager.Weapons)
             {
                 var animationStyle = kv.Key;
@@ -1251,7 +1238,7 @@ namespace VisualAdjustments
                 Util.ChooseSlider($"Override {animationStyle} ", weaponLookup, ref currentValue, onWeapon);
             }
             GUILayout.BeginHorizontal();
-            GUILayout.Label("Main Weapon Enchantments", "box", GUILayout.Width(DefaultLabelWidth));
+            ModKit.UI.Label("Main Weapon Enchantments",  GUILayout.Width(DefaultLabelWidth));
             if (GUILayout.Button("Add Enchantment", GUILayout.ExpandWidth(false)))
             {
                 characterSettings.overrideMainWeaponEnchantments.Add(null);
@@ -1267,7 +1254,7 @@ namespace VisualAdjustments
                     characterSettings.overrideMainWeaponEnchantments, i, onWeaponEnchantment);
             }
             GUILayout.BeginHorizontal();
-            GUILayout.Label("Offhand Weapon Enchantments", "box", GUILayout.Width(DefaultLabelWidth));
+            ModKit.UI.Label("Offhand Weapon Enchantments",  GUILayout.Width(DefaultLabelWidth));
             if (GUILayout.Button("Add Enchantment", GUILayout.ExpandWidth(false)))
             {
                 characterSettings.overrideOffhandWeaponEnchantments.Add("");
@@ -1278,13 +1265,13 @@ namespace VisualAdjustments
                 Util.ChooseSliderList($"Override Off Hand", EquipmentResourcesManager.WeaponEnchantments,
                     characterSettings.overrideOffhandWeaponEnchantments, i, onWeaponEnchantment);
             }
-            GUILayout.Label("View", "box", GUILayout.Width(DefaultLabelWidth));
+            ModKit.UI.Label("View",  GUILayout.Width(DefaultLabelWidth));
             Util.ChooseSlider("Override View", EquipmentResourcesManager.Units, ref characterSettings.overrideView, onView);
             void onChooseScale()
             {
                 Traverse.Create(unitEntityData.View).Field("m_Scale").SetValue(unitEntityData.View.GetSizeScale() + 0.01f);
             }
-            GUILayout.Label("Scale", "box", GUILayout.Width(DefaultLabelWidth));
+            ModKit.UI.Label("Scale",  GUILayout.Width(DefaultLabelWidth));
             GUILayout.BeginHorizontal();
             ChooseToggle("Enable Override Scale", ref characterSettings.overrideScale, onChooseScale);
             ChooseToggle("Restrict to polymorph", ref characterSettings.overrideScaleShapeshiftOnly, onChooseScale);
