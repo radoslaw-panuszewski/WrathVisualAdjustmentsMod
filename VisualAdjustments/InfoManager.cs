@@ -176,12 +176,20 @@ namespace VisualAdjustments
                     {
                         unitEntityData.View.HandsEquipment.UpdateAll();
                     }
+                    GUILayout.EndHorizontal();
+                    GUILayout.BeginHorizontal();
                     if (GUILayout.Button("Set EEL's",GUILayout.Width(175f)))
                     {
                         Main.SetEELs(unitEntityData,DollResourcesManager.GetDoll(unitEntityData));
                     }
-                    GUILayout.EndHorizontal();
-                    GUILayout.BeginHorizontal();
+                    if(GUILayout.Button("Generate Procedural Hair",GUILayout.Width(175f)))
+                    {
+                      Main.GenerateHairColor(unitEntityData);
+                    }
+                    if(GUILayout.Button("Generate Procedural Skin",GUILayout.Width(175f)))
+                    {
+                      Main.GenerateSkinColor(unitEntityData);
+                    }
                     if (GUILayout.Button("Toggle Stance",GUILayout.Width(175f)))
                     {
                         unitEntityData.View.HandsEquipment.ForceSwitch(!unitEntityData.View.HandsEquipment.InCombat);

@@ -68,6 +68,7 @@ namespace VisualAdjustments
             {
                 try
                 {
+                    ///Main.logger.Log("CreateView");
                     if (!Main.enabled) return true;
                     if (!__instance.IsPlayerFaction) return true;
                     var characterSettings = Main.settings.GetCharacterSettings(__instance);
@@ -146,6 +147,7 @@ namespace VisualAdjustments
             {
                 try
                 {
+                   /// Main.logger.Log("GetSpeedAnimationCoeff");
                     if (!Main.enabled) return;
                     if (!__instance.EntityData.IsPlayerFaction) return;
                     var characterSettings = Main.settings.GetCharacterSettings(__instance.EntityData);
@@ -194,7 +196,7 @@ namespace VisualAdjustments
         static void OverrideSize(UnitEntityView __instance, Settings.CharacterSettings characterSettings)
         {
             var sizeScale = GetRealSizeScale(__instance, characterSettings);
-            var m_OriginalScale = m_OriginalScaleRef(__instance);
+            var m_OriginalScale = m_OriginalScaleRef;
             var m_Scale = __instance.transform.localScale.x / m_OriginalScale.x;
             if (!sizeScale.Equals(m_Scale) && !__instance.DoNotAdjustScale)
             {
@@ -212,23 +214,26 @@ namespace VisualAdjustments
                 __instance.ParticlesSnapMap.AdditionalScale = __instance.transform.localScale.x / m_OriginalScale.x;
             }
             //Prevent fighting m_Scale to set transform scale
-            m_ScaleRef(__instance) = __instance.GetSizeScale();
+             m_ScaleRef = __instance.GetSizeScale();
         }
-        static HarmonyLib.AccessTools.FieldRef<UnitEntityView, Vector3> m_OriginalScaleRef;
-        static HarmonyLib.AccessTools.FieldRef<UnitEntityView, float> m_ScaleRef;
+        static Vector3 m_OriginalScaleRef;
+        static float m_ScaleRef;
         [HarmonyPatch(typeof(UnitEntityView), "LateUpdate")]
         static class UnitEntityView_LateUpdate_Patch
         {
-            static bool Prepare()
+            /*static bool Prepare(UnitEntityView __instance)
             {
-                m_OriginalScaleRef = Accessors.CreateFieldRef<UnitEntityView, Vector3>("m_OriginalScale");
-                m_ScaleRef = Accessors.CreateFieldRef<UnitEntityView, float>("m_Scale");
+                m_OriginalScaleRef = __instance.m_OriginalScale;
+                m_ScaleRef = __instance.m_Scale;
+                //m_ScaleRef = Accessors.CreateFieldRef<UnitEntityView, float>("m_Scale");
                 return true;
-            }
+            }*/
             static void Postfix(UnitEntityView __instance)
             {
                 try
                 {
+                    m_OriginalScaleRef = __instance.m_OriginalScale;
+                    m_ScaleRef = __instance.m_Scale;
                     if (!Main.enabled) return;
                     if (__instance.EntityData == null) return;
                     if (!__instance.EntityData.IsPlayerFaction) return;

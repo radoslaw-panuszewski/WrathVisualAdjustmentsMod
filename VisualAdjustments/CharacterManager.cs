@@ -30,56 +30,165 @@ namespace VisualAdjustments
          */
         public static void RebuildCharacter(UnitEntityData unitEntityData)
         {
-            var Settings = Main.settings.GetCharacterSettings(unitEntityData);
-            DollData doll = null;
-            if(DollResourcesManager.GetDoll(unitEntityData) != null) doll = DollResourcesManager.GetDoll(unitEntityData).CreateData();
-            if (doll == null && Settings.classOutfit.Name == "Default")
+            try
             {
-                unitEntityData.Descriptor.ForcceUseClassEquipment = false;
-                Traverse.Create(unitEntityData.Descriptor).Field("UseClassEquipment").SetValue(false);
-            }
+                Main.SetEELs(unitEntityData, DollResourcesManager.GetDoll(unitEntityData),false);
+                var Settings = Main.settings.GetCharacterSettings(unitEntityData);
+                if (Settings.customHairColor)
+                {
+                    Main.GenerateHairColor(unitEntityData);
+                }
+                if (Settings.customSkinColor)
+                {
+                    Main.GenerateSkinColor(unitEntityData);
+                }
+                DollData doll = null;
+                if (DollResourcesManager.GetDoll(unitEntityData) != null) doll = DollResourcesManager.GetDoll(unitEntityData).CreateData();
+                if (doll == null && Settings.classOutfit.Name == "Default")
+                {
+                    unitEntityData.Descriptor.ForcceUseClassEquipment = false;
+                    Traverse.Create(unitEntityData.Descriptor).Field("UseClassEquipment").SetValue(false);
+                }
                 var character = unitEntityData.View.CharacterAvatar;
-            ///Traverse.Create(unitEntityData.Descriptor).Field("UseClassEquipment").SetValue(true);
-            if (character == null) return; // Happens when overriding view
-            if (doll != null)
-            {
-                unitEntityData.Descriptor.ForcceUseClassEquipment = true;
-                Traverse.Create(unitEntityData.Descriptor).Field("UseClassEquipment").SetValue(true);
-                var savedEquipment = true;
-                character.RemoveAllEquipmentEntities(savedEquipment);
-                if (doll.RacePreset != null)
+                ///Traverse.Create(unitEntityData.Descriptor).Field("UseClassEquipment").SetValue(true);
+                if (character == null) return; // Happens when overriding view
+                if (doll != null)
                 {
-                    character.Skeleton = (doll.Gender != Gender.Male) ? doll.RacePreset.FemaleSkeleton : doll.RacePreset.MaleSkeleton;
-                    character.AddEquipmentEntities(doll.RacePreset.Skin.Load(doll.Gender, doll.RacePreset.RaceId), savedEquipment);
-                   /// Main.logger.Log(character.name);
-                    ///Main.logger.Log(unitEntityData.CharacterName);
+                    unitEntityData.Descriptor.ForcceUseClassEquipment = true;
+                    Traverse.Create(unitEntityData.Descriptor).Field("UseClassEquipment").SetValue(true);
+                    var savedEquipment = true;
+                    character.RemoveAllEquipmentEntities(savedEquipment);
+                    if (doll.RacePreset != null)
+                    {
+                      /*  if()
+                        {
+
+                        }
+                        else
+                        {
+
+                        }
+                        character.Skeleton = (doll.Gender != Gender.Male) ? doll.RacePreset.FemaleSkeleton : doll.RacePreset.MaleSkeleton;*/
+                        character.AddEquipmentEntities(doll.RacePreset.Skin.Load(doll.Gender, doll.RacePreset.RaceId), savedEquipment);
+                        /// Main.logger.Log(character.name);
+                        ///Main.logger.Log(unitEntityData.CharacterName);
+                    }
+                    ///character.m_Mirror = doll.LeftHanded;
+                    foreach (string assetID in doll.EquipmentEntityIds)
+                    {
+                        EquipmentEntity ee = ResourcesLibrary.TryGetResource<EquipmentEntity>(assetID);
+                        character.AddEquipmentEntity(ee, savedEquipment);
+                    }
+                    doll.ApplyRampIndices(character);
+                    Traverse.Create(unitEntityData.View).Field("m_EquipmentClass").SetValue(null); //UpdateClassEquipment won't update if the class doesn't change
+                                                                                                   //Adds Armor
+                    unitEntityData.View.UpdateBodyEquipmentModel();
+                    unitEntityData.View.UpdateClassEquipment();
+
+                    Main.SetEELs(unitEntityData, DollResourcesManager.GetDoll(unitEntityData), false);
+                   // Main.GenerateHairColor(unitEntityData);
                 }
-                ///character.m_Mirror = doll.LeftHanded;
-                foreach (string assetID in doll.EquipmentEntityIds)
+                else
                 {
-                    EquipmentEntity ee = ResourcesLibrary.TryGetResource<EquipmentEntity>(assetID);
-                    character.AddEquipmentEntity(ee, savedEquipment);
+                    character.RemoveAllEquipmentEntities();
+                    character.RestoreSavedEquipment();
+                    IEnumerable<EquipmentEntity> bodyEquipment = unitEntityData.Body.AllSlots.SelectMany(
+                        new Func<ItemSlot, IEnumerable<EquipmentEntity>>(unitEntityData.View.ExtractEquipmentEntities));
+                    character.AddEquipmentEntities(bodyEquipment, false);
                 }
-                doll.ApplyRampIndices(character);
-                Traverse.Create(unitEntityData.View).Field("m_EquipmentClass").SetValue(null); //UpdateClassEquipment won't update if the class doesn't change
-                //Adds Armor
-                unitEntityData.View.UpdateBodyEquipmentModel();
-                unitEntityData.View.UpdateClassEquipment();
-            } 
-            else
-            {
-                character.RemoveAllEquipmentEntities();
-                character.RestoreSavedEquipment();
-                IEnumerable<EquipmentEntity> bodyEquipment = unitEntityData.Body.AllSlots.SelectMany(
-                    new Func<ItemSlot, IEnumerable<EquipmentEntity>>(unitEntityData.View.ExtractEquipmentEntities));
-                character.AddEquipmentEntities(bodyEquipment, false);
+                Main.SetEELs(unitEntityData, DollResourcesManager.GetDoll(unitEntityData), false);
+                //  DollResourcesManager.GetDoll(unitEntityData).SetHairColor(Settings.HairColor);
+                //Add Kineticist Tattoos
+                EventBus.RaiseEvent<IUnitViewAttachedHandler>(unitEntityData, delegate (IUnitViewAttachedHandler h)
+                {
+                    h.HandleUnitViewAttached();
+                });
             }
-            Main.SetEELs(unitEntityData,DollResourcesManager.GetDoll(unitEntityData),false);
-            //Add Kineticist Tattoos
-            EventBus.RaiseEvent<IUnitViewAttachedHandler>(unitEntityData, delegate (IUnitViewAttachedHandler h)
+            catch(Exception e)
             {
-                h.HandleUnitViewAttached();
-            }); 
+                Main.logger.Log(e.ToString());
+            }
+        }
+        public static void RebuildCharacterNew(UnitEntityData unitEntityData)
+        {
+            try
+            {
+               /* Main.SetEELs(unitEntityData, DollResourcesManager.GetDoll(unitEntityData), false);
+                var Settings = Main.settings.GetCharacterSettings(unitEntityData);
+                if (Settings.customHairColor)
+                {
+                    Main.GenerateHairColor(unitEntityData);
+                }
+                if (Settings.customSkinColor)
+                {
+                    Main.GenerateSkinColor(unitEntityData);
+                }
+                DollData doll = null;
+                if (DollResourcesManager.GetDoll(unitEntityData) != null) doll = DollResourcesManager.GetDoll(unitEntityData).CreateData();
+                if (doll == null && Settings.classOutfit.Name == "Default")
+                {
+                    unitEntityData.Descriptor.ForcceUseClassEquipment = false;
+                    Traverse.Create(unitEntityData.Descriptor).Field("UseClassEquipment").SetValue(false);
+                }
+                var character = unitEntityData.View.CharacterAvatar;
+                ///Traverse.Create(unitEntityData.Descriptor).Field("UseClassEquipment").SetValue(true);
+                if (character == null) return; // Happens when overriding view
+                if (doll != null)
+                {
+                    unitEntityData.Descriptor.ForcceUseClassEquipment = true;
+                    Traverse.Create(unitEntityData.Descriptor).Field("UseClassEquipment").SetValue(true);
+                    var savedEquipment = true;
+                    character.RemoveAllEquipmentEntities(savedEquipment);
+                    if (doll.RacePreset != null)
+                    {
+                        /*  if()
+                          {
+
+                          }
+                          else
+                          {
+
+                          }
+                          character.Skeleton = (doll.Gender != Gender.Male) ? doll.RacePreset.FemaleSkeleton : doll.RacePreset.MaleSkeleton;*//*
+                        character.AddEquipmentEntities(doll.RacePreset.Skin.Load(doll.Gender, doll.RacePreset.RaceId), savedEquipment);
+                        /// Main.logger.Log(character.name);
+                        ///Main.logger.Log(unitEntityData.CharacterName);
+                    }
+                    ///character.m_Mirror = doll.LeftHanded;
+                    foreach (string assetID in doll.EquipmentEntityIds)
+                    {
+                        EquipmentEntity ee = ResourcesLibrary.TryGetResource<EquipmentEntity>(assetID);
+                        character.AddEquipmentEntity(ee, savedEquipment);
+                    }
+                    doll.ApplyRampIndices(character);
+                    Traverse.Create(unitEntityData.View).Field("m_EquipmentClass").SetValue(null); //UpdateClassEquipment won't update if the class doesn't change
+                                                                                                   //Adds Armor
+                    unitEntityData.View.UpdateBodyEquipmentModel();
+                    unitEntityData.View.UpdateClassEquipment();
+
+                    Main.SetEELs(unitEntityData, DollResourcesManager.GetDoll(unitEntityData), false);
+                    // Main.GenerateHairColor(unitEntityData);
+                }
+                else
+                {
+                    character.RemoveAllEquipmentEntities();
+                    character.RestoreSavedEquipment();
+                    IEnumerable<EquipmentEntity> bodyEquipment = unitEntityData.Body.AllSlots.SelectMany(
+                        new Func<ItemSlot, IEnumerable<EquipmentEntity>>(unitEntityData.View.ExtractEquipmentEntities));
+                    character.AddEquipmentEntities(bodyEquipment, false);
+                }
+                Main.SetEELs(unitEntityData, DollResourcesManager.GetDoll(unitEntityData), false);
+                //  DollResourcesManager.GetDoll(unitEntityData).SetHairColor(Settings.HairColor);
+                //Add Kineticist Tattoos
+                EventBus.RaiseEvent<IUnitViewAttachedHandler>(unitEntityData, delegate (IUnitViewAttachedHandler h)
+                {
+                    h.HandleUnitViewAttached();
+                });
+            */}
+            catch (Exception e)
+            {
+                Main.logger.Log(e.ToString());
+            }
         }
         static void ChangeCompanionOutfit(UnitEntityView __instance, CharacterSettings characterSettings)
         {
@@ -806,12 +915,13 @@ namespace VisualAdjustments
                     foreach (var character in Game.Instance.Player.AllCharacters)
                     {
                         var doll = DollResourcesManager.GetDoll(character);
-                        Main.SetEELs(character,doll);
+                        ///Main.SetEELs(character,doll);
                         ///character.View.UpdateClassEquipment();
-                        
+                      //  Main.GenerateHairColor(character);
+                      //  Main.SetEELs(character,doll,true);
                         RebuildCharacter(character);
                         UpdateModel(character.View);
-                       /// character.View.HandsEquipment.UpdateAll();
+                        /// character.View.HandsEquipment.UpdateAll();
                     }
                 }
                 catch (Exception ex)

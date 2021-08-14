@@ -41,6 +41,7 @@ namespace VisualAdjustments
             {
                 try
                 {
+                   /// Main.logger.Log("TrySpawnParticleEffect");
                     if (!Main.enabled) return true;
                     if (!__instance.Owner.IsPlayerFaction) return true;
                     var characterSettings = Main.settings.GetCharacterSettings(__instance.Owner.Unit);
@@ -76,12 +77,12 @@ namespace VisualAdjustments
         [HarmonyPatch(typeof(DollRoom), "UpdateAvatarRenderers")]
         static class DollRoom_UpdateAvatarRenderers_Patch
         {
-            static FastInvoker<DollRoom, GameObject, object> UnscaleFxTimes;
-            static bool Prepare()
+            //static FastInvoker<DollRoom, GameObject, object> UnscaleFxTimes;
+            /*static bool Prepare()
             {
-                UnscaleFxTimes = Accessors.CreateInvoker<DollRoom, GameObject, object>("UnscaleFxTimes");
+               // UnscaleFxTimes = Accessors.CreateInvoker<DollRoom, GameObject, object>("UnscaleFxTimes");
                 return true;
-            }
+            }*/
             static void Postfix(DollRoom __instance, UnitViewHandsEquipment ___m_AvatarHands, UnitEntityData ___m_Unit)
             {
                 try
@@ -108,7 +109,8 @@ namespace VisualAdjustments
                                 {
                                     foreach (var fxObject in fxObjects)
                                     {
-                                        UnscaleFxTimes(__instance, fxObject);
+                                        __instance.UnscaleFxTimes(fxObject);
+                                       /// UnscaleFxTimes(__instance, fxObject);
                                     }
                                 }
                             }
@@ -126,7 +128,8 @@ namespace VisualAdjustments
         {
             static void Postfix(UnitViewHandSlotData __instance, bool isVisible)
             {
-                try {
+                try 
+                {
                     if (!Main.enabled) return;
                     if (!__instance.Owner.IsPlayerFaction) return;
                     var characterSettings = Main.settings.GetCharacterSettings(__instance.Owner);

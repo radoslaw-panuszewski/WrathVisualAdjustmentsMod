@@ -54,6 +54,9 @@ namespace VisualAdjustments
         {
             if (logger != null) logger.Log(msg);
         }
+        public static Texture2D dot;
+        public static ColorPicker HairColorPicker = new ColorPicker();
+        public static ColorPicker SkinColorPicker = new ColorPicker();
         public static bool unlockcustomization;
         public static bool enabled;
         public static bool showsettings = false;
@@ -93,6 +96,8 @@ namespace VisualAdjustments
                 settings = Settings.Load(modEntry);
                 var harmony = new Harmony(modEntry.Info.Id);
                 harmony.PatchAll(Assembly.GetExecutingAssembly());
+               /// colorpicker = CreateColorPicker();
+                //dot = ColorPickerLoad.GetTexture(ModEntry.Path + "\\ColorPicker\\dot.png");
                 modEntry.OnToggle = OnToggle;
                 modEntry.OnGUI = onGUI;
                 modEntry.OnSaveGUI = OnSaveGUI;
@@ -100,6 +105,10 @@ namespace VisualAdjustments
                 modEntry.OnUnload = Unload;
 #endif
                 HairUnlocker.Main.Load(modEntry);
+                if(Main.blueprints == null)
+                {
+                    Main.blueprints = Util.GetBlueprints();
+                }
             }
             catch (Exception e)
             {
@@ -107,6 +116,129 @@ namespace VisualAdjustments
                 throw e;
             }
             return true;
+        }
+
+        public static void GenerateHairColor(UnitEntityData data)
+        {
+            /// might have to add race identifier to Main.HairColors
+            /// bypass primarycolorsprofile and set 2dtexture directly
+            try
+            {
+                var doll = DollResourcesManager.GetDoll(data);
+                if (doll == null) return;
+                var settings = Main.settings.GetCharacterSettings(data);
+                var colornum = settings.hairColor;
+                var jas = new Color(colornum[0], colornum[1], colornum[2]);
+                if (!doll.Hair.m_Entity.PrimaryColorsProfile.Ramps.Where(b => b.isReadable).Any(a => a.GetPixel(1, 1).ToString() == jas.ToString()))
+                {
+                var texture = new Texture2D(256, 1, TextureFormat.ARGB32, false)
+                {
+                    filterMode = FilterMode.Bilinear
+                };
+                for (var y = 0; y < 1; y++)
+                {
+                    for (var x = 0; x < 256; x++)
+                    {
+                        texture.SetPixel(x, y, jas);
+                    }
+                }
+                texture.Apply();
+               /// if (!doll.Hair.m_Entity.PrimaryColorsProfile.Ramps.Where(b => b.isReadable).Any(a => a.GetPixel(1, 1).ToString() == texture.GetPixel(1, 1).ToString()))
+                /// if (!HairColors.ContainsKey(jas.ToString()))
+                {
+                   /// HairColors.Add(jas.ToString(), texture);
+                    doll.Hair.m_Entity.PrimaryColorsProfile.Ramps.Add(texture);
+                }
+                ///something with the indexing it messing up and returning -1
+                ///var index = doll.Hair.m_Entity.PrimaryColorsProfile.Ramps.Where(b => b.isReadable).First(a => a.GetPixel(1,1).ToString() == texture.GetPixel(1,1).ToString());
+                }
+                var index = doll.Hair.m_Entity.PrimaryColorsProfile.Ramps.Where(b => b.isReadable).First(a => a.GetPixel(1, 1).ToString() == jas.ToString());
+                settings.HairColor = doll.Hair.m_Entity.PrimaryColorsProfile.Ramps.IndexOf(index);
+                doll.SetHairColor(settings.HairColor);
+                Main.logger.Log(settings.HairColor.ToString());
+                ///Main.logger.Log(jas.ToString());
+                /*if(!doll.Hair.m_Entity.PrimaryColorsProfile.Ramps.Any(a => a == texture))
+                {
+                    doll.Hair.m_Entity.PrimaryColorsProfile.Ramps.Add(texture);
+                }*/
+                /// doll.SetHairColor(doll.Hair.m_Entity.PrimaryColorsProfile.Ramps.IndexOf(texture));
+            }
+            catch(Exception e)
+            {
+                Main.logger.Log(e.ToString());
+            }
+        }
+        public static void GenerateSkinColor(UnitEntityData data)
+        {
+            /// might have to add race identifier to Main.HairColors
+            /// bypass primarycolorsprofile and set 2dtexture directly
+            try
+            {
+                var doll = DollResourcesManager.GetDoll(data);
+                if (doll == null) return;
+                var settings = Main.settings.GetCharacterSettings(data);
+                var colornum = settings.skinColor;
+                var jas = new Color(colornum[0], colornum[1], colornum[2]);
+                if (!doll.Head.m_Entity.PrimaryColorsProfile.Ramps.Where(b => b.isReadable).Any(a => a.GetPixel(1, 1).ToString() == jas.ToString()))
+                {
+                    var texture = new Texture2D(256, 1, TextureFormat.ARGB32, false)
+                    {
+                        filterMode = FilterMode.Bilinear
+                    };
+                    for (var y = 0; y < 1; y++)
+                    {
+                        for (var x = 0; x < 256; x++)
+                        {
+                            texture.SetPixel(x, y, jas);
+                        }
+                    }
+                    texture.Apply();
+                    if (!doll.Head.m_Entity.PrimaryColorsProfile.Ramps.Where(b => b.isReadable).Any(a => a.GetPixel(1, 1).ToString() == texture.GetPixel(1, 1).ToString()))
+                    /// if (!HairColors.ContainsKey(jas.ToString()))
+                    {
+                        /// HairColors.Add(jas.ToString(), texture);
+                        doll.Head.m_Entity.PrimaryColorsProfile.Ramps.Add(texture);
+                    }
+                    ///something with the indexing it messing up and returning -1
+                    ///var index = doll.Hair.m_Entity.PrimaryColorsProfile.Ramps.Where(b => b.isReadable).First(a => a.GetPixel(1,1).ToString() == texture.GetPixel(1,1).ToString());
+                }
+                var index = doll.Head.m_Entity.PrimaryColorsProfile.Ramps.Where(b => b.isReadable).First(a => a.GetPixel(1, 1).ToString() == jas.ToString());
+                settings.SkinColor = doll.Head.m_Entity.PrimaryColorsProfile.Ramps.IndexOf(index);
+                doll.SetSkinColor(settings.SkinColor);
+                Main.logger.Log(settings.SkinColor.ToString());
+                ///Main.logger.Log(jas.ToString());
+                /*if(!doll.Hair.m_Entity.PrimaryColorsProfile.Ramps.Any(a => a == texture))
+                {
+                    doll.Hair.m_Entity.PrimaryColorsProfile.Ramps.Add(texture);
+                }*/
+                /// doll.SetHairColor(doll.Hair.m_Entity.PrimaryColorsProfile.Ramps.IndexOf(texture));
+            }
+            catch (Exception e)
+            {
+                Main.logger.Log(e.ToString());
+            }
+        }
+        private static Texture2D CreateGradient(Color colorStart, Color colorEnd, int width = 256, int height = 1)
+        {
+            var gradient = new Texture2D(width, height, TextureFormat.ARGB32, false)
+            {
+                filterMode = FilterMode.Bilinear
+            };
+
+            float inv = 1f / width;
+            for (var y = 0; y < height; y++)
+            {
+                for (var x = 0; x < width; x++)
+                {
+                    float t = x * inv;
+                    Color color = Color.Lerp(colorStart, colorEnd, t);
+                    gradient.SetPixel(x, y, color);
+                }
+            }
+
+            gradient.Apply();
+
+            return gradient;
         }
         static bool Unload(UnityModManager.ModEntry modEntry)
         {
@@ -123,6 +255,14 @@ namespace VisualAdjustments
             enabled = value;
             return true; // Permit or not.
         }
+       /* public static ColorPicker CreateColorPicker()
+        {
+            var asd = new ColorPicker 
+            { 
+            colorPicker = ColorPickerLoad.GetTexture(ModEntry.Path + "\\ColorPicker\\color.png")
+            };
+            return asd;
+        }*/
         public static void GetClasses()
         {
             if (classes.Count == 0)
@@ -348,10 +488,10 @@ namespace VisualAdjustments
                                 ModKit.UI.DisclosureToggle("Show Info", ref characterSettings.showInfo);
 #endif
                                 GUILayout.EndHorizontal();
-                                if (characterSettings.ReloadStuff == true)
+                                /*if (characterSettings.ReloadStuff == true)
                                 {
                                     CharacterManager.UpdateModel(unitEntityData.View);
-                                }
+                                }*/
                                 if (characterSettings.showClassSelection)
                                 {
                                     ChooseClassOutfit(characterSettings, unitEntityData);
@@ -436,7 +576,7 @@ namespace VisualAdjustments
                 var key = unitEntityData.Descriptor.UISettings.CustomPortraitRaw.CustomId;
                 var currentIndex = DollResourcesManager.CustomPortraits.IndexOf(key);
                 GUILayout.BeginHorizontal();
-                ModKit.UI.Label("Portrait  ", GUILayout.Width(DefaultLabelWidth));
+                ModKit.UI.Label("Portrait ", GUILayout.Width(DefaultLabelWidth));
                 var newIndex = (int)Math.Round(GUILayout.HorizontalSlider(currentIndex, 0, DollResourcesManager.CustomPortraits.Count, GUILayout.Width(DefaultSliderWidth)), 0);
                 if (GUILayout.Button("Prev", GUILayout.Width(55)) && currentIndex >= 0)
                 {
@@ -897,28 +1037,39 @@ namespace VisualAdjustments
                     race = doll.Race;
                 }
                 doll.SetRace(race);
+                doll.SetRacePreset(race.Presets.First());
+                if(dat.Gender == Gender.Male)
+                {
+                    dat.View.CharacterAvatar.Skeleton = doll.RacePreset.MaleSkeleton;
+                    dat.View.CharacterAvatar.m_Skeleton = doll.RacePreset.MaleSkeleton;
+                    dat.View.CharacterAvatar.m_SkeletonChanged = true;
+                }
+                else
+                {
+                    dat.View.CharacterAvatar.Skeleton = doll.RacePreset.FemaleSkeleton;
+                    dat.View.CharacterAvatar.m_Skeleton = doll.RacePreset.FemaleSkeleton;
+                    dat.View.CharacterAvatar.m_SkeletonChanged = true;
+                }
+                dat.View.CharacterAvatar.UpdateSkeleton();
+                dat.View.CharacterAvatar.m_Skeleton = (doll.Gender != Gender.Male) ? doll.RacePreset.FemaleSkeleton : doll.RacePreset.MaleSkeleton;
                 CustomizationOptions customizationOptions = gender != Gender.Male ? race.FemaleOptions : race.MaleOptions;
-                if (Settings.Face != -1)
-                {
-                    doll.SetHead(customizationOptions.Heads[Settings.Face]);
-                }
-                else
-                {
-                    doll.SetHead(customizationOptions.Heads[0]);
-                }
-                if (Settings.Hair != -1)
-                {
-                    doll.SetHair(customizationOptions.Hair[Settings.Hair]);
-                }
-                else
-                {
-                    doll.SetHair(customizationOptions.Hair[0]);
-                }
-                if(customizationOptions.Beards.Length > 0 && Settings.Beards != -1)doll.SetBeard(customizationOptions.Beards[Settings.Beards]);
-                if (customizationOptions.Horns.Length > 0 && Settings.Horns != -1) doll.SetHorn(customizationOptions.Horns[Settings.Horns]);
-                if(Settings.HairColor != -1)doll.SetHairColor(Settings.HairColor);
-                if(Settings.SkinColor != -1)doll.SetSkinColor(Settings.SkinColor);
-                if (customizationOptions.Horns.Length > 0 && Settings.HornsColor != -1) doll.SetHornsColor(Settings.HornsColor);
+                Settings.Face = Main.EELIndex(Settings.Face, customizationOptions.Heads.Length);
+                doll.SetHead(customizationOptions.Heads[Settings.Face]);
+                if (customizationOptions.Hair.Length > 0)Settings.Hair = Main.EELIndex(Settings.Hair, customizationOptions.Hair.Length);
+                if (customizationOptions.Hair.Length > 0) doll.SetHair(customizationOptions.Hair[Settings.Hair]);
+                if (customizationOptions.Hair.Length > 0) Settings.HairColor = Main.EELIndex(Settings.HairColor, doll.Hair.m_Entity.PrimaryColorsProfile.Ramps.Count);
+                if (customizationOptions.Horns.Length > 0) Settings.Horns = Main.EELIndex(Settings.Horns, customizationOptions.Horns.Length);
+                if (customizationOptions.Horns.Length > 0) Settings.HornsColor = Main.EELIndex(Settings.HornsColor, doll.GetHornsRamps().Count);
+                //Settings.PrimaryColor = Math.Max(0, Math.Min(customizationOptions.Hair.Length, Settings.Hair));
+                //Settings.SecondaryColor = Math.Max(0, Math.Min(customizationOptions.Hair.Length, Settings.Hair));
+                Settings.SkinColor = Main.EELIndex(Settings.SkinColor, doll.Head.m_Entity.PrimaryColorsProfile.Ramps.Count);
+                /// doll.SetHair(customizationOptions.Hair[Settings.Hair]);
+                if (customizationOptions.Beards.Length > 0) Settings.Beards = Main.EELIndex(Settings.Beards, customizationOptions.Beards.Length);
+                if (customizationOptions.Beards.Length > 0)doll.SetBeard(customizationOptions.Beards[Settings.Beards]);
+                if(customizationOptions.Horns.Length > 0) doll.SetHorn(customizationOptions.Horns[Settings.Horns]);
+                if(customizationOptions.Hair.Length > 0)doll.SetHairColor(Settings.HairColor);
+                doll.SetSkinColor(Settings.SkinColor);
+                if(customizationOptions.Horns.Length > 0 && Settings.HornsColor != -1) doll.SetHornsColor(Settings.HornsColor);
                 doll.SetEquipColors(Settings.PrimaryColor, Settings.SecondaryColor);
                 if (shouldRebuild)
                 {
@@ -1025,7 +1176,33 @@ namespace VisualAdjustments
                 }*/
                 ChoosePortrait(unitEntityData);
                 ChooseAsks(unitEntityData);
-                if (unitEntityData.IsMainCharacter || unitEntityData.IsCustomCompanion()) ChooseAsks(unitEntityData);
+                ModKit.UI.Toggle("Custom Hair Color", ref Settings.customHairColor);
+                if (Settings.customHairColor)
+                {
+                    GUILayout.BeginHorizontal();
+                    GUILayout.Space(15f);
+                    ModKit.UI.DisclosureToggle("Show Picker", ref Settings.showHair);
+                    GUILayout.EndHorizontal();
+                    if (Settings.showHair)
+                    {
+                        HairColorPicker.OnGUI(Settings, unitEntityData, new Color(Settings.hairColor[0], Settings.hairColor[1], Settings.hairColor[2]), true);
+                    }
+                    GUILayout.Space(5f);
+                }
+                ModKit.UI.Toggle("Custom Skin Color", ref Settings.customSkinColor);
+                if (Settings.customSkinColor)
+                {
+                    GUILayout.BeginHorizontal();
+                    GUILayout.Space(15f);
+                    ModKit.UI.DisclosureToggle("Show Picker", ref Settings.showSkin);
+                    GUILayout.EndHorizontal();
+                    if (Settings.showSkin)
+                    {
+                        SkinColorPicker.OnGUI(Settings, unitEntityData, new Color(Settings.skinColor[0], Settings.skinColor[1], Settings.skinColor[2]), false);
+                    }
+                    GUILayout.Space(5f);
+                }
+                // if (unitEntityData.IsMainCharacter || unitEntityData.IsCustomCompanion()) ChooseAsks(unitEntityData);
             }
             catch (Exception e) { Main.logger.Log(e.ToString()); }
         }
@@ -1118,6 +1295,11 @@ namespace VisualAdjustments
                 onChoose();
             }
         }
+        public static int EELIndex(int setting, int length)
+        {
+            if (setting >= 0 && setting < length) return setting;
+            else return 0;
+        }
         static void ChooseEquipment(UnitEntityData unitEntityData, CharacterSettings characterSettings)
         {
             void onHideEquipment()
@@ -1133,7 +1315,7 @@ namespace VisualAdjustments
             }
             void onWeaponChanged()
             {
-                /// if(unitEntityData.View.HandsEquipment.GetWeaponModel(false). != characterSettings.overrideWeapons)
+                ///if(unitEntityData.View.HandsEquipment.GetWeaponModel(false) != characterSettings.overrideWeapons)
                 unitEntityData.View.HandsEquipment.UpdateAll();
             }
             ChooseToggle("Hide Cap", ref characterSettings.hideCap, onHideEquipment);
@@ -1147,6 +1329,7 @@ namespace VisualAdjustments
             ChooseToggle("Hide Gloves", ref characterSettings.hideGloves, onHideEquipment);
             ChooseToggle("Hide Boots", ref characterSettings.hideBoots, onHideEquipment);
             ChooseToggle("Hide Inactive Weapons", ref characterSettings.hideWeapons, onWeaponChanged);
+            ChooseToggle("Hide Sheaths/Scabbards",ref characterSettings.hideSheaths,onWeaponChanged);
             ChooseToggle("Hide Belt Slots", ref characterSettings.hideBeltSlots, onWeaponChanged);
             ChooseToggle("Hide Quiver", ref characterSettings.hideQuiver, onWeaponChanged);
             ChooseToggle("Hide Weapon Enchantments", ref characterSettings.hideWeaponEnchantments, onWeaponChanged);

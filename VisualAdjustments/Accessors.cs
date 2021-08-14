@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Linq;
 
-namespace VisualAdjustments
+/*namespace VisualAdjustments
 {
     public delegate TResult FastGetter<TClass, TResult>(TClass source);
     public delegate object FastGetter(object source);
@@ -88,7 +88,7 @@ namespace VisualAdjustments
             var handler = CreateSetter(classType, valueType, name);
             return new FastSetter<TClass, TValue>((instance, value) => handler.Invoke(instance, value));
         }*/
-        public static FastInvoker CreateInvoker(Type classType, string name, Type resultType, params Type[] parameters)
+       /* public static FastInvoker CreateInvoker(Type classType, string name, Type resultType, params Type[] parameters)
         {
             var methodInfo = HarmonyLib.AccessTools.Method(classType, name, parameters);
             if (methodInfo == null)
@@ -189,4 +189,4 @@ namespace VisualAdjustments
             return new StaticFastInvokeHandler(classType, HarmonyLib.MethodInvoker.GetHandler(methodInfo)).Invoke;
         }
     }
-}
+}*/

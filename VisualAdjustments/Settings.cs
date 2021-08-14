@@ -5,6 +5,7 @@ using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using UnityEngine;
 using UnityModManagerNet;
 using static UnityModManagerNet.UnityModManager;
 
@@ -79,6 +80,13 @@ namespace VisualAdjustments
             public CharInfo classOutfit;
             public int companionPrimary = -1;
             public int companionSecondary = -1;
+            public float[] hairColor = new float[] {0,0,0};
+            public float[] skinColor = new float[] { 0, 0, 0 };
+            public bool customHairColor;
+            public bool customSkinColor;
+            public bool showSkin;
+            public bool showHair;
+            public bool hideSheaths;
         }
         [JsonProperty]
         public Dictionary<string, CharacterSettings> characterSettings = new Dictionary<string, CharacterSettings>();

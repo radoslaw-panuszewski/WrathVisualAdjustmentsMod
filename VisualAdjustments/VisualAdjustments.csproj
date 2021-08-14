@@ -58,14 +58,29 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="Accessors.cs" />
+    <Compile Include="CabariusModKitUI\GUIHelper.cs" />
+    <Compile Include="CabariusModKitUI\RichText.cs" />
+    <Compile Include="CabariusModKitUI\Toggle.cs" />
+    <Compile Include="CabariusModKitUI\UI+Builders.cs" />
+    <Compile Include="CabariusModKitUI\UI+Controls.cs" />
+    <Compile Include="CabariusModKitUI\UI+Elements.cs" />
+    <Compile Include="CabariusModKitUI\UI+Pickers.cs" />
+    <Compile Include="CabariusModKitUI\UI+Toggles.cs" />
+    <Compile Include="CabariusModKitUI\UI+Wrappers.cs" />
     <Compile Include="CharacterManager.cs" />
+    <Compile Include="ColorPicker.cs" />
     <Compile Include="CustomTypes.cs" />
     <Compile Include="DollResourcesManager.cs" />
     <Compile Include="EffectsManager.cs" />
     <Compile Include="EquipmentResourcesManager.cs" />
+    <Compile Include="ExtractEquipmentEntities.cs" />
     <Compile Include="HandsEquipmentManager.cs" />
     <Compile Include="InfoManager.cs" />
     <Compile Include="Main.cs" />
+    <Compile Include="mattatzcolor\Scripts\Editor\IMColorPickerEditor.cs" />
+    <Compile Include="mattatzcolor\Scripts\IMColorPicker.cs" />
+    <Compile Include="mattatzcolor\Scripts\IMColorPreset.cs" />
+    <Compile Include="mattatzcolor\Scripts\IMColorUtil.cs" />
     <Compile Include="PortraitPatch.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ResourceInfo.cs" />
@@ -102,9 +117,6 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\RespecModRepo\RespecWrath\bin\Debug\Aze.Publicise.MSBuild.Task.dll</HintPath>
     </Reference>
-    <Reference Include="JetBrains.Annotations, Version=2021.1.0.0, Culture=neutral, PublicKeyToken=1010a0d8d6380325, processorArchitecture=MSIL">
-      <HintPath>..\packages\JetBrains.Annotations.2021.1.0\lib\net20\JetBrains.Annotations.dll</HintPath>
-    </Reference>
     <Reference Include="Newtonsoft.Json, Version=8.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>B:\Games\Steam\steamapps\common\Pathfinder Second Adventure Demo\Wrath_Data\Managed\Newtonsoft.Json.dll</HintPath>
@@ -137,6 +149,10 @@
     <Reference Include="UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\RespecModRepo\RespecWrath\bin\Debug\UnityEngine.CoreModule.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.ImageConversionModule, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>B:\Games\Steam\steamapps\common\Pathfinder Second Adventure Demo\Wrath_Data\Managed\UnityEngine.ImageConversionModule.dll</HintPath>
     </Reference>
     <Reference Include="UnityEngine.IMGUIModule, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
