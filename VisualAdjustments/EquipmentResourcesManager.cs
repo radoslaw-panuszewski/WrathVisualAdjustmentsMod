@@ -195,7 +195,7 @@ namespace VisualAdjustments
                 }
             }
         }
-            static void BuildEquipmentLookupOld()
+          /* static void BuildEquipmentLookupOld()
             {
             var bp2 = Main.blueprints.OfType<KingmakerEquipmentEntity>().OrderBy(bp => bp.name);
            /// var blueprints = BluePrintThing.GetBlueprints<BlueprintItemEquipment>()
@@ -238,7 +238,7 @@ namespace VisualAdjustments
                         break;
                 }
             }
-        }
+        }*/
         static void BuildWeaponLookup()
         {
             ///var weapons = BluePrintThing.GetBlueprints<BlueprintItemEquipmentHand>().OrderBy((bp) => bp.name);

@@ -17,7 +17,7 @@ namespace ModKit {
         public static void Label(String title, params GUILayoutOption[] options) {
             // var content = tooltip == null ? new GUIContent(title) : new GUIContent(title, tooltip);
             // if (options.Length == 0) { options = new GUILayoutOption[] { GL.Width(150f) }; }
-            GL.Label(title, options);
+            GL.Label(title,options);
         }
 
         // Controls

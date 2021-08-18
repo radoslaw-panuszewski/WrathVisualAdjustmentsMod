@@ -66,7 +66,6 @@ namespace ModKit.Utility
         {
             value = GUILayout.TextField(value, style ?? GUI.skin.textField, options);
         }
-
         public static void TextField(ref string value, Action onChanged, GUIStyle style = null, params GUILayoutOption[] options)
         {
             TextField(ref value, null, onChanged, style, options);

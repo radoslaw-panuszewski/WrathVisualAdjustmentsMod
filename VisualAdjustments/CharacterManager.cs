@@ -34,14 +34,6 @@ namespace VisualAdjustments
             {
                 Main.SetEELs(unitEntityData, DollResourcesManager.GetDoll(unitEntityData),false);
                 var Settings = Main.settings.GetCharacterSettings(unitEntityData);
-                if (Settings.customHairColor)
-                {
-                    Main.GenerateHairColor(unitEntityData);
-                }
-                if (Settings.customSkinColor)
-                {
-                    Main.GenerateSkinColor(unitEntityData);
-                }
                 DollData doll = null;
                 if (DollResourcesManager.GetDoll(unitEntityData) != null) doll = DollResourcesManager.GetDoll(unitEntityData).CreateData();
                 if (doll == null && Settings.classOutfit.Name == "Default")
@@ -67,8 +59,8 @@ namespace VisualAdjustments
                         else
                         {
 
-                        }
-                        character.Skeleton = (doll.Gender != Gender.Male) ? doll.RacePreset.FemaleSkeleton : doll.RacePreset.MaleSkeleton;*/
+                        }*/
+                        character.Skeleton = (doll.Gender != Gender.Male) ? doll.RacePreset.FemaleSkeleton : doll.RacePreset.MaleSkeleton;
                         character.AddEquipmentEntities(doll.RacePreset.Skin.Load(doll.Gender, doll.RacePreset.RaceId), savedEquipment);
                         /// Main.logger.Log(character.name);
                         ///Main.logger.Log(unitEntityData.CharacterName);
@@ -80,12 +72,20 @@ namespace VisualAdjustments
                         character.AddEquipmentEntity(ee, savedEquipment);
                     }
                     doll.ApplyRampIndices(character);
+                   // Main.SetEELs(unitEntityData, DollResourcesManager.GetDoll(unitEntityData), false);
                     Traverse.Create(unitEntityData.View).Field("m_EquipmentClass").SetValue(null); //UpdateClassEquipment won't update if the class doesn't change
                                                                                                    //Adds Armor
                     unitEntityData.View.UpdateBodyEquipmentModel();
                     unitEntityData.View.UpdateClassEquipment();
-
-                    Main.SetEELs(unitEntityData, DollResourcesManager.GetDoll(unitEntityData), false);
+                    /*if (Settings.customHairColor)
+                    {
+                        Main.GenerateHairColor(unitEntityData);
+                    }
+                    if (Settings.customSkinColor)
+                    {
+                        Main.GenerateSkinColor(unitEntityData);
+                    }*/
+                   // Main.SetEELs(unitEntityData, DollResourcesManager.GetDoll(unitEntityData), false);
                    // Main.GenerateHairColor(unitEntityData);
                 }
                 else
@@ -218,6 +218,7 @@ namespace VisualAdjustments
             var asd = "";
             __instance.EntityData.Progression.Classes.Where(a => a.CharacterClass.HasEquipmentEntities()).Do(a => asd = a.CharacterClass.Name);
             ///Main.logger.Log(asd);
+            ///Main.logger.Log(asd);
             FilterOutfit(asd);
            /* switch (__instance.EntityData.Blueprint.AssetGuidThreadSafe)
             {
@@ -322,6 +323,7 @@ namespace VisualAdjustments
                 __instance.CharacterAvatar.SetPrimaryRampIndex(ee, primaryIndex);
                 __instance.CharacterAvatar.SetSecondaryRampIndex(ee, secondaryIndex);
             }
+            
         }
         static void HideSlot(UnitEntityView __instance, ItemSlot slot, ref bool dirty)
         {
@@ -525,8 +527,7 @@ namespace VisualAdjustments
                         }
                     }
 
-                    if (characterSettings.overrideCloak
-                       != null && !characterSettings.hideItemCloak)
+                    if (characterSettings.overrideCloak != null && !characterSettings.hideItemCloak)
                           {
                                     if (!OverrideEquipment(view, view.EntityData.Body.Shoulders, characterSettings.overrideCloak, ref dirty))
                                     {
@@ -593,7 +594,7 @@ namespace VisualAdjustments
                     {
                       view.CharacterAvatar.IsDirty = dirty;
                     }
-                   /// Main.SetEELs(view.EntityData, DollResourcesManager.GetDoll(view.EntityData));
+                    Main.SetEELs(view.EntityData, DollResourcesManager.GetDoll(view.EntityData),false);
         }
         /*
          * Called by CheatsSilly.UpdatePartyNoArmor and OnDataAttached
@@ -684,7 +685,7 @@ namespace VisualAdjustments
                 try
                 {
                     if (!Main.enabled) return;
-                    ///UpdateModel(__instance);
+                    UpdateModel(__instance);
                 }
                 catch (Exception ex)
                 {
@@ -918,7 +919,7 @@ namespace VisualAdjustments
                         ///Main.SetEELs(character,doll);
                         ///character.View.UpdateClassEquipment();
                       //  Main.GenerateHairColor(character);
-                      //  Main.SetEELs(character,doll,true);
+                        Main.SetEELs(character,doll,true);
                         RebuildCharacter(character);
                         UpdateModel(character.View);
                         /// character.View.HandsEquipment.UpdateAll();

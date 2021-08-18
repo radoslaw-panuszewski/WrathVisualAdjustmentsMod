@@ -24,7 +24,7 @@ namespace VisualAdjustments
         public  int ImageHeight = 400;
         public  Color col;
 
-        public void OnGUI(Settings.CharacterSettings charsettings, UnitEntityData data, Color initcolor, bool skinorhair)
+        public void OnGUI(Settings.CharacterSettings charsettings, UnitEntityData data, Color initcolor, ref float[] floatsetting)
         {
 
             /*if(col == null)
@@ -142,14 +142,15 @@ namespace VisualAdjustments
              {
                colorPicker.changeActiveColor(colorPicker._color,h,s,v);
              }
-            if(skinorhair)
-            {
-                charsettings.hairColor = new float[] { col.r, col.g, col.b };
-            }
-            else
-            {
-                charsettings.skinColor = new float[] { col.r, col.g, col.b };
-            }
+            /*  if(skinorhair)
+              {
+                  charsettings.hairColor = new float[] { col.r, col.g, col.b };
+              }
+              else
+              {
+                  charsettings.skinColor = new float[] { col.r, col.g, col.b };
+              }*/
+            floatsetting = new float[] {col.r,col.g,col.b };
             if (GUILayout.Button("Apply",GUILayout.ExpandWidth(false)))
             {
                 CharacterManager.RebuildCharacter(data);

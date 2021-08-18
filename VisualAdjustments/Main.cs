@@ -57,6 +57,8 @@ namespace VisualAdjustments
         public static Texture2D dot;
         public static ColorPicker HairColorPicker = new ColorPicker();
         public static ColorPicker SkinColorPicker = new ColorPicker();
+        public static ColorPicker PrimaryColorPicker = new ColorPicker();
+        public static ColorPicker SecondaryColorPicker = new ColorPicker();
         public static bool unlockcustomization;
         public static bool enabled;
         public static bool showsettings = false;
@@ -128,8 +130,8 @@ namespace VisualAdjustments
                 if (doll == null) return;
                 var settings = Main.settings.GetCharacterSettings(data);
                 var colornum = settings.hairColor;
-                var jas = new Color(colornum[0], colornum[1], colornum[2]);
-                if (!doll.Hair.m_Entity.PrimaryColorsProfile.Ramps.Where(b => b.isReadable).Any(a => a.GetPixel(1, 1).ToString() == jas.ToString()))
+                var settingcol = new Color(colornum[0], colornum[1], colornum[2]);
+                if (!doll.Hair.m_Entity.PrimaryColorsProfile.Ramps.Where(b => b.isReadable).Any(a => a.GetPixel(1, 1).ToString() == settingcol.ToString()))
                 {
                 var texture = new Texture2D(256, 1, TextureFormat.ARGB32, false)
                 {
@@ -139,7 +141,7 @@ namespace VisualAdjustments
                 {
                     for (var x = 0; x < 256; x++)
                     {
-                        texture.SetPixel(x, y, jas);
+                        texture.SetPixel(x, y, settingcol);
                     }
                 }
                 texture.Apply();
@@ -152,10 +154,10 @@ namespace VisualAdjustments
                 ///something with the indexing it messing up and returning -1
                 ///var index = doll.Hair.m_Entity.PrimaryColorsProfile.Ramps.Where(b => b.isReadable).First(a => a.GetPixel(1,1).ToString() == texture.GetPixel(1,1).ToString());
                 }
-                var index = doll.Hair.m_Entity.PrimaryColorsProfile.Ramps.Where(b => b.isReadable).First(a => a.GetPixel(1, 1).ToString() == jas.ToString());
+                var index = doll.Hair.m_Entity.PrimaryColorsProfile.Ramps.Where(b => b.isReadable).First(a => a.GetPixel(1, 1).ToString() == settingcol.ToString());
                 settings.HairColor = doll.Hair.m_Entity.PrimaryColorsProfile.Ramps.IndexOf(index);
                 doll.SetHairColor(settings.HairColor);
-                Main.logger.Log(settings.HairColor.ToString());
+                //Main.logger.Log(settings.HairColor.ToString());
                 ///Main.logger.Log(jas.ToString());
                 /*if(!doll.Hair.m_Entity.PrimaryColorsProfile.Ramps.Any(a => a == texture))
                 {
@@ -178,8 +180,8 @@ namespace VisualAdjustments
                 if (doll == null) return;
                 var settings = Main.settings.GetCharacterSettings(data);
                 var colornum = settings.skinColor;
-                var jas = new Color(colornum[0], colornum[1], colornum[2]);
-                if (!doll.Head.m_Entity.PrimaryColorsProfile.Ramps.Where(b => b.isReadable).Any(a => a.GetPixel(1, 1).ToString() == jas.ToString()))
+                var settingcol = new Color(colornum[0], colornum[1], colornum[2]);
+                if (!doll.Head.m_Entity.PrimaryColorsProfile.Ramps.Where(b => b.isReadable).Any(a => a.GetPixel(1, 1).ToString() == settingcol.ToString()))
                 {
                     var texture = new Texture2D(256, 1, TextureFormat.ARGB32, false)
                     {
@@ -189,7 +191,7 @@ namespace VisualAdjustments
                     {
                         for (var x = 0; x < 256; x++)
                         {
-                            texture.SetPixel(x, y, jas);
+                            texture.SetPixel(x, y, settingcol);
                         }
                     }
                     texture.Apply();
@@ -202,10 +204,10 @@ namespace VisualAdjustments
                     ///something with the indexing it messing up and returning -1
                     ///var index = doll.Hair.m_Entity.PrimaryColorsProfile.Ramps.Where(b => b.isReadable).First(a => a.GetPixel(1,1).ToString() == texture.GetPixel(1,1).ToString());
                 }
-                var index = doll.Head.m_Entity.PrimaryColorsProfile.Ramps.Where(b => b.isReadable).First(a => a.GetPixel(1, 1).ToString() == jas.ToString());
+                var index = doll.Head.m_Entity.PrimaryColorsProfile.Ramps.Where(b => b.isReadable).First(a => a.GetPixel(1, 1).ToString() == settingcol.ToString());
                 settings.SkinColor = doll.Head.m_Entity.PrimaryColorsProfile.Ramps.IndexOf(index);
                 doll.SetSkinColor(settings.SkinColor);
-                Main.logger.Log(settings.SkinColor.ToString());
+                //Main.logger.Log(settings.SkinColor.ToString());
                 ///Main.logger.Log(jas.ToString());
                 /*if(!doll.Hair.m_Entity.PrimaryColorsProfile.Ramps.Any(a => a == texture))
                 {
@@ -218,7 +220,131 @@ namespace VisualAdjustments
                 Main.logger.Log(e.ToString());
             }
         }
-        private static Texture2D CreateGradient(Color colorStart, Color colorEnd, int width = 256, int height = 1)
+        static public void GenerateOutfitcolor(UnitEntityData dat)
+        {
+            try
+            {
+                var doll = DollResourcesManager.GetDoll(dat);
+                if (doll == null) return;
+                if (dat.View == null) return;
+                if (dat.View.CharacterAvatar == null) return;
+                var settings = Main.settings.GetCharacterSettings(dat);
+                var colornum = settings.primColor;
+                var colornum2 = settings.secondColor;
+                var settingcol = new Color(colornum[0],colornum[1],colornum[2]);
+                var settingcolsecondary = new Color(colornum2[0], colornum2[1], colornum2[2]);
+                foreach (var a in doll.Clothes.Select(a => a.Load()))
+                {
+                 //   Main.logger.Log(a.ToString());
+                    if (a.PrimaryColorsProfile != null)// && a.PrimaryColorsProfile.Ramps.Count > 0)
+                    {
+                        if (!a.PrimaryColorsProfile.Ramps.Where(b => b.isReadable).Any(h => h.GetPixel(1, 1).ToString() == settingcol.ToString()))
+                        {
+                            var texture = new Texture2D(256, 1, TextureFormat.ARGB32, false)
+                            {
+                                filterMode = FilterMode.Bilinear
+                            };
+                            for (var y = 0; y < 1; y++)
+                            {
+                                for (var x = 0; x < 256; x++)
+                                {
+                                    texture.SetPixel(x, y, settingcol);
+                                }
+                            }
+                            texture.Apply();
+                            if (!a.PrimaryColorsProfile.Ramps.Where(b => b.isReadable).Any(x => x.GetPixel(1, 1).ToString() == texture.GetPixel(1, 1).ToString()))
+                            {
+                                a.PrimaryColorsProfile.Ramps.Add(texture);
+                              //  Main.logger.Log("addedtex");
+                              //  Main.logger.Log(texture.GetPixel(1, 1).ToString());
+                            }
+                          //  else
+                            {
+                               // Main.logger.Log("Didntaddtex");
+                            }
+                        }
+                        if (!a.PrimaryColorsProfile.Ramps.Where(b => b.isReadable).Any(h => h.GetPixel(1, 1).ToString() == settingcolsecondary.ToString()))
+                        {
+                            var texture = new Texture2D(256, 1, TextureFormat.ARGB32, false)
+                            {
+                                filterMode = FilterMode.Bilinear
+                            };
+                            for (var y = 0; y < 1; y++)
+                            {
+                                for (var x = 0; x < 256; x++)
+                                {
+                                    texture.SetPixel(x, y, settingcolsecondary);
+                                }
+                            }
+                            texture.Apply();
+                            if (!a.PrimaryColorsProfile.Ramps.Where(b => b.isReadable).Any(x => x.GetPixel(1, 1).ToString() == texture.GetPixel(1, 1).ToString()))
+                            {
+                                a.PrimaryColorsProfile.Ramps.Add(texture);
+                                //  Main.logger.Log("addedtex");
+                                //  Main.logger.Log(texture.GetPixel(1, 1).ToString());
+                            }
+                            //  else
+                            {
+                                // Main.logger.Log("Didntaddtex");
+                            }
+                        }
+                        var index = a.PrimaryColorsProfile.Ramps.Where(b => b.isReadable).First(w => w.GetPixel(1, 1).ToString() == settingcol.ToString());
+                        settings.PrimaryColor = a.PrimaryColorsProfile.Ramps.IndexOf(index);
+                        var indexsec = a.PrimaryColorsProfile.Ramps.Where(b => b.isReadable).First(w => w.GetPixel(1, 1).ToString() == settingcolsecondary.ToString());
+                        settings.SecondaryColor = a.PrimaryColorsProfile.Ramps.IndexOf(indexsec);
+                        // doll.SetSkinColor(settings.SkinColor);
+                        /*if (a.PrimaryColorsProfile.Ramps.Where(b => b.isReadable).Any(c => c.GetPixel(1, 1).ToString() == settingcol.ToString()))
+                        {
+                            var index = a.PrimaryColorsProfile.Ramps.Where(b => b.isReadable).FirstOrDefault(c => c.GetPixel(1, 1).ToString() == settingcol.ToString());
+                            foreach(var asdasddffads in a.PrimaryColorsProfile.Ramps.Where(nb => nb.isReadable))
+                            {
+                                Main.logger.Log(asdasddffads.ToString());
+                                Main.logger.Log(asdasddffads.GetPixel(1,1).ToString());
+                            }
+                            if (a.PrimaryColorsProfile.Ramps.FindIndex(h => h.isReadable && h.GetPixel(1,1).ToString() == index.GetPixel(1,1).ToString()) != -1)
+                            {
+                                settings.PrimaryColor = a.PrimaryColorsProfile.Ramps.FindIndex(h => h.isReadable && h.GetPixel(1, 1).ToString() == index.GetPixel(1, 1).ToString());
+                                Main.logger.Log("index stuff");
+                            }
+                           /* foreach(var xsdaf in a.PrimaryColorsProfile.Ramps)
+                            {
+                                if(xsdaf.isReadable)
+                                {
+                                    Main.logger.Log(settingcol.ToString());
+                                    Main.logger.Log(xsdaf.GetPixel(1, 1).ToString());
+                                    if (xsdaf.GetPixel(1,1).ToString() == settingcol.ToString())
+                                    {
+                                        Main.logger.Log("indexmatch");
+                                        settings.PrimaryColor = a.PrimaryColorsProfile.Ramps.IndexOf(index);
+                                        Main.logger.Log(a.PrimaryColorsProfile.Ramps.IndexOf(index).ToString());
+                                    }
+                                }
+                            }*/
+                        /* else
+                         {
+                             Main.logger.Log("NoIndexMatch");
+                         }
+                     }*/
+                    }
+                }
+                // var index = doll.Head.m_Entity.PrimaryColorsProfile.Ramps.Where(b => b.isReadable).First(a => a.GetPixel(1, 1).ToString() == settingcol.ToString());
+                //settings.SkinColor = doll.Head.m_Entity.PrimaryColorsProfile.Ramps.IndexOf(index);
+                doll.SetPrimaryEquipColor(settings.PrimaryColor);
+                //Main.logger.Log(settings.SkinColor.ToString());
+                ///Main.logger.Log(jas.ToString());
+                /*if(!doll.Hair.m_Entity.PrimaryColorsProfile.Ramps.Any(a => a == texture))
+                {
+                    doll.Hair.m_Entity.PrimaryColorsProfile.Ramps.Add(texture);
+                }*/
+                /// doll.SetHairColor(doll.Hair.m_Entity.PrimaryColorsProfile.Ramps.IndexOf(texture));
+            }
+            catch (Exception e)
+            {
+                Main.logger.Log(e.ToString());
+            }
+        }
+
+     /*   private static Texture2D CreateGradient(Color colorStart, Color colorEnd, int width = 256, int height = 1)
         {
             var gradient = new Texture2D(width, height, TextureFormat.ARGB32, false)
             {
@@ -239,7 +365,7 @@ namespace VisualAdjustments
             gradient.Apply();
 
             return gradient;
-        }
+        }*/
         static bool Unload(UnityModManager.ModEntry modEntry)
         {
             new Harmony(modEntry.Info.Id).UnpatchAll(modEntry.Info.Id);
@@ -730,15 +856,17 @@ namespace VisualAdjustments
             ChooseFromList(label, links, ref index, () =>
             {
 
-                Main.SetEELs(unitEntityData, doll);
+                //Main.SetEELs(unitEntityData, doll);
+
                 setter(links[index]);
-                unitEntityData.Descriptor.Doll = doll.CreateData();
-                CharacterManager.RebuildCharacter(unitEntityData);
 
             });
-            /// if(setting != index)
+            if(setting != index)
             {
                 setting = index;
+               // unitEntityData.Parts.Get<UnitPartDollData>().Default = doll.CreateData();
+                // CharacterManager.RebuildCharacter(unitEntityData);
+                Main.SetEELs(unitEntityData, doll);
             }
         }
         static void ChooseEEL(ref int setting, UnitEntityData unitEntityData, DollState doll, string label, EquipmentEntityLink[] links, EquipmentEntityLink link)
@@ -751,34 +879,41 @@ namespace VisualAdjustments
             ChooseFromList(label, links, ref index, () =>
             {
                 unitEntityData.Descriptor.Doll = doll.CreateData();
-                CharacterManager.RebuildCharacter(unitEntityData);
             });
             if (setting != index)
             {
                 setting = index;
                 SetEELs(unitEntityData, doll);
+                //CharacterManager.RebuildCharacter(unitEntityData);
             }
         }
         static void ChooseRamp(ref int setting, UnitEntityData unitEntityData, DollState doll, string label, List<Texture2D> textures, int currentRamp, Action<int> setter)
         {
-            GUILayout.BeginHorizontal();
-            ChooseFromList(label, textures, ref currentRamp, () =>
+            try
             {
-                SetEELs(unitEntityData, doll);
-                setter(currentRamp);
-                var DollPart = unitEntityData.Parts.Get<UnitPartDollData>();
-                DollPart.Default = doll.CreateData();
-                Traverse.Create(DollPart).Field("ActiveDoll").SetValue(doll.CreateData());
-               /// unitEntityData.Parts.Get<UnitPartDollData>().ActiveDoll = doll.CreateData();
-                CharacterManager.RebuildCharacter(unitEntityData);
-            });
-            if (setting != currentRamp)
-            {
-                setting = currentRamp;
+                GUILayout.BeginHorizontal();
+                ChooseFromList(label, textures, ref currentRamp, () =>
+                {
+                    setter(currentRamp);
+                 //   var DollPart = unitEntityData.Parts.Get<UnitPartDollData>();
+                //    DollPart.Default = doll.CreateData();
+                 ////   Traverse.Create(DollPart).Field("ActiveDoll").SetValue(doll.CreateData());
+                /// unitEntityData.Parts.Get<UnitPartDollData>().ActiveDoll = doll.CreateData();
+                });
+                if (setting != currentRamp)
+                {
+                    setting = currentRamp;
+                   // CharacterManager.RebuildCharacter(unitEntityData);
+                    SetEELs(unitEntityData, DollResourcesManager.GetDoll(unitEntityData));
+                }
+                GUILayout.EndHorizontal();
             }
-            GUILayout.EndHorizontal();
+            catch(Exception e)
+            {
+                Main.logger.Log(e.ToString());
+            }
         }
-        static void ChooseRamp(UnitEntityData unitEntityData, DollState doll, string label, List<Texture2D> textures, int currentRamp, Action<int> setter)
+       /* static void ChooseRamp(UnitEntityData unitEntityData, DollState doll, string label, List<Texture2D> textures, int currentRamp, Action<int> setter)
         {
             ChooseFromList(label, textures, ref currentRamp, () =>
             {
@@ -786,8 +921,9 @@ namespace VisualAdjustments
                 setter(currentRamp);
                 unitEntityData.Descriptor.Doll = doll.CreateData();
                 CharacterManager.RebuildCharacter(unitEntityData);
+                SetEELs(unitEntityData, doll);
             });
-        }
+        }*/
         public static int GetRaceIndex(UnitEntityData data)
         {
             var race = data.Progression.Race;
@@ -1028,7 +1164,7 @@ namespace VisualAdjustments
                 var gender = dat.Gender;
                 var races = BlueprintRoot.Instance.Progression.CharacterRaces.ToArray<BlueprintRace>();
                 BlueprintRace race;
-                if (Settings.RaceIndex != -1)
+                if(Settings.RaceIndex != -1)
                 { 
                  race = races[Settings.RaceIndex]; 
                 }
@@ -1038,6 +1174,18 @@ namespace VisualAdjustments
                 }
                 doll.SetRace(race);
                 doll.SetRacePreset(race.Presets.First());
+                if(Settings.customSkinColor)
+                {
+                    Main.GenerateSkinColor(dat);
+                }
+                if(Settings.customHairColor)
+                {
+                    Main.GenerateHairColor(dat);
+                }
+                if(Settings.customOutfitColors)
+                {
+                    Main.GenerateOutfitcolor(dat);
+                }
                 if(dat.Gender == Gender.Male)
                 {
                     dat.View.CharacterAvatar.Skeleton = doll.RacePreset.MaleSkeleton;
@@ -1051,26 +1199,45 @@ namespace VisualAdjustments
                     dat.View.CharacterAvatar.m_SkeletonChanged = true;
                 }
                 dat.View.CharacterAvatar.UpdateSkeleton();
-                dat.View.CharacterAvatar.m_Skeleton = (doll.Gender != Gender.Male) ? doll.RacePreset.FemaleSkeleton : doll.RacePreset.MaleSkeleton;
+               // dat.View.CharacterAvatar.m_Skeleton = (doll.Gender != Gender.Male) ? doll.RacePreset.FemaleSkeleton : doll.RacePreset.MaleSkeleton;
                 CustomizationOptions customizationOptions = gender != Gender.Male ? race.FemaleOptions : race.MaleOptions;
                 Settings.Face = Main.EELIndex(Settings.Face, customizationOptions.Heads.Length);
                 doll.SetHead(customizationOptions.Heads[Settings.Face]);
                 if (customizationOptions.Hair.Length > 0)Settings.Hair = Main.EELIndex(Settings.Hair, customizationOptions.Hair.Length);
+
                 if (customizationOptions.Hair.Length > 0) doll.SetHair(customizationOptions.Hair[Settings.Hair]);
-                if (customizationOptions.Hair.Length > 0) Settings.HairColor = Main.EELIndex(Settings.HairColor, doll.Hair.m_Entity.PrimaryColorsProfile.Ramps.Count);
-                if (customizationOptions.Horns.Length > 0) Settings.Horns = Main.EELIndex(Settings.Horns, customizationOptions.Horns.Length);
-                if (customizationOptions.Horns.Length > 0) Settings.HornsColor = Main.EELIndex(Settings.HornsColor, doll.GetHornsRamps().Count);
-                //Settings.PrimaryColor = Math.Max(0, Math.Min(customizationOptions.Hair.Length, Settings.Hair));
-                //Settings.SecondaryColor = Math.Max(0, Math.Min(customizationOptions.Hair.Length, Settings.Hair));
-                Settings.SkinColor = Main.EELIndex(Settings.SkinColor, doll.Head.m_Entity.PrimaryColorsProfile.Ramps.Count);
-                /// doll.SetHair(customizationOptions.Hair[Settings.Hair]);
+
                 if (customizationOptions.Beards.Length > 0) Settings.Beards = Main.EELIndex(Settings.Beards, customizationOptions.Beards.Length);
-                if (customizationOptions.Beards.Length > 0)doll.SetBeard(customizationOptions.Beards[Settings.Beards]);
-                if(customizationOptions.Horns.Length > 0) doll.SetHorn(customizationOptions.Horns[Settings.Horns]);
-                if(customizationOptions.Hair.Length > 0)doll.SetHairColor(Settings.HairColor);
+
+                if (customizationOptions.Beards.Length > 0) doll.SetBeard(customizationOptions.Beards[Settings.Beards]);
+
+                if (customizationOptions.Horns.Length > 0) Settings.Horns = Main.EELIndex(Settings.Horns, customizationOptions.Horns.Length);
+
+                if (customizationOptions.Horns.Length > 0) doll.SetHorn(customizationOptions.Horns[Settings.Horns]);
+
+                if (customizationOptions.Hair.Length > 0) Settings.HairColor = Main.EELIndex(Settings.HairColor, doll.Hair.m_Entity.PrimaryColorsProfile.Ramps.Count);
+
+                if (customizationOptions.Hair.Length > 0) doll.SetHairColor(Settings.HairColor);
+
+                if (customizationOptions.Horns.Length > 0) Settings.HornsColor = Main.EELIndex(Settings.HornsColor, doll.GetHornsRamps().Count);
+
+                if (customizationOptions.Horns.Length > 0) doll.SetHornsColor(Settings.HornsColor);
+
+                Settings.SkinColor = Main.EELIndex(Settings.SkinColor, doll.Head.m_Entity.PrimaryColorsProfile.Ramps.Count);
+
                 doll.SetSkinColor(Settings.SkinColor);
-                if(customizationOptions.Horns.Length > 0 && Settings.HornsColor != -1) doll.SetHornsColor(Settings.HornsColor);
+
+               // Settings.PrimaryColor = EELIndex(Settings.PrimaryColor, doll.GetOutfitRampsPrimary().Count);
+
+               // Settings.SecondaryColor = EELIndex(Settings.SecondaryColor, doll.GetOutfitRampsSecondary().Count); 
+
+                //doll.SetHair(customizationOptions.Hair[Settings.Hair]);
+
                 doll.SetEquipColors(Settings.PrimaryColor, Settings.SecondaryColor);
+                doll.SetPrimaryEquipColor(Settings.PrimaryColor);
+                doll.SetSecondaryEquipColor(Settings.SecondaryColor);
+                dat.Parts.Get<UnitPartDollData>().Default = doll.CreateData();
+              ///  CharacterManager.UpdateModel(dat.View);
                 if (shouldRebuild)
                 {
                     CharacterManager.RebuildCharacter(dat);
@@ -1155,9 +1322,15 @@ namespace VisualAdjustments
                 if (customizationOptions.Horns.Count() > 0) ChooseEEL(ref Settings.Horns, unitEntityData, doll, "Horns", customizationOptions.Horns, doll.Horn.m_Link, (EquipmentEntityLink ee) => doll.SetHorn(ee));
                 ChooseRamp(ref Settings.HairColor, unitEntityData, doll, "Hair Color", doll.GetHairRamps(), Settings.HairColor, (int index) => doll.SetHairColor(index));
                 ChooseRamp(ref Settings.SkinColor, unitEntityData, doll, "Skin Color", doll.GetSkinRamps(), Settings.SkinColor, (int index) => doll.SetSkinColor(index));
-                ChooseRamp(ref Settings.HornsColor, unitEntityData, doll, "Horn Color", doll.GetHornsRamps(), Settings.HornsColor, (int index) => doll.SetHornsColor(index));
-                ChooseRamp(ref Settings.PrimaryColor, unitEntityData, doll, "Primary Outfit Color", doll.GetOutfitRampsPrimary(), Settings.PrimaryColor, (int index) => doll.SetEquipColors(index, doll.EquipmentRampIndexSecondary));
-                ChooseRamp(ref Settings.SecondaryColor, unitEntityData, doll, "Secondary Outfit Color", doll.GetOutfitRampsSecondary(), Settings.SecondaryColor, (int index) => doll.SetEquipColors(doll.EquipmentRampIndex, index));
+                // Horn color doesnt exist in wrath?
+               // ChooseRamp(ref Settings.HornsColor, unitEntityData, doll, "Horn Color", doll.GetHornsRamps(), Settings.HornsColor, (int index) => doll.SetHornsColor(index));
+               // Main.logger.Log(doll.GetHornsRamps().Count.ToString());;
+                ChooseRamp(ref Settings.PrimaryColor, unitEntityData, doll, "Primary Outfit Color", doll.GetOutfitRampsPrimary(), Settings.PrimaryColor, (int index) => doll.SetPrimaryEquipColor(index));
+                ChooseRamp(ref Settings.SecondaryColor, unitEntityData, doll, "Secondary Outfit Color", doll.GetOutfitRampsSecondary(), Settings.SecondaryColor, (int index) => doll.SetSecondaryEquipColor(index));
+                if(Settings.PrimaryColor != doll.EquipmentRampIndex || Settings.SecondaryColor != doll.EquipmentRampIndexSecondary)
+                {
+                    doll.SetEquipColors(Settings.PrimaryColor,Settings.SecondaryColor);
+                }
                 ReferenceArrayProxy<BlueprintRaceVisualPreset, BlueprintRaceVisualPresetReference> presets = doll.Race.Presets;
                 BlueprintRaceVisualPreset racePreset = doll.RacePreset;
                 /*if (unitEntityData.Descriptor.LeftHandedOverride == true && GUILayout.Button("Set Right Handed", GUILayout.Width(DefaultLabelWidth)))
@@ -1185,7 +1358,7 @@ namespace VisualAdjustments
                     GUILayout.EndHorizontal();
                     if (Settings.showHair)
                     {
-                        HairColorPicker.OnGUI(Settings, unitEntityData, new Color(Settings.hairColor[0], Settings.hairColor[1], Settings.hairColor[2]), true);
+                        HairColorPicker.OnGUI(Settings, unitEntityData, new Color(Settings.hairColor[0], Settings.hairColor[1], Settings.hairColor[2]), ref Settings.hairColor);
                     }
                     GUILayout.Space(5f);
                 }
@@ -1198,7 +1371,29 @@ namespace VisualAdjustments
                     GUILayout.EndHorizontal();
                     if (Settings.showSkin)
                     {
-                        SkinColorPicker.OnGUI(Settings, unitEntityData, new Color(Settings.skinColor[0], Settings.skinColor[1], Settings.skinColor[2]), false);
+                        SkinColorPicker.OnGUI(Settings, unitEntityData, new Color(Settings.skinColor[0], Settings.skinColor[1], Settings.skinColor[2]), ref Settings.skinColor);
+                    }
+                    GUILayout.Space(5f);
+                }
+                ModKit.UI.Toggle("Custom Outfit Colors", ref Settings.customOutfitColors);
+                if (Settings.customOutfitColors)
+                {
+                    GUILayout.BeginHorizontal();
+                    GUILayout.Space(15f);
+                    ModKit.UI.DisclosureToggle("Show Primary Picker", ref Settings.showPrimColor);
+                    GUILayout.EndHorizontal();
+                    if (Settings.showPrimColor)
+                    {
+                        PrimaryColorPicker.OnGUI(Settings, unitEntityData, new Color(Settings.primColor[0], Settings.primColor[1], Settings.primColor[2]), ref Settings.primColor);
+                    }
+                    GUILayout.Space(5f);
+                    GUILayout.BeginHorizontal();
+                    GUILayout.Space(15f);
+                    ModKit.UI.DisclosureToggle("Show Secondary Picker", ref Settings.showSecondColor);
+                    GUILayout.EndHorizontal();
+                    if (Settings.showSecondColor)
+                    {
+                        SecondaryColorPicker.OnGUI(Settings, unitEntityData, new Color(Settings.secondColor[0], Settings.secondColor[1], Settings.secondColor[2]), ref Settings.secondColor);
                     }
                     GUILayout.Space(5f);
                 }
@@ -1234,23 +1429,26 @@ namespace VisualAdjustments
                     if (options.Hair.Length > 0) dollState.SetHair(options.Hair[0]);
                     if (options.Heads.Length > 0) dollState.SetHead(options.Hair[0]);
                     if (options.Beards.Length > 0) dollState.SetBeard(options.Hair[0]);
-                    dollState.Validate();
-                    ///SetEELs(unitEntityData, dollState);
-                    unitEntityData.Descriptor.Doll = dollState.CreateData();
+                    //dollState.Validate();
+                    SetEELs(unitEntityData, dollState);
+                    // unitEntityData.Descriptor.Doll = dollState.CreateData();
                     unitEntityData.Parts.Add<UnitPartDollData>();
                     unitEntityData.Parts.Get<UnitPartDollData>().Default = dollState.CreateData();
+                    unitEntityData.Parts.Get<UnitPartDollData>().OnDidAttachToEntity();
+                    unitEntityData.Parts.Get<UnitPartDollData>().OnViewDidAttach();
+                    unitEntityData.View.HandsEquipment.UpdateLocatorTrackers();
                     // Traverse.Create(unitEntityData.Parts.Get<UnitPartDollData>()).Field("ActiveDoll").SetValue(dollState.CreateData()); 
-                    unitEntityData.Descriptor.ForcceUseClassEquipment = true;
-                    //CharacterManager.RebuildCharacter(unitEntityData);
+                //    unitEntityData.Descriptor.ForcceUseClassEquipment = true;
+                    CharacterManager.RebuildCharacter(unitEntityData);
                     // SetEELs(unitEntityData,dollState);
                     ///SetEELs(unitEntityData, dollState);
-                    CharacterManager.RebuildCharacter(unitEntityData);
+                  //  CharacterManager.RebuildCharacter(unitEntityData);
                     //SetEELs(unitEntityData, dollState);
-                    CharacterManager.UpdateModel(unitEntityData.View);
+                  //  CharacterManager.UpdateModel(unitEntityData.View);
                     // SetEELs(unitEntityData, dollState);
                     //CharacterManager.RebuildCharacter(unitEntityData);
                     // SetEELs(unitEntityData, dollState);
-                    SetEELs(unitEntityData, dollState, true);
+                   // SetEELs(unitEntityData, dollState, true);
                 }         
             }
             catch(Exception e)

@@ -17,7 +17,7 @@ namespace VisualAdjustments
 #if DEBUG
     public class ResourceInfo
     {
-        ///[HarmonyPatch(typeof(ResourcesLibrary), "CleanupLoadedCache")]
+        [HarmonyPatch(typeof(ResourcesLibrary), "CleanupLoadedCache")]
         class ResourcesLibrary_CleanupLoadedCache_Patch
         {
             static void Log()

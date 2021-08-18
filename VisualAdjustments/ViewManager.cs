@@ -140,6 +140,7 @@ namespace VisualAdjustments
                 }
             }
         }
+        
         [HarmonyPatch(typeof(UnitEntityView), "GetSpeedAnimationCoeff")]
         static class UnitEntityView_GetSpeedAnimationCoeff_Patch
         {

@@ -3,6 +3,7 @@ using Kingmaker;
 using Kingmaker.Blueprints;
 using Kingmaker.Blueprints.Items.Equipment;
 using Kingmaker.EntitySystem.Entities;
+using Kingmaker.Items;
 using Kingmaker.View;
 using Kingmaker.View.Equipment;
 using System;
@@ -100,6 +101,7 @@ namespace VisualAdjustments
                     var characterSettings = Main.settings.GetCharacterSettings(__instance.Owner);
                     if (characterSettings == null) return true;
                     if (!HasQuiver(__instance)) return true;
+                    updateSheaths(__instance.Owner.View);
                     if (characterSettings.hideQuiver)
                     {
                         UnitViewHandSlotData unitViewHandSlotData = ___m_Equipment.QuiverHandSlot;
@@ -119,6 +121,17 @@ namespace VisualAdjustments
                 }
                 return true;
             }
+            static void Postfix(UnitViewHandSlotData __instance)
+            {
+                try
+                {
+                   // updateSheaths(__instance.Owner.View);
+                }
+                catch(Exception e)
+                {
+                    Main.logger.Error(e.StackTrace);
+                }
+            }
         }
         /*
          * Hide Weapon Models 
@@ -132,6 +145,7 @@ namespace VisualAdjustments
                 {
                     if (!Main.enabled) return;
                     if (!__instance.Owner.IsPlayerFaction) return;
+                   // updateSheaths(__instance.Owner.View);
                     var characterSettings = Main.settings.GetCharacterSettings(__instance.Owner);
                     if (characterSettings == null) return;
                     if (characterSettings.hideWeapons)
@@ -206,11 +220,46 @@ namespace VisualAdjustments
         [HarmonyPatch(typeof(UnitViewHandsEquipment), "UpdateAll")]
         static class unitViewHandsEquipment_Patch
         {
-            //static bool Prefix(UnitViewHandsEquipment __instance)
-            // {
-            /// return false;
-            // }
-            static void Postfix(UnitViewHandsEquipment __instance)
+            static bool Prefix(UnitViewHandsEquipment __instance)
+            {
+
+                if (!Main.enabled && !__instance.Owner.IsPlayerFaction || !Main.enabled || !__instance.Active) return true;
+                try
+                {
+                      foreach (var slot in __instance.m_SlotsByVisualSlot)
+                      {
+                          if (slot != null && slot.SheathVisualModel != null && __instance.Active)
+                          {
+                                  foreach (Transform sheath in slot.SheathVisualModel.transform)
+                                  {
+                                      if (sheath != null)
+                                      {
+                                          if (Main.settings.GetCharacterSettings(__instance.Owner).hideSheaths)
+                                          {
+                                              slot.DestroySheathModel();
+                                          }
+                                          else
+                                          {
+                                              slot.SheathVisualModel.transform.localPosition = slot.VisualModel.transform.localPosition;
+                                          }
+                                      }
+                                  }
+                          }
+                      }
+                      if (__instance.Active)
+                      {
+                          __instance.RedistributeSlots();
+                      }
+                      __instance.UpdateLocatorTrackers();
+                      return true;
+                }
+                catch (Exception e)
+                {
+                    Main.logger.Error(e.ToString());
+                    return true;
+                }
+            }
+           /* static void Postfix(UnitViewHandsEquipment __instance)
             {
                 if (!Main.enabled && !__instance.Owner.IsPlayerFaction) return;
                 try
@@ -223,7 +272,15 @@ namespace VisualAdjustments
                             foreach (Transform sheath in slot.SheathVisualModel.transform)
                             {
                                 if (sheath == null) return;
-                                Main.logger.Log("UpdateAll");
+                                if(Main.settings.GetCharacterSettings(__instance.Owner).hideSheaths)
+                                {
+                                    slot.DestroySheathModel();
+                                }
+                                else
+                                {
+                                    slot.SheathVisualModel.transform.localPosition = slot.VisualModel.transform.localPosition;
+                                }
+                                /*Main.logger.Log("UpdateAll");
                                 Main.logger.Log("Sheath " + sheath.position.x.ToString() +" "+ sheath.position.y.ToString() +" "+ sheath.position.z.ToString());
                                 Main.logger.Log("Weapon " + slot.VisualModel.transform.position.x.ToString() + " " + slot.VisualModel.transform.position.y.ToString() +" "+ slot.VisualModel.transform.position.z.ToString());
                                 string xdiff = (slot.VisualModel.transform.position.x - sheath.position.x).ToString();
@@ -233,9 +290,9 @@ namespace VisualAdjustments
                                 string xdiff2 = (slot.VisualModel.transform.localPosition.x - sheath.localPosition.x).ToString();
                                 string ydiff2 = (slot.VisualModel.transform.localPosition.y - sheath.localPosition.y).ToString();
                                 string zdiff2 = (slot.VisualModel.transform.localPosition.z - sheath.localPosition.z).ToString();
-                                Main.logger.Log("diff2 " + xdiff2 + " " + zdiff2 + " " + ydiff2);
-                               /// slot.SheathVisualModel.transform.localPosition = slot.VisualModel.transform.localPosition;
-                                // sheath.position = slot.VisualModel.transform.position;
+                                Main.logger.Log("diff2 " + xdiff2 + " " + zdiff2 + " " + ydiff2);*//*
+                                
+                                //sheath.position = slot.VisualModel.transform.position;
                                 //sheath.position = new Vector3(0f, 0f, 0f);
                             }
                         }
@@ -245,29 +302,30 @@ namespace VisualAdjustments
                 {
                     Main.logger.Error(e.ToString());
                 }
-            }
+            }*/
         }
         static void updateSheaths(UnitEntityView data)
         {
             try
             {
+                if (data == null) return;
                 foreach (var slot in data.HandsEquipment.m_SlotsByVisualSlot)
                 {
                     if (slot != null)
                     {
-                        if (slot.SheathVisualModel == null) return;
-                        foreach (Transform sheath in slot.SheathVisualModel.transform)
+                        if (slot.SheathVisualModel != null)
                         {
-                            Main.logger.Log("updatesheaths");
-                          //  Main.logger.Log(sheath.position.x.ToString() + sheath.position.y.ToString() + sheath.position.z.ToString());
-                            Main.logger.Log("Sheath " + sheath.position.x.ToString() +" "+ sheath.position.y.ToString() +" "+ sheath.position.z.ToString());
-                            Main.logger.Log("Weapon " + slot.VisualModel.transform.position.x.ToString() +" "+ slot.VisualModel.transform.position.y.ToString() +" "+ slot.VisualModel.transform.position.z.ToString());
-                            string xdiff = (slot.VisualModel.transform.position.x - sheath.position.x).ToString();
-                            string ydiff = (slot.VisualModel.transform.position.y - sheath.position.y).ToString();
-                            string zdiff = (slot.VisualModel.transform.position.z - sheath.position.z).ToString();
-                            Main.logger.Log("diff " + xdiff + " " + zdiff + " " + ydiff);
-                          ///  slot.SheathVisualModel.transform.localPosition = slot.VisualModel.transform.localPosition;
-                            //sheath.position;
+                            if (Main.settings.GetCharacterSettings(data.Data).hideSheaths)
+                            {
+                                slot.DestroySheathModel();
+                            }
+                            else
+                            {
+                                if (slot.VisualModel != null)
+                                {
+                                    slot.SheathVisualModel.transform.localPosition = slot.VisualModel.transform.localPosition;
+                                }
+                            }
                         }
                     }
                 }
@@ -280,30 +338,30 @@ namespace VisualAdjustments
         [HarmonyPatch(typeof(UnitViewHandSlotData), "MatchVisuals")]
         static class unitViewHandSlotData_Patch
         {
-            static void Postfix(UnitViewHandSlotData __instance)
+            static bool Prefix(UnitViewHandSlotData __instance)
             {
                 try
                 {
                     //if (__instance == null) return;
-                    if (__instance.VisualModel == null) return;
+                    if (__instance.VisualModel == null) return true;
                     //if (__instance.Owner == null) return;
                     if (Main.enabled && __instance.Owner.IsPlayerFaction)
                     {
                         /*if (!Main.settings.GetCharacterSettings(__instance.Owner).hideSheaths)*/
-                       /// Main.logger.Log(__instance.Owner.CharacterName);
-                        if (!Main.settings.GetCharacterSettings(__instance.Owner).hideSheaths)
-                        {
-                            updateSheaths(__instance.Owner.View);
-                        }
-                        else
-                        {
-                            __instance.DestroySheathModel();
-                        }
+                        /// Main.logger.Log(__instance.Owner.CharacterName);
+                        updateSheaths(__instance.Owner.View);
+                        return false;
+
+                    }
+                    else
+                    {
+                        return true;
                     }
                 }
                 catch(Exception e)
                 {
                     Main.logger.Error(e.ToString());
+                    return true;
                 }
             }
         }
