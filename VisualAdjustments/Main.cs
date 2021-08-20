@@ -106,7 +106,6 @@ namespace VisualAdjustments
 #if DEBUG
                 modEntry.OnUnload = Unload;
 #endif
-                HairUnlocker.Main.Load(modEntry);
                 if(Main.blueprints == null)
                 {
                     Main.blueprints = Util.GetBlueprints();
@@ -225,119 +224,191 @@ namespace VisualAdjustments
             try
             {
                 var doll = DollResourcesManager.GetDoll(dat);
-                if (doll == null) return;
+                // if (doll == null) return;
                 if (dat.View == null) return;
                 if (dat.View.CharacterAvatar == null) return;
                 var settings = Main.settings.GetCharacterSettings(dat);
                 var colornum = settings.primColor;
                 var colornum2 = settings.secondColor;
-                var settingcol = new Color(colornum[0],colornum[1],colornum[2]);
+                var settingcol = new Color(colornum[0], colornum[1], colornum[2]);
                 var settingcolsecondary = new Color(colornum2[0], colornum2[1], colornum2[2]);
-                foreach (var a in doll.Clothes.Select(a => a.Load()))
+                //if (doll != null)
                 {
-                 //   Main.logger.Log(a.ToString());
-                    if (a.PrimaryColorsProfile != null)// && a.PrimaryColorsProfile.Ramps.Count > 0)
+                 ///   foreach (var a in doll.Clothes.Select(a => a.Load()))
+                    foreach(var a in dat.View.CharacterAvatar.EquipmentEntities.Where(A => A.PrimaryColorsProfile != null && A.PrimaryColorsProfile.Ramps.Count > 75))
                     {
-                        if (!a.PrimaryColorsProfile.Ramps.Where(b => b.isReadable).Any(h => h.GetPixel(1, 1).ToString() == settingcol.ToString()))
+                        //   Main.logger.Log(a.ToString());
+                        if (a.PrimaryColorsProfile != null)// && a.PrimaryColorsProfile.Ramps.Count > 0)
                         {
-                            var texture = new Texture2D(256, 1, TextureFormat.ARGB32, false)
+                            if (!a.PrimaryColorsProfile.Ramps.Where(b => b.isReadable).Any(h => h.GetPixel(1, 1).ToString() == settingcol.ToString()))
                             {
-                                filterMode = FilterMode.Bilinear
-                            };
-                            for (var y = 0; y < 1; y++)
-                            {
-                                for (var x = 0; x < 256; x++)
+                                var texture = new Texture2D(256, 1, TextureFormat.ARGB32, false)
                                 {
-                                    texture.SetPixel(x, y, settingcol);
-                                }
-                            }
-                            texture.Apply();
-                            if (!a.PrimaryColorsProfile.Ramps.Where(b => b.isReadable).Any(x => x.GetPixel(1, 1).ToString() == texture.GetPixel(1, 1).ToString()))
-                            {
-                                a.PrimaryColorsProfile.Ramps.Add(texture);
-                              //  Main.logger.Log("addedtex");
-                              //  Main.logger.Log(texture.GetPixel(1, 1).ToString());
-                            }
-                          //  else
-                            {
-                               // Main.logger.Log("Didntaddtex");
-                            }
-                        }
-                        if (!a.PrimaryColorsProfile.Ramps.Where(b => b.isReadable).Any(h => h.GetPixel(1, 1).ToString() == settingcolsecondary.ToString()))
-                        {
-                            var texture = new Texture2D(256, 1, TextureFormat.ARGB32, false)
-                            {
-                                filterMode = FilterMode.Bilinear
-                            };
-                            for (var y = 0; y < 1; y++)
-                            {
-                                for (var x = 0; x < 256; x++)
+                                    filterMode = FilterMode.Bilinear
+                                };
+                                for (var y = 0; y < 1; y++)
                                 {
-                                    texture.SetPixel(x, y, settingcolsecondary);
-                                }
-                            }
-                            texture.Apply();
-                            if (!a.PrimaryColorsProfile.Ramps.Where(b => b.isReadable).Any(x => x.GetPixel(1, 1).ToString() == texture.GetPixel(1, 1).ToString()))
-                            {
-                                a.PrimaryColorsProfile.Ramps.Add(texture);
-                                //  Main.logger.Log("addedtex");
-                                //  Main.logger.Log(texture.GetPixel(1, 1).ToString());
-                            }
-                            //  else
-                            {
-                                // Main.logger.Log("Didntaddtex");
-                            }
-                        }
-                        var index = a.PrimaryColorsProfile.Ramps.Where(b => b.isReadable).First(w => w.GetPixel(1, 1).ToString() == settingcol.ToString());
-                        settings.PrimaryColor = a.PrimaryColorsProfile.Ramps.IndexOf(index);
-                        var indexsec = a.PrimaryColorsProfile.Ramps.Where(b => b.isReadable).First(w => w.GetPixel(1, 1).ToString() == settingcolsecondary.ToString());
-                        settings.SecondaryColor = a.PrimaryColorsProfile.Ramps.IndexOf(indexsec);
-                        // doll.SetSkinColor(settings.SkinColor);
-                        /*if (a.PrimaryColorsProfile.Ramps.Where(b => b.isReadable).Any(c => c.GetPixel(1, 1).ToString() == settingcol.ToString()))
-                        {
-                            var index = a.PrimaryColorsProfile.Ramps.Where(b => b.isReadable).FirstOrDefault(c => c.GetPixel(1, 1).ToString() == settingcol.ToString());
-                            foreach(var asdasddffads in a.PrimaryColorsProfile.Ramps.Where(nb => nb.isReadable))
-                            {
-                                Main.logger.Log(asdasddffads.ToString());
-                                Main.logger.Log(asdasddffads.GetPixel(1,1).ToString());
-                            }
-                            if (a.PrimaryColorsProfile.Ramps.FindIndex(h => h.isReadable && h.GetPixel(1,1).ToString() == index.GetPixel(1,1).ToString()) != -1)
-                            {
-                                settings.PrimaryColor = a.PrimaryColorsProfile.Ramps.FindIndex(h => h.isReadable && h.GetPixel(1, 1).ToString() == index.GetPixel(1, 1).ToString());
-                                Main.logger.Log("index stuff");
-                            }
-                           /* foreach(var xsdaf in a.PrimaryColorsProfile.Ramps)
-                            {
-                                if(xsdaf.isReadable)
-                                {
-                                    Main.logger.Log(settingcol.ToString());
-                                    Main.logger.Log(xsdaf.GetPixel(1, 1).ToString());
-                                    if (xsdaf.GetPixel(1,1).ToString() == settingcol.ToString())
+                                    for (var x = 0; x < 256; x++)
                                     {
-                                        Main.logger.Log("indexmatch");
-                                        settings.PrimaryColor = a.PrimaryColorsProfile.Ramps.IndexOf(index);
-                                        Main.logger.Log(a.PrimaryColorsProfile.Ramps.IndexOf(index).ToString());
+                                        texture.SetPixel(x, y, settingcol);
                                     }
                                 }
-                            }*/
-                        /* else
-                         {
-                             Main.logger.Log("NoIndexMatch");
-                         }
-                     }*/
+                                texture.Apply();
+                                if (!a.PrimaryColorsProfile.Ramps.Where(b => b.isReadable).Any(x => x.GetPixel(1, 1).ToString() == texture.GetPixel(1, 1).ToString()))
+                                {
+                                    a.PrimaryColorsProfile.Ramps.Add(texture);
+                                    //  Main.logger.Log("addedtex");
+                                    //  Main.logger.Log(texture.GetPixel(1, 1).ToString());
+                                }
+                                //  else
+                                {
+                                    // Main.logger.Log("Didntaddtex");
+                                }
+                            }
+                            if (!a.PrimaryColorsProfile.Ramps.Where(b => b.isReadable).Any(h => h.GetPixel(1, 1).ToString() == settingcolsecondary.ToString()))
+                            {
+                                var texture = new Texture2D(256, 1, TextureFormat.ARGB32, false)
+                                {
+                                    filterMode = FilterMode.Bilinear
+                                };
+                                for (var y = 0; y < 1; y++)
+                                {
+                                    for (var x = 0; x < 256; x++)
+                                    {
+                                        texture.SetPixel(x, y, settingcolsecondary);
+                                    }
+                                }
+                                texture.Apply();
+                                if (!a.PrimaryColorsProfile.Ramps.Where(b => b.isReadable).Any(x => x.GetPixel(1, 1).ToString() == texture.GetPixel(1, 1).ToString()))
+                                {
+                                    a.PrimaryColorsProfile.Ramps.Add(texture);
+                                    //  Main.logger.Log("addedtex");
+                                    //  Main.logger.Log(texture.GetPixel(1, 1).ToString());
+                                }
+                                //  else
+                                {
+                                    // Main.logger.Log("Didntaddtex");
+                                }
+                            }
+                            var index = a.PrimaryColorsProfile.Ramps.Where(b => b.isReadable).First(w => w.GetPixel(1, 1).ToString() == settingcol.ToString());
+                            settings.PrimaryColor = a.PrimaryColorsProfile.Ramps.IndexOf(index);
+                            settings.companionPrimary = a.PrimaryColorsProfile.Ramps.IndexOf(index);
+                            var indexsec = a.PrimaryColorsProfile.Ramps.Where(b => b.isReadable).First(w => w.GetPixel(1, 1).ToString() == settingcolsecondary.ToString());
+                            settings.SecondaryColor = a.PrimaryColorsProfile.Ramps.IndexOf(indexsec);
+                            settings.companionSecondary = a.PrimaryColorsProfile.Ramps.IndexOf(indexsec);
+                            // doll.SetSkinColor(settings.SkinColor);
+                            /*if (a.PrimaryColorsProfile.Ramps.Where(b => b.isReadable).Any(c => c.GetPixel(1, 1).ToString() == settingcol.ToString()))
+                            {
+                                var index = a.PrimaryColorsProfile.Ramps.Where(b => b.isReadable).FirstOrDefault(c => c.GetPixel(1, 1).ToString() == settingcol.ToString());
+                                foreach(var asdasddffads in a.PrimaryColorsProfile.Ramps.Where(nb => nb.isReadable))
+                                {
+                                    Main.logger.Log(asdasddffads.ToString());
+                                    Main.logger.Log(asdasddffads.GetPixel(1,1).ToString());
+                                }
+                                if (a.PrimaryColorsProfile.Ramps.FindIndex(h => h.isReadable && h.GetPixel(1,1).ToString() == index.GetPixel(1,1).ToString()) != -1)
+                                {
+                                    settings.PrimaryColor = a.PrimaryColorsProfile.Ramps.FindIndex(h => h.isReadable && h.GetPixel(1, 1).ToString() == index.GetPixel(1, 1).ToString());
+                                    Main.logger.Log("index stuff");
+                                }
+                               /* foreach(var xsdaf in a.PrimaryColorsProfile.Ramps)
+                                {
+                                    if(xsdaf.isReadable)
+                                    {
+                                        Main.logger.Log(settingcol.ToString());
+                                        Main.logger.Log(xsdaf.GetPixel(1, 1).ToString());
+                                        if (xsdaf.GetPixel(1,1).ToString() == settingcol.ToString())
+                                        {
+                                            Main.logger.Log("indexmatch");
+                                            settings.PrimaryColor = a.PrimaryColorsProfile.Ramps.IndexOf(index);
+                                            Main.logger.Log(a.PrimaryColorsProfile.Ramps.IndexOf(index).ToString());
+                                        }
+                                    }
+                                }*/
+                            /* else
+                             {
+                                 Main.logger.Log("NoIndexMatch");
+                             }
+                         }*/
+                        }
                     }
                 }
-                // var index = doll.Head.m_Entity.PrimaryColorsProfile.Ramps.Where(b => b.isReadable).First(a => a.GetPixel(1, 1).ToString() == settingcol.ToString());
-                //settings.SkinColor = doll.Head.m_Entity.PrimaryColorsProfile.Ramps.IndexOf(index);
-                doll.SetPrimaryEquipColor(settings.PrimaryColor);
-                //Main.logger.Log(settings.SkinColor.ToString());
-                ///Main.logger.Log(jas.ToString());
-                /*if(!doll.Hair.m_Entity.PrimaryColorsProfile.Ramps.Any(a => a == texture))
-                {
-                    doll.Hair.m_Entity.PrimaryColorsProfile.Ramps.Add(texture);
-                }*/
-                /// doll.SetHairColor(doll.Hair.m_Entity.PrimaryColorsProfile.Ramps.IndexOf(texture));
             }
+            /* else
+             {
+                 foreach(var asdasdasd in dat.View.CharacterAvatar.EquipmentEntities)
+                 {
+                     if (asdasdasd != null && asdasdasd.PrimaryColorsProfile != null && asdasdasd.PrimaryColorsProfile.Ramps != null)
+                     {
+                         Main.logger.Log(asdasdasd.ToString());
+                         Main.logger.Log(asdasdasd.PrimaryColorsProfile.Ramps.Count.ToString());
+                     }
+                 }
+                 var bb = dat.View.CharacterAvatar.EquipmentEntities.First();
+                 Main.logger.Log(bb.ToString());
+                 Main.logger.Log("nodoll");
+                 if (!bb.PrimaryColorsProfile.Ramps.Where(b => b.isReadable).Any(h => h.GetPixel(1, 1).ToString() == settingcol.ToString()))
+                 {
+                     var texture = new Texture2D(256, 1, TextureFormat.ARGB32, false)
+                     {
+                         filterMode = FilterMode.Bilinear
+                     };
+                     for (var y = 0; y < 1; y++)
+                     {
+                         for (var x = 0; x < 256; x++)
+                         {
+                             texture.SetPixel(x, y, settingcol);
+                         }
+                     }
+                     texture.Apply();
+                     if (!bb.PrimaryColorsProfile.Ramps.Where(b => b.isReadable).Any(x => x.GetPixel(1, 1).ToString() == texture.GetPixel(1, 1).ToString()))
+                     {
+                         bb.PrimaryColorsProfile.Ramps.Add(texture);
+                         Main.logger.Log("addedtexnodoll");
+                         //  Main.logger.Log(texture.GetPixel(1, 1).ToString());
+                     }
+                     //  else
+                     {
+                          Main.logger.Log("Didntaddtexnodoll");
+                     }
+                 }
+                 if (!bb.PrimaryColorsProfile.Ramps.Where(b => b.isReadable).Any(h => h.GetPixel(1, 1).ToString() == settingcolsecondary.ToString()))
+                 {
+                     var texture = new Texture2D(256, 1, TextureFormat.ARGB32, false)
+                     {
+                         filterMode = FilterMode.Bilinear
+                     };
+                     for (var y = 0; y < 1; y++)
+                     {
+                         for (var x = 0; x < 256; x++)
+                         {
+                             texture.SetPixel(x, y, settingcolsecondary);
+                         }
+                     }
+                     texture.Apply();
+                     if (!bb.PrimaryColorsProfile.Ramps.Where(b => b.isReadable).Any(x => x.GetPixel(1, 1).ToString() == texture.GetPixel(1, 1).ToString()))
+                     {
+                         bb.PrimaryColorsProfile.Ramps.Add(texture);
+                         //  Main.logger.Log("addedtex");
+                         //  Main.logger.Log(texture.GetPixel(1, 1).ToString());
+                     }
+                     //  else
+                     {
+                         // Main.logger.Log("Didntaddtex");
+                     }
+                 }
+
+             }
+             // var index = doll.Head.m_Entity.PrimaryColorsProfile.Ramps.Where(b => b.isReadable).First(a => a.GetPixel(1, 1).ToString() == settingcol.ToString());
+             //settings.SkinColor = doll.Head.m_Entity.PrimaryColorsProfile.Ramps.IndexOf(index);
+             doll.SetPrimaryEquipColor(settings.PrimaryColor);
+             //Main.logger.Log(settings.SkinColor.ToString());
+             ///Main.logger.Log(jas.ToString());
+             /*if(!doll.Hair.m_Entity.PrimaryColorsProfile.Ramps.Any(a => a == texture))
+             {
+                 doll.Hair.m_Entity.PrimaryColorsProfile.Ramps.Add(texture);
+             }*//*
+             /// doll.SetHairColor(doll.Hair.m_Entity.PrimaryColorsProfile.Ramps.IndexOf(texture));
+         }*/
             catch (Exception e)
             {
                 Main.logger.Log(e.ToString());
@@ -443,6 +514,8 @@ namespace VisualAdjustments
                     GUILayout.Space(20f);
                     GUILayout.BeginVertical();
                     ModKit.UI.Toggle("Unlock all Portraits", ref settings.AllPortraits);
+                    ModKit.UI.Toggle("Unlock Hair", ref settings.UnlockHair,HairUnlocker.RestoreOptions,HairUnlocker.UnlockHair);
+                    ModKit.UI.Label("Warning: Unlock hair might have some hairstyles that clip or are otherwise malformed");
                     /*ModKit.UI.Toggle("Unlock Hair Options",ref HairUnlocker.Main.settings.UnlockHair);
                     if (HairUnlocker.Main.settings.UnlockHair) ModKit.UI.Toggle("Unlock All Hair Options (Includes incompatible options)",ref HairUnlocker.Main.settings.UnlockAllHair);
                     ModKit.UI.Toggle("Unlock Horns",ref HairUnlocker.Main.settings.UnlockHorns);
@@ -1170,22 +1243,18 @@ namespace VisualAdjustments
                 }
                 else
                 {
-                    race = doll.Race;
+                    if (!dat.Descriptor.Progression.Race.NameForAcronym.Contains("Mongrel"))
+                    {
+                        race = dat.Progression.Race;
+                    }
+                    else
+                    {
+                        race = Utilities.GetBlueprint<BlueprintRace>("0a5d473ead98b0646b94495af250fdc4");
+                    }
+                   // race = dat.Progression.Race;
                 }
                 doll.SetRace(race);
                 doll.SetRacePreset(race.Presets.First());
-                if(Settings.customSkinColor)
-                {
-                    Main.GenerateSkinColor(dat);
-                }
-                if(Settings.customHairColor)
-                {
-                    Main.GenerateHairColor(dat);
-                }
-                if(Settings.customOutfitColors)
-                {
-                    Main.GenerateOutfitcolor(dat);
-                }
                 if(dat.Gender == Gender.Male)
                 {
                     dat.View.CharacterAvatar.Skeleton = doll.RacePreset.MaleSkeleton;
@@ -1227,9 +1296,9 @@ namespace VisualAdjustments
 
                 doll.SetSkinColor(Settings.SkinColor);
 
-               // Settings.PrimaryColor = EELIndex(Settings.PrimaryColor, doll.GetOutfitRampsPrimary().Count);
+                Settings.PrimaryColor = EELIndex(Settings.PrimaryColor, doll.GetOutfitRampsPrimary().Count);
 
-               // Settings.SecondaryColor = EELIndex(Settings.SecondaryColor, doll.GetOutfitRampsSecondary().Count); 
+                Settings.SecondaryColor = EELIndex(Settings.SecondaryColor, doll.GetOutfitRampsSecondary().Count); 
 
                 //doll.SetHair(customizationOptions.Hair[Settings.Hair]);
 
@@ -1358,7 +1427,7 @@ namespace VisualAdjustments
                     GUILayout.EndHorizontal();
                     if (Settings.showHair)
                     {
-                        HairColorPicker.OnGUI(Settings, unitEntityData, new Color(Settings.hairColor[0], Settings.hairColor[1], Settings.hairColor[2]), ref Settings.hairColor);
+                        HairColorPicker.OnGUI(Settings, unitEntityData, new Color(Settings.hairColor[0], Settings.hairColor[1], Settings.hairColor[2]), ref Settings.hairColor, Main.GenerateHairColor);
                     }
                     GUILayout.Space(5f);
                 }
@@ -1371,7 +1440,7 @@ namespace VisualAdjustments
                     GUILayout.EndHorizontal();
                     if (Settings.showSkin)
                     {
-                        SkinColorPicker.OnGUI(Settings, unitEntityData, new Color(Settings.skinColor[0], Settings.skinColor[1], Settings.skinColor[2]), ref Settings.skinColor);
+                        SkinColorPicker.OnGUI(Settings, unitEntityData, new Color(Settings.skinColor[0], Settings.skinColor[1], Settings.skinColor[2]), ref Settings.skinColor, Main.GenerateSkinColor);
                     }
                     GUILayout.Space(5f);
                 }
@@ -1384,7 +1453,7 @@ namespace VisualAdjustments
                     GUILayout.EndHorizontal();
                     if (Settings.showPrimColor)
                     {
-                        PrimaryColorPicker.OnGUI(Settings, unitEntityData, new Color(Settings.primColor[0], Settings.primColor[1], Settings.primColor[2]), ref Settings.primColor);
+                        PrimaryColorPicker.OnGUI(Settings, unitEntityData, new Color(Settings.primColor[0], Settings.primColor[1], Settings.primColor[2]), ref Settings.primColor,Main.GenerateOutfitcolor);
                     }
                     GUILayout.Space(5f);
                     GUILayout.BeginHorizontal();
@@ -1393,7 +1462,7 @@ namespace VisualAdjustments
                     GUILayout.EndHorizontal();
                     if (Settings.showSecondColor)
                     {
-                        SecondaryColorPicker.OnGUI(Settings, unitEntityData, new Color(Settings.secondColor[0], Settings.secondColor[1], Settings.secondColor[2]), ref Settings.secondColor);
+                        SecondaryColorPicker.OnGUI(Settings, unitEntityData, new Color(Settings.secondColor[0], Settings.secondColor[1], Settings.secondColor[2]), ref Settings.secondColor, Main.GenerateOutfitcolor);
                     }
                     GUILayout.Space(5f);
                 }
@@ -1459,26 +1528,54 @@ namespace VisualAdjustments
             {
                 GUILayout.BeginHorizontal();
                 ModKit.UI.Label("Primary Outfit Color ", GUILayout.Width(DefaultLabelWidth));
-                var newIndex = (int)Math.Round(GUILayout.HorizontalSlider(characterSettings.companionPrimary, -1, 35, GUILayout.Width(DefaultSliderWidth)), 0);
+                var newIndex = (int)Math.Round(GUILayout.HorizontalSlider(characterSettings.companionPrimary, -1, 90, GUILayout.Width(DefaultSliderWidth)), 0);
                 ModKit.UI.Label(" " + newIndex, GUILayout.ExpandWidth(false));
                 GUILayout.EndHorizontal();
                 if (newIndex != characterSettings.companionPrimary)
                 {
                     characterSettings.companionPrimary = newIndex;
+                    CharacterManager.RebuildCharacter(unitEntityData);
                     CharacterManager.UpdateModel(unitEntityData.View);
                 }
             }
             {
                 GUILayout.BeginHorizontal();
                 ModKit.UI.Label("Secondary Outfit Color ", GUILayout.Width(DefaultLabelWidth));
-                var newIndex = (int)Math.Round(GUILayout.HorizontalSlider(characterSettings.companionSecondary, -1, 35, GUILayout.Width(DefaultSliderWidth)), 0);
+                var newIndex = (int)Math.Round(GUILayout.HorizontalSlider(characterSettings.companionSecondary, -1, 90, GUILayout.Width(DefaultSliderWidth)), 0);
                 ModKit.UI.Label(" " + newIndex, GUILayout.ExpandWidth(false));
                 GUILayout.EndHorizontal();
                 if (newIndex != characterSettings.companionSecondary)
                 {
                     characterSettings.companionSecondary = newIndex;
+                    if(characterSettings.customOutfitColors)
+                    {
+                        Main.GenerateOutfitcolor(unitEntityData);
+                    }
+                    CharacterManager.RebuildCharacter(unitEntityData);
                     CharacterManager.UpdateModel(unitEntityData.View);
                 }
+            }
+            ModKit.UI.Toggle("Custom Outfit Colors", ref characterSettings.customOutfitColors);
+            if (characterSettings.customOutfitColors)
+            {
+                GUILayout.BeginHorizontal();
+                GUILayout.Space(15f);
+                ModKit.UI.DisclosureToggle("Show Primary Picker", ref characterSettings.showPrimColor);
+                GUILayout.EndHorizontal();
+                if (characterSettings.showPrimColor)
+                {
+                    PrimaryColorPicker.OnGUI(characterSettings, unitEntityData, new Color(characterSettings.primColor[0], characterSettings.primColor[1], characterSettings.primColor[2]), ref characterSettings.primColor, Main.GenerateOutfitcolor);
+                }
+                GUILayout.Space(5f);
+                GUILayout.BeginHorizontal();
+                GUILayout.Space(15f);
+                ModKit.UI.DisclosureToggle("Show Secondary Picker", ref characterSettings.showSecondColor);
+                GUILayout.EndHorizontal();
+                if (characterSettings.showSecondColor)
+                {
+                    SecondaryColorPicker.OnGUI(characterSettings, unitEntityData, new Color(characterSettings.secondColor[0], characterSettings.secondColor[1], characterSettings.secondColor[2]), ref characterSettings.secondColor, Main.GenerateOutfitcolor);
+                }
+                GUILayout.Space(5f);
             }
             ChoosePortrait(unitEntityData);
             ChooseAsks(unitEntityData);

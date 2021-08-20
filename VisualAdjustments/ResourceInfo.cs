@@ -33,14 +33,14 @@ namespace VisualAdjustments
                     var LoadedResource = loadedResources[key];
                     var resource = Traverse.Create(LoadedResource).Field("Resource").GetValue<UnityEngine.Object>();
                     int requestCounter = Traverse.Create(LoadedResource).Field("RequestCounter").GetValue<int>();
-                    Main.Log($"Resource {resource?.name ?? "NULL"} RequestCounter {requestCounter} Key {key}");
+                  //  Main.Log($"Resource {resource?.name ?? "NULL"} RequestCounter {requestCounter} Key {key}");
                 }
             }
             static bool Prefix()
             {
                 try
                 {
-                    Main.Log("CleanupLoadedCache.Prefix");
+                 //   Main.Log("CleanupLoadedCache.Prefix");
                     Log();
                 }
                 catch(Exception ex)
@@ -53,7 +53,7 @@ namespace VisualAdjustments
             {
                 try
                 {
-                    Main.Log("CleanupLoadedCache.Postfix");
+                  //  Main.Log("CleanupLoadedCache.Postfix");
                     Log();
                 }
                 catch (Exception ex)

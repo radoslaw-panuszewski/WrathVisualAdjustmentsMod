@@ -190,6 +190,10 @@ namespace VisualAdjustments
                     {
                       Main.GenerateSkinColor(unitEntityData);
                     }
+                    if(GUILayout.Button("Generate Procedural Outfit Colors",GUILayout.Width(175f)))
+                    { 
+                      Main.GenerateOutfitcolor(unitEntityData);
+                    }
                     if (GUILayout.Button("Toggle Stance",GUILayout.Width(175f)))
                     {
                         unitEntityData.View.HandsEquipment.ForceSwitch(!unitEntityData.View.HandsEquipment.InCombat);

@@ -243,11 +243,11 @@ namespace imColorPicker
             }
             var currentHexCol = this.HexCol;
             this.HexCol = GUILayout.TextField(this.HexCol, 6, GUILayout.Width(100f));
-            if (currentHexCol != this.HexCol && this.HexCol != ColorUtility.ToHtmlStringRGB(_color))
+            if (this.HexCol != ColorUtility.ToHtmlStringRGB(_color) && currentHexCol != this.HexCol)
             {
                 if (ColorUtility.TryParseHtmlString("#" + this.HexCol, out _color))
                 {
-                    Main.logger.Log("ParsedHTML" + _color.ToString());
+                   // Main.logger.Log("ParsedHTML" + _color.ToString());
                     /*Color.RGBToHSV(_color, out float hh, out float ss, out float vv);
                     ///colorPicker.changeActiveColor(color, hh, ss, vv);
                   //  colorPicker._color = Color.HSVToRGB(hh, ss, vv);

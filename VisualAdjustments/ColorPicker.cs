@@ -24,7 +24,7 @@ namespace VisualAdjustments
         public  int ImageHeight = 400;
         public  Color col;
 
-        public void OnGUI(Settings.CharacterSettings charsettings, UnitEntityData data, Color initcolor, ref float[] floatsetting)
+        public void OnGUI(Settings.CharacterSettings charsettings, UnitEntityData data, Color initcolor, ref float[] floatsetting,Action<UnitEntityData> func)
         {
 
             /*if(col == null)
@@ -39,6 +39,7 @@ namespace VisualAdjustments
             }*/
             ///GUILayout.BeginHorizontal();
             //Color col;
+            
             if (colorPicker == null)
             {
                 colorPicker = new IMColorPicker();
@@ -131,6 +132,7 @@ namespace VisualAdjustments
                      colorPicker._color = col;*//*
                  }
              }*/
+            colorPicker.HexCol = ColorUtility.ToHtmlStringRGB(col);
             colorPicker.HexColUI(ref col);
             /*if (GUILayout.Button("!?button?!", GUILayout.Width(150)))
             {
@@ -150,10 +152,17 @@ namespace VisualAdjustments
               {
                   charsettings.skinColor = new float[] { col.r, col.g, col.b };
               }*/
-            floatsetting = new float[] {col.r,col.g,col.b };
-            if (GUILayout.Button("Apply",GUILayout.ExpandWidth(false)))
+            //floatsetting = new float[] {col.r,col.g,col.b };
+            floatsetting[0] = col.r;
+            floatsetting[1] = col.g;
+            floatsetting[2] = col.b;
+            if (GUILayout.Button("Rebuild Character (Apply)",GUILayout.ExpandWidth(false)))
             {
+              //  floatsetting = new float[] { col.r, col.g, col.b };
+                func(data);
                 CharacterManager.RebuildCharacter(data);
+                Main.SetEELs(data,DollResourcesManager.GetDoll(data));
+                func(data);
             }
 
            /// GUILayout.EndHorizontal();

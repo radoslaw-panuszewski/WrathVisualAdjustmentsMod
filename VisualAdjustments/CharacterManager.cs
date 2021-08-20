@@ -32,6 +32,7 @@ namespace VisualAdjustments
         {
             try
             {
+                if (unitEntityData.IsPet) return;
                 Main.SetEELs(unitEntityData, DollResourcesManager.GetDoll(unitEntityData),false);
                 var Settings = Main.settings.GetCharacterSettings(unitEntityData);
                 DollData doll = null;
@@ -44,6 +45,10 @@ namespace VisualAdjustments
                 var character = unitEntityData.View.CharacterAvatar;
                 ///Traverse.Create(unitEntityData.Descriptor).Field("UseClassEquipment").SetValue(true);
                 if (character == null) return; // Happens when overriding view
+                if (Settings.customOutfitColors)
+                {
+                    Main.GenerateOutfitcolor(unitEntityData);
+                }
                 if (doll != null)
                 {
                     unitEntityData.Descriptor.ForcceUseClassEquipment = true;
@@ -77,16 +82,14 @@ namespace VisualAdjustments
                                                                                                    //Adds Armor
                     unitEntityData.View.UpdateBodyEquipmentModel();
                     unitEntityData.View.UpdateClassEquipment();
-                    /*if (Settings.customHairColor)
-                    {
-                        Main.GenerateHairColor(unitEntityData);
-                    }
                     if (Settings.customSkinColor)
                     {
                         Main.GenerateSkinColor(unitEntityData);
-                    }*/
-                   // Main.SetEELs(unitEntityData, DollResourcesManager.GetDoll(unitEntityData), false);
-                   // Main.GenerateHairColor(unitEntityData);
+                    }
+                    if (Settings.customHairColor)
+                    {
+                        Main.GenerateHairColor(unitEntityData);
+                    }
                 }
                 else
                 {
@@ -95,8 +98,17 @@ namespace VisualAdjustments
                     IEnumerable<EquipmentEntity> bodyEquipment = unitEntityData.Body.AllSlots.SelectMany(
                         new Func<ItemSlot, IEnumerable<EquipmentEntity>>(unitEntityData.View.ExtractEquipmentEntities));
                     character.AddEquipmentEntities(bodyEquipment, false);
+                    unitEntityData.View.UpdateClassEquipment();
                 }
                 Main.SetEELs(unitEntityData, DollResourcesManager.GetDoll(unitEntityData), false);
+                if (Settings.customSkinColor)
+                {
+                    Main.GenerateSkinColor(unitEntityData);
+                }
+                if (Settings.customHairColor)
+                {
+                    Main.GenerateHairColor(unitEntityData);
+                }
                 //  DollResourcesManager.GetDoll(unitEntityData).SetHairColor(Settings.HairColor);
                 //Add Kineticist Tattoos
                 EventBus.RaiseEvent<IUnitViewAttachedHandler>(unitEntityData, delegate (IUnitViewAttachedHandler h)
@@ -106,7 +118,8 @@ namespace VisualAdjustments
             }
             catch(Exception e)
             {
-                Main.logger.Log(e.ToString());
+
+                Main.logger.Log(e.ToString() + " " + unitEntityData.CharacterName);
             }
         }
         public static void RebuildCharacterNew(UnitEntityData unitEntityData)
@@ -374,6 +387,11 @@ namespace VisualAdjustments
                     if (view.CharacterAvatar == null || view.EntityData == null) return;
                     if (!view.EntityData.IsPlayerFaction) return;
                     Settings.CharacterSettings characterSettings = Main.settings.GetCharacterSettings(view.EntityData);
+                    if(view.Data.IsPet)
+                    {
+
+                        return;
+                    }
                     if (characterSettings == null) return;
                     var doll = DollResourcesManager.GetDoll(view.EntityData);
                     bool dirty = view.CharacterAvatar.IsDirty;
@@ -807,6 +825,7 @@ namespace VisualAdjustments
         public static void PreloadUnit(UnitEntityView __instance)
         {
             if (__instance == null) return;
+            if (__instance.Data.IsPet) return;
             var unit = __instance.EntityData;
             if (!unit.IsPlayerFaction) return;
             var characterSettings = Main.settings.GetCharacterSettings(unit);

@@ -26,7 +26,7 @@
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
-    <DebugType>portable</DebugType>
+    <DebugType>full</DebugType>
     <Optimize>false</Optimize>
     <OutputPath>bin\Debug\</OutputPath>
     <DefineConstants>DEBUG;TRACE</DefineConstants>
@@ -85,9 +85,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ResourceInfo.cs" />
     <Compile Include="Settings.cs" />
-    <Compile Include="SpacehamsterUnlock\DisplayInfo.cs" />
-    <Compile Include="SpacehamsterUnlock\Main.cs" />
-    <Compile Include="SpacehamsterUnlock\Settings.cs" />
+    <Compile Include="SpacehamsterUnlock\Unlocker.cs" />
     <Compile Include="UnorderedList.cs" />
     <Compile Include="Util.cs" />
     <Compile Include="ViewManager.cs" />

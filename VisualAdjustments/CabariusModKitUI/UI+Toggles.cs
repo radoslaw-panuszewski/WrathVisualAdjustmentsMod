@@ -75,6 +75,23 @@ namespace ModKit {
                 params GUILayoutOption[] options) {
             return TogglePrivate(title, ref value, false, false, width, options);
         }
+        public static bool Toggle(
+        String title,
+        ref bool value,
+        Action act,
+        Action act2,
+        float width = 0,
+        params GUILayoutOption[] options)
+        {
+          //  var toggle = TogglePrivate(title, ref value, false, false, width, options);
+            if (TogglePrivate(title, ref value, false, false, width, options))
+            {
+               // value = toggle;
+                act();
+                    act2();
+            }
+            return value;
+        }
 
         public static bool ActionToggle(
                 String title,

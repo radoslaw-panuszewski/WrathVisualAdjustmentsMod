@@ -15,6 +15,7 @@ namespace VisualAdjustments
     {
         public bool rebuildCharacters = true;
         public bool AllPortraits = false;
+        public bool UnlockHair = false;
         public class CharacterSettings
         {
             public string characterName = "";
