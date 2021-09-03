@@ -507,13 +507,13 @@ namespace VisualAdjustments
             try
             {
                 if (!enabled) return;
-                if(GUILayout.Button("Fix Grey Characters",GUILayout.Width(200f)))
+               /* if(GUILayout.Button("Fix Grey Characters",GUILayout.Width(200f)))
                 {
                     foreach (var ch in Game.Instance.Player.AllCharacters)
                     {
                       CharacterManager.RebuildCharacter(ch);
                     }
-                }
+                }*/
                 ModKit.UI.DisclosureToggle("Settings",ref showsettings);
                 if(showsettings)
                 {
