@@ -507,6 +507,13 @@ namespace VisualAdjustments
             try
             {
                 if (!enabled) return;
+                if(GUILayout.Button("Fix Grey Characters",GUILayout.Width(200f)))
+                {
+                    foreach (var ch in Game.Instance.Player.AllCharacters)
+                    {
+                      CharacterManager.RebuildCharacter(ch);
+                    }
+                }
                 ModKit.UI.DisclosureToggle("Settings",ref showsettings);
                 if(showsettings)
                 {
@@ -543,6 +550,10 @@ namespace VisualAdjustments
                                     GUID = unitEntityData.Progression.GetEquipmentClass().AssetGuidThreadSafe,
                                     Name = unitEntityData.Progression.GetEquipmentClass().Name
                                 };
+                                if(unitEntityData.IsStoryCompanion())
+                                {
+                                    charinfo.Name = "Default";
+                                }
                                 var fb = new CharacterSettings
                                 {
                                     characterName = unitEntityData.CharacterName,
@@ -960,7 +971,7 @@ namespace VisualAdjustments
                 //CharacterManager.RebuildCharacter(unitEntityData);
             }
         }
-        static void ChooseRamp(ref int setting, UnitEntityData unitEntityData, DollState doll, string label, List<Texture2D> textures, int currentRamp, Action<int> setter)
+        private static void ChooseRamp(ref int setting, UnitEntityData unitEntityData, DollState doll, string label, List<Texture2D> textures, int currentRamp, Action<int> setter)
         {
             try
             {
@@ -1001,7 +1012,7 @@ namespace VisualAdjustments
         {
             var race = data.Progression.Race;
             var Settings = settings.GetCharacterSettings(data);
-            ///Main.logger.Log(race.Name.ToString());
+            //Main.logger.Log(race.Name.ToString());
             var result = -2;
             if (race.Name.ToString().Contains("Human"))
             {
@@ -1055,7 +1066,7 @@ namespace VisualAdjustments
             Main.logger.Log(result.ToString());
             return result;
         }
-        /// still doesnt move the silder
+        // still doesnt move the silder
       /*  static void ChooseRace(UnitEntityData unitEntityData, DollState doll)
         {
             var Settings = settings.GetCharacterSettings(unitEntityData);
@@ -1158,7 +1169,7 @@ namespace VisualAdjustments
             {
                 var doll2 = DollResourcesManager.GetDoll(dat);
                 if (dat.IsStoryCompanion() && doll2 == null) return;
-               /// Main.logger.Log("triedgetindices");
+               // Main.logger.Log("triedgetindices");
                 var doll = DollResourcesManager.GetDoll(dat);
                 var gender = dat.Gender;
                 var race = doll.Race;
@@ -1251,7 +1262,6 @@ namespace VisualAdjustments
                     {
                         race = Utilities.GetBlueprint<BlueprintRace>("0a5d473ead98b0646b94495af250fdc4");
                     }
-                   // race = dat.Progression.Race;
                 }
                 doll.SetRace(race);
                 doll.SetRacePreset(race.Presets.First());
@@ -1303,8 +1313,11 @@ namespace VisualAdjustments
                 //doll.SetHair(customizationOptions.Hair[Settings.Hair]);
 
                 doll.SetEquipColors(Settings.PrimaryColor, Settings.SecondaryColor);
-                doll.SetPrimaryEquipColor(Settings.PrimaryColor);
-                doll.SetSecondaryEquipColor(Settings.SecondaryColor);
+                if (Settings.classOutfit.Name != "Default")
+                {
+                    doll.SetPrimaryEquipColor(Settings.PrimaryColor);
+                    doll.SetSecondaryEquipColor(Settings.SecondaryColor);
+                }
                 dat.Parts.Get<UnitPartDollData>().Default = doll.CreateData();
               ///  CharacterManager.UpdateModel(dat.View);
                 if (shouldRebuild)
@@ -1613,6 +1626,21 @@ namespace VisualAdjustments
                 ///if(unitEntityData.View.HandsEquipment.GetWeaponModel(false) != characterSettings.overrideWeapons)
                 unitEntityData.View.HandsEquipment.UpdateAll();
             }
+            characterSettings.hideAll = !unitEntityData.UISettings.ShowClassEquipment;
+            ChooseToggle("Hide All Equipment", ref characterSettings.hideAll, onHideEquipment);
+            unitEntityData.UISettings.ShowClassEquipment = !characterSettings.hideAll;
+            if(unitEntityData.UISettings.ShowClassEquipment)
+            {
+                if (!characterSettings.hideArmor) characterSettings.hideArmor = true;
+                if (!characterSettings.hideHelmet) characterSettings.hideHelmet = true;
+                if (!characterSettings.hideGlasses) characterSettings.hideGlasses = true;
+                if (!characterSettings.hideShirt) characterSettings.hideShirt = true;
+                if (!characterSettings.hideItemCloak) characterSettings.hideItemCloak = true;
+                if (!characterSettings.hideBracers) characterSettings.hideBracers = true;
+                if (!characterSettings.hideGloves) characterSettings.hideGloves = true;
+                if (!characterSettings.hideBoots) characterSettings.hideBoots = true;
+                if (!characterSettings.hideCap) characterSettings.hideCap = true;
+            }
             ChooseToggle("Hide Cap", ref characterSettings.hideCap, onHideEquipment);
             ChooseToggle("Hide Helmet", ref characterSettings.hideHelmet, onHideEquipment);
             ChooseToggle("Hide Glasses", ref characterSettings.hideGlasses, onHideEquipment);
@@ -1696,12 +1724,13 @@ namespace VisualAdjustments
             Util.ChooseSlider("Override Helm", EquipmentResourcesManager.Helm, ref characterSettings.overrideHelm, onEquipment);
             Util.ChooseSlider("Override Cloak", EquipmentResourcesManager.Cloak, ref characterSettings.overrideCloak, onEquipment);
             Util.ChooseSlider("Override Shirt", EquipmentResourcesManager.Shirt, ref characterSettings.overrideShirt, onEquipment);
-            Util.ChooseSlider("Override Glasses", EquipmentResourcesManager.Glasses, ref characterSettings.overrideGlasses, onEquipment);
+            Util.ChooseSlider("Override Glasses/Mask", EquipmentResourcesManager.Glasses, ref characterSettings.overrideGlasses, onEquipment);
             Util.ChooseSlider("Override Armor", EquipmentResourcesManager.Armor, ref characterSettings.overrideArmor, onEquipment);
             Util.ChooseSlider("Override Bracers", EquipmentResourcesManager.Bracers, ref characterSettings.overrideBracers, onEquipment);
             Util.ChooseSlider("Override Gloves", EquipmentResourcesManager.Gloves, ref characterSettings.overrideGloves, onEquipment);
             Util.ChooseSlider("Override Boots", EquipmentResourcesManager.Boots, ref characterSettings.overrideBoots, onEquipment);
             Util.ChooseSlider("Override Tattoos", EquipmentResourcesManager.Tattoos, ref characterSettings.overrideTattoo, onEquipment);
+           // Util.ChooseSlider("Override Misc", EquipmentResourcesManager.Tattoos, ref characterSettings.overrideOther, onEquipment);
             ModKit.UI.Label("Weapons",  GUILayout.Width(DefaultLabelWidth));
             foreach (var kv in EquipmentResourcesManager.Weapons)
             {

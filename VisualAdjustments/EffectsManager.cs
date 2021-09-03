@@ -109,8 +109,9 @@ namespace VisualAdjustments
                                 {
                                     foreach (var fxObject in fxObjects)
                                     {
-                                        __instance.UnscaleFxTimes(fxObject);
-                                       /// UnscaleFxTimes(__instance, fxObject);
+                                        DollRoom.UnscaleFxTimes(fxObject);
+                                        //__instance.UnscaleFxTimes(fxObject);
+                                       // UnscaleFxTimes(__instance, fxObject);
                                     }
                                 }
                             }

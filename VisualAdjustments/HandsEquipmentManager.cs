@@ -313,7 +313,7 @@ namespace VisualAdjustments
                 {
                     if (slot != null)
                     {
-                        if (slot.SheathVisualModel != null)
+                        if (slot.SheathVisualModel != null && slot.VisualModel != null)
                         {
                             if (Main.settings.GetCharacterSettings(data.Data).hideSheaths)
                             {
@@ -361,6 +361,22 @@ namespace VisualAdjustments
                 catch(Exception e)
                 {
                     Main.logger.Error(e.ToString());
+                    return true;
+                }
+            }
+        }
+        [HarmonyPatch(typeof(UnitViewHandsEquipment), "ForceSwitch", new Type[] {typeof(bool) })]
+        static class UnitViewHandsSlotData_ForceSwitch_Patch
+        {
+            static bool Prefix(UnitViewHandSlotData __instance)
+            {
+                try
+                {
+                    return false;
+                }
+                catch (Exception ex)
+                {
+                    Main.Error(ex);
                     return true;
                 }
             }

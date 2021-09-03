@@ -41,6 +41,7 @@ namespace VisualAdjustments
             public bool hideQuiver = false;
             public bool hideGlasses = false;
             public bool hideShirt = false;
+            public bool hideAll = false;
             public bool ReloadStuff = false;
             public int RaceIndex = -1;
             public int Face = -1;
@@ -62,6 +63,7 @@ namespace VisualAdjustments
             public BlueprintRef overrideGloves = null;
             public BlueprintRef overrideBoots = null;
             public ResourceRef overrideTattoo = null;
+            public ResourceRef overrideOther = null;
             public ResourceRef overrideView = null;
             public List<BlueprintRef> overrideMainWeaponEnchantments = new List<BlueprintRef>();
             public List<BlueprintRef> overrideOffhandWeaponEnchantments = new List<BlueprintRef>();

@@ -141,6 +141,7 @@ namespace VisualAdjustments
         private static Dictionary<BlueprintRef, string> m_Gloves = new Dictionary<BlueprintRef, string>();
         private static Dictionary<BlueprintRef, string> m_Boots = new Dictionary<BlueprintRef, string>();
         private static Dictionary<ResourceRef, string> m_Tattoo = new Dictionary<ResourceRef, string>();
+        private static Dictionary<ResourceRef, string> m_Other = new Dictionary<ResourceRef, string>();
         private static Dictionary<ResourceRef, string> m_Units = new Dictionary<ResourceRef, string>();
         private static Dictionary<BlueprintRef, string> m_WeaponEnchantments = new Dictionary<BlueprintRef, string>();
         private static Dictionary<string, Dictionary<BlueprintRef, string>> m_Weapons = new Dictionary<string, Dictionary<BlueprintRef, string>>();
@@ -151,7 +152,7 @@ namespace VisualAdjustments
             /// var blueprints = BluePrintThing.GetBlueprints<BlueprintItemEquipment>()
             foreach (var bp in blueprints)
             {
-                if(bp.name.Contains("Goggles"))
+                if(bp.name.Contains("Goggles") || bp.name.Contains("Mask"))
                 {
                     if (!m_Glasses.ContainsKey(bp.AssetGuidThreadSafe))
                     m_Glasses[bp.AssetGuidThreadSafe] = bp.name;
@@ -170,8 +171,8 @@ namespace VisualAdjustments
                 {
                     if (!m_Armor.ContainsKey(bp.AssetGuidThreadSafe))
                         m_Armor[bp.AssetGuidThreadSafe] = bp.name;
-                    if (!m_Glasses.ContainsKey(bp.AssetGuidThreadSafe))
-                        m_Glasses[bp.AssetGuidThreadSafe] = bp.name;
+                    //if (!m_Glasses.ContainsKey(bp.AssetGuidThreadSafe))
+                      //  m_Glasses[bp.AssetGuidThreadSafe] = bp.name;
                 }
                 else if (bp.name.Contains("Bracers"))
                 {
@@ -193,6 +194,13 @@ namespace VisualAdjustments
                     if (!m_Cloak.ContainsKey(bp.AssetGuidThreadSafe))
                         m_Cloak[bp.AssetGuidThreadSafe] = bp.name;
                 }
+             /*   else
+                {
+                    if(!m_Other.ContainsKey(bp.AssetGuidThreadSafe))
+                    {
+                        m_Other[bp.AssetGuidThreadSafe] = bp.name;
+                    }
+                }*/
             }
         }
           /* static void BuildEquipmentLookupOld()
