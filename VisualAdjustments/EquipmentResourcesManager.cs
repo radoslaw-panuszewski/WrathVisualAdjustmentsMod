@@ -140,6 +140,8 @@ namespace VisualAdjustments
         private static Dictionary<BlueprintRef, string> m_Bracers = new Dictionary<BlueprintRef, string>();
         private static Dictionary<BlueprintRef, string> m_Gloves = new Dictionary<BlueprintRef, string>();
         private static Dictionary<BlueprintRef, string> m_Boots = new Dictionary<BlueprintRef, string>();
+        private static Dictionary<BlueprintRef, string> m_Warpaint = new Dictionary<BlueprintRef, string>();
+        private static Dictionary<BlueprintRef, string> m_Scars = new Dictionary<BlueprintRef, string>();
         private static Dictionary<ResourceRef, string> m_Tattoo = new Dictionary<ResourceRef, string>();
         private static Dictionary<ResourceRef, string> m_Other = new Dictionary<ResourceRef, string>();
         private static Dictionary<ResourceRef, string> m_Units = new Dictionary<ResourceRef, string>();
@@ -194,13 +196,23 @@ namespace VisualAdjustments
                     if (!m_Cloak.ContainsKey(bp.AssetGuidThreadSafe))
                         m_Cloak[bp.AssetGuidThreadSafe] = bp.name;
                 }
-             /*   else
+                else if (bp.name.Contains("Warpaint"))
                 {
-                    if(!m_Other.ContainsKey(bp.AssetGuidThreadSafe))
-                    {
-                        m_Other[bp.AssetGuidThreadSafe] = bp.name;
-                    }
-                }*/
+                    if (!m_Warpaint.ContainsKey(bp.AssetGuidThreadSafe))
+                        m_Warpaint[bp.AssetGuidThreadSafe] = bp.name;
+                }
+                else if (bp.name.Contains("Scar"))
+                {
+                    if (!m_Scars.ContainsKey(bp.AssetGuidThreadSafe))
+                        m_Scars[bp.AssetGuidThreadSafe] = bp.name;
+                }
+                /*   else
+                   {
+                       if(!m_Other.ContainsKey(bp.AssetGuidThreadSafe))
+                       {
+                           m_Other[bp.AssetGuidThreadSafe] = bp.name;
+                       }
+                   }*/
             }
         }
           /* static void BuildEquipmentLookupOld()

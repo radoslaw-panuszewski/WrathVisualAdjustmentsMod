@@ -38,7 +38,7 @@ namespace VisualAdjustments
             public bool hideHorns = false;
             public bool hideWeapons = false;
             public bool hideBeltSlots = false;
-            public bool hideQuiver = false;
+            public bool hidequiver = false;
             public bool hideGlasses = false;
             public bool hideShirt = false;
             public bool hideAll = false;
@@ -53,6 +53,10 @@ namespace VisualAdjustments
             public int HornsColor = -1;
             public int PrimaryColor = -1;
             public int SecondaryColor = -1;
+            public int BodyType = -1;
+            public int Scar = -1;
+            public int Warpaint = -1;
+            public int WarpaintCol = -1;
 
             public BlueprintRef overrideHelm = null;
             public BlueprintRef overrideCloak = null;

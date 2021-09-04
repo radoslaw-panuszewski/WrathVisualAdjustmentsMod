@@ -102,7 +102,7 @@ namespace VisualAdjustments
                     if (characterSettings == null) return true;
                     if (!HasQuiver(__instance)) return true;
                     updateSheaths(__instance.Owner.View);
-                    if (characterSettings.hideQuiver)
+                    if (characterSettings.hidequiver)
                     {
                         UnitViewHandSlotData unitViewHandSlotData = ___m_Equipment.QuiverHandSlot;
                         if (unitViewHandSlotData == null) return true;
@@ -338,7 +338,7 @@ namespace VisualAdjustments
         [HarmonyPatch(typeof(UnitViewHandSlotData), "MatchVisuals")]
         static class unitViewHandSlotData_Patch
         {
-            static bool Prefix(UnitViewHandSlotData __instance)
+            /*static bool Prefix(UnitViewHandSlotData __instance)
             {
                 try
                 {
@@ -347,10 +347,10 @@ namespace VisualAdjustments
                     //if (__instance.Owner == null) return;
                     if (Main.enabled && __instance.Owner.IsPlayerFaction)
                     {
-                        /*if (!Main.settings.GetCharacterSettings(__instance.Owner).hideSheaths)*/
+                        /*if (!Main.settings.GetCharacterSettings(__instance.Owner).hideSheaths)*//*
                         /// Main.logger.Log(__instance.Owner.CharacterName);
                         updateSheaths(__instance.Owner.View);
-                        return false;
+                        return true;
 
                     }
                     else
@@ -363,16 +363,35 @@ namespace VisualAdjustments
                     Main.logger.Error(e.ToString());
                     return true;
                 }
+            */
+            static void Postfix(UnitViewHandSlotData __instance)
+            {
+                try
+                {
+                    //if (__instance == null) return;
+                    if (__instance.VisualModel == null) return;
+                    //if (__instance.Owner == null) return;
+                    if (Main.enabled && __instance.Owner.IsPlayerFaction)
+                    {
+                        /*if (!Main.settings.GetCharacterSettings(__instance.Owner).hideSheaths)*/
+                        /// Main.logger.Log(__instance.Owner.CharacterName);
+                        updateSheaths(__instance.Owner.View);
+                    }
+                }
+                catch (Exception e)
+                {
+                    Main.logger.Error(e.ToString());
+                }
             }
         }
-        [HarmonyPatch(typeof(UnitViewHandsEquipment), "ForceSwitch", new Type[] {typeof(bool) })]
+     /*)   [HarmonyPatch(typeof(UnitViewHandsEquipment), "ForceSwitch", new Type[] {typeof(bool) })]
         static class UnitViewHandsSlotData_ForceSwitch_Patch
         {
             static bool Prefix(UnitViewHandSlotData __instance)
             {
                 try
                 {
-                    return false;
+                   // return false;
                 }
                 catch (Exception ex)
                 {
@@ -380,6 +399,6 @@ namespace VisualAdjustments
                     return true;
                 }
             }
-        }
+        }*/
     }
 }

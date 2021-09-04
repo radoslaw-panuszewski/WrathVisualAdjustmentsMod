@@ -61,7 +61,7 @@ namespace VisualAdjustments
         public static ColorPicker SecondaryColorPicker = new ColorPicker();
         public static bool unlockcustomization;
         public static bool enabled;
-        public static bool showsettings = false;
+        public static bool showsettings = true;
         public static bool classesloaded = false;
         public static Settings settings;
         public static Dictionary<string, EquipmentEntity.OutfitPart> CapeOutfitParts = new Dictionary<string, EquipmentEntity.OutfitPart>();
@@ -130,7 +130,8 @@ namespace VisualAdjustments
                 var settings = Main.settings.GetCharacterSettings(data);
                 var colornum = settings.hairColor;
                 var settingcol = new Color(colornum[0], colornum[1], colornum[2]);
-                if (!doll.Hair.m_Entity.PrimaryColorsProfile.Ramps.Where(b => b.isReadable).Any(a => a.GetPixel(1, 1).ToString() == settingcol.ToString()))
+                if (doll.GetHairEntities().Count <= 0) return;
+                    if (!doll.Hair.m_Entity.PrimaryColorsProfile.Ramps.Where(b => b.isReadable).Any(a => a.GetPixel(1, 1).ToString() == settingcol.ToString()))
                 {
                 var texture = new Texture2D(256, 1, TextureFormat.ARGB32, false)
                 {
@@ -617,10 +618,10 @@ namespace VisualAdjustments
                           /*  characterSettings.showInfo = */ModKit.UI.DisclosureToggle("Show Info", ref characterSettings.showInfo);
 #endif
                             GUILayout.EndHorizontal();
-                            if (characterSettings.ReloadStuff == true)
+                           /* if (characterSettings.ReloadStuff == true)
                             {
                                 CharacterManager.UpdateModel(unitEntityData.View);
-                            }
+                            }*/
                             if (characterSettings.showClassSelection)
                             {
                                 ChooseClassOutfit(characterSettings, unitEntityData);
@@ -1153,13 +1154,16 @@ namespace VisualAdjustments
         }
 
         static void ChooseVisualPreset(UnitEntityData unitEntityData, DollState doll, string label, BlueprintRaceVisualPreset[] presets,
-            BlueprintRaceVisualPreset currentPreset)
+            BlueprintRaceVisualPreset currentPreset, CharacterSettings settings)
         {
             var index = Array.FindIndex(presets, (vp) => vp == currentPreset);
             ChooseFromList(label, presets, ref index, () =>
             {
+                settings.BodyType = index;
                 doll.SetRacePreset(presets[index]);
+                unitEntityData.Parts.Get<UnitPartDollData>().Default = doll.CreateData();
                 unitEntityData.Descriptor.Doll = doll.CreateData();
+                
                 CharacterManager.RebuildCharacter(unitEntityData);
             });
         }
@@ -1215,7 +1219,6 @@ namespace VisualAdjustments
                 if (customizationOptions.Hair.Count() > 0) charsettings.Hair = Array.IndexOf(customizationOptions.Hair, doll.Hair.m_Link);
                 if (customizationOptions.Beards.Count() > 0) charsettings.Beards = Array.IndexOf(customizationOptions.Beards, doll.Beard.m_Link);
                 if (customizationOptions.Horns.Count() > 0) charsettings.Horns = Array.IndexOf(customizationOptions.Horns, doll.Horn.m_Link);
-
                 /// Main.logger.Log("hornpassed");
                 if (customizationOptions.Hair.Count() > 0) charsettings.HairColor = doll.HairRampIndex;
                 /// Main.logger.Log("haircolorpassed");
@@ -1227,7 +1230,10 @@ namespace VisualAdjustments
                 charsettings.PrimaryColor = doll.EquipmentRampIndex;
                 charsettings.SecondaryColor = doll.EquipmentRampIndexSecondary;
                 charsettings.RaceIndex = Array.IndexOf(BlueprintRoot.Instance.Progression.CharacterRaces.ToArray<BlueprintRace>(), doll.Race);
-
+               // charsettings.BodyType = doll.;
+                charsettings.Warpaint = doll.Warpaints.IndexOf(doll.Warpaint.m_Link);
+                charsettings.WarpaintCol = doll.WarpaintRampIndex;
+                charsettings.Scar = doll.Scars.IndexOf(doll.Scar.m_Link);
 
                 ///Main.logger.Log("Got Indices");
             }
@@ -1264,8 +1270,9 @@ namespace VisualAdjustments
                     }
                 }
                 doll.SetRace(race);
-                doll.SetRacePreset(race.Presets.First());
-                if(dat.Gender == Gender.Male)
+                Settings.BodyType = EELIndex(Settings.BodyType, doll.Race.Presets.Length);
+                doll.SetRacePreset(doll.Race.Presets[Settings.BodyType]);
+                if (dat.Gender == Gender.Male)
                 {
                     dat.View.CharacterAvatar.Skeleton = doll.RacePreset.MaleSkeleton;
                     dat.View.CharacterAvatar.m_Skeleton = doll.RacePreset.MaleSkeleton;
@@ -1279,6 +1286,8 @@ namespace VisualAdjustments
                 }
                 dat.View.CharacterAvatar.UpdateSkeleton();
                // dat.View.CharacterAvatar.m_Skeleton = (doll.Gender != Gender.Male) ? doll.RacePreset.FemaleSkeleton : doll.RacePreset.MaleSkeleton;
+              
+               
                 CustomizationOptions customizationOptions = gender != Gender.Male ? race.FemaleOptions : race.MaleOptions;
                 Settings.Face = Main.EELIndex(Settings.Face, customizationOptions.Heads.Length);
                 doll.SetHead(customizationOptions.Heads[Settings.Face]);
@@ -1301,6 +1310,14 @@ namespace VisualAdjustments
                 if (customizationOptions.Horns.Length > 0) Settings.HornsColor = Main.EELIndex(Settings.HornsColor, doll.GetHornsRamps().Count);
 
                 if (customizationOptions.Horns.Length > 0) doll.SetHornsColor(Settings.HornsColor);
+
+                if (doll.Scars.Count > 0) Settings.Scar = Main.EELIndex(Settings.Scar, doll.Scars.Count);
+                if (doll.Scars.Count > 0) doll.SetScar(doll.Scars[Settings.Scar]);
+                if (doll.Warpaints.Count > 0)
+                {
+                    if (doll.Warpaints.Count > 0) doll.SetWarpaint(doll.Warpaints[Settings.Warpaint]);
+                    if (doll.Warpaints.Count > 0) doll.SetWarpaintColor(Settings.WarpaintCol);
+                }
 
                 Settings.SkinColor = Main.EELIndex(Settings.SkinColor, doll.Head.m_Entity.PrimaryColorsProfile.Ramps.Count);
 
@@ -1398,14 +1415,17 @@ namespace VisualAdjustments
                 ChooseRace(unitEntityData, doll2);
                 if (doll2.Race != races[Settings.RaceIndex]) doll2.SetRace(races[Settings.RaceIndex]);
                 var doll = DollResourcesManager.GetDoll(unitEntityData);
+                ChooseVisualPreset(unitEntityData,doll,"Body Type",doll.Race.m_Presets.Select(a => (BlueprintRaceVisualPreset)a.GetBlueprint()).ToArray(),doll.RacePreset,Settings);
                 ChooseEEL(ref Settings.Face, unitEntityData, doll, "Face", customizationOptions.Heads, doll.Head.m_Link, (EquipmentEntityLink ee) => doll.SetHead(ee));
+                if(doll.Scars.Count > 0)ChooseEEL(ref Settings.Scar, unitEntityData, doll, "Scar", doll.Scars.ToArray(), doll.Scar.m_Link, (EquipmentEntityLink ee) => doll.SetScar(ee));
+                ChooseEEL(ref Settings.Warpaint, unitEntityData, doll, "Warpaint", doll.Warpaints.ToArray(), doll.Warpaint.m_Link, (EquipmentEntityLink ee) => doll.SetWarpaint(ee));
                 if (customizationOptions.Hair.Count() > 0) ChooseEEL(ref Settings.Hair, unitEntityData, doll, "Hair", customizationOptions.Hair, doll.Hair.m_Link, (EquipmentEntityLink ee) => doll.SetHair(ee));
                 if (customizationOptions.Beards.Count() > 0) ChooseEEL(ref Settings.Beards, unitEntityData, doll, "Beards", customizationOptions.Beards, doll.Beard.m_Link, (EquipmentEntityLink ee) => doll.SetBeard(ee));
                 if (customizationOptions.Horns.Count() > 0) ChooseEEL(ref Settings.Horns, unitEntityData, doll, "Horns", customizationOptions.Horns, doll.Horn.m_Link, (EquipmentEntityLink ee) => doll.SetHorn(ee));
+                if (doll.Warpaints.Count > 0) ChooseRamp(ref Settings.WarpaintCol, unitEntityData, doll, "Warpaint Color", doll.GetWarpaintRamps(), Settings.WarpaintCol, (int index) => doll.SetWarpaintColor(index));
                 ChooseRamp(ref Settings.HairColor, unitEntityData, doll, "Hair Color", doll.GetHairRamps(), Settings.HairColor, (int index) => doll.SetHairColor(index));
                 ChooseRamp(ref Settings.SkinColor, unitEntityData, doll, "Skin Color", doll.GetSkinRamps(), Settings.SkinColor, (int index) => doll.SetSkinColor(index));
-                // Horn color doesnt exist in wrath?
-               // ChooseRamp(ref Settings.HornsColor, unitEntityData, doll, "Horn Color", doll.GetHornsRamps(), Settings.HornsColor, (int index) => doll.SetHornsColor(index));
+                ChooseRamp(ref Settings.HornsColor, unitEntityData, doll, "Horn Color", doll.GetHornsRamps(), Settings.HornsColor, (int index) => doll.SetHornsColor(index));
                // Main.logger.Log(doll.GetHornsRamps().Count.ToString());;
                 ChooseRamp(ref Settings.PrimaryColor, unitEntityData, doll, "Primary Outfit Color", doll.GetOutfitRampsPrimary(), Settings.PrimaryColor, (int index) => doll.SetPrimaryEquipColor(index));
                 ChooseRamp(ref Settings.SecondaryColor, unitEntityData, doll, "Secondary Outfit Color", doll.GetOutfitRampsSecondary(), Settings.SecondaryColor, (int index) => doll.SetSecondaryEquipColor(index));
@@ -1547,8 +1567,8 @@ namespace VisualAdjustments
                 if (newIndex != characterSettings.companionPrimary)
                 {
                     characterSettings.companionPrimary = newIndex;
-                    CharacterManager.RebuildCharacter(unitEntityData);
                     CharacterManager.UpdateModel(unitEntityData.View);
+                    CharacterManager.RebuildCharacter(unitEntityData);
                 }
             }
             {
@@ -1564,8 +1584,8 @@ namespace VisualAdjustments
                     {
                         Main.GenerateOutfitcolor(unitEntityData);
                     }
-                    CharacterManager.RebuildCharacter(unitEntityData);
                     CharacterManager.UpdateModel(unitEntityData.View);
+                    CharacterManager.RebuildCharacter(unitEntityData);
                 }
             }
             ModKit.UI.Toggle("Custom Outfit Colors", ref characterSettings.customOutfitColors);
@@ -1612,8 +1632,8 @@ namespace VisualAdjustments
         {
             void onHideEquipment()
             {
-                CharacterManager.RebuildCharacter(unitEntityData);
                 CharacterManager.UpdateModel(unitEntityData.View);
+                CharacterManager.RebuildCharacter(unitEntityData);
             }
             void onHideBuff()
             {
@@ -1626,10 +1646,10 @@ namespace VisualAdjustments
                 ///if(unitEntityData.View.HandsEquipment.GetWeaponModel(false) != characterSettings.overrideWeapons)
                 unitEntityData.View.HandsEquipment.UpdateAll();
             }
-            characterSettings.hideAll = !unitEntityData.UISettings.ShowClassEquipment;
-            ChooseToggle("Hide All Equipment", ref characterSettings.hideAll, onHideEquipment);
+           // characterSettings.hideAll = unitEntityData.UISettings.ShowClassEquipment;
+           /* ChooseToggle("Hide All Equipment", ref characterSettings.hideAll, onHideEquipment);
             unitEntityData.UISettings.ShowClassEquipment = !characterSettings.hideAll;
-            if(unitEntityData.UISettings.ShowClassEquipment)
+            if(characterSettings.hideAll)
             {
                 if (!characterSettings.hideArmor) characterSettings.hideArmor = true;
                 if (!characterSettings.hideHelmet) characterSettings.hideHelmet = true;
@@ -1640,7 +1660,19 @@ namespace VisualAdjustments
                 if (!characterSettings.hideGloves) characterSettings.hideGloves = true;
                 if (!characterSettings.hideBoots) characterSettings.hideBoots = true;
                 if (!characterSettings.hideCap) characterSettings.hideCap = true;
-            }
+            }*/
+            /*else
+            {
+                if (characterSettings.hideArmor) characterSettings.hideArmor = false;
+                if (characterSettings.hideHelmet) characterSettings.hideHelmet = false;
+                if (characterSettings.hideGlasses) characterSettings.hideGlasses = false;
+                if (characterSettings.hideShirt) characterSettings.hideShirt = false;
+                if (characterSettings.hideItemCloak) characterSettings.hideItemCloak = false;
+                if (characterSettings.hideBracers) characterSettings.hideBracers = false;
+                if (characterSettings.hideGloves) characterSettings.hideGloves = false;
+                if (characterSettings.hideBoots) characterSettings.hideBoots = false;
+                if (characterSettings.hideCap) characterSettings.hideCap = false;
+            }*/
             ChooseToggle("Hide Cap", ref characterSettings.hideCap, onHideEquipment);
             ChooseToggle("Hide Helmet", ref characterSettings.hideHelmet, onHideEquipment);
             ChooseToggle("Hide Glasses", ref characterSettings.hideGlasses, onHideEquipment);
@@ -1654,7 +1686,7 @@ namespace VisualAdjustments
             ChooseToggle("Hide Inactive Weapons", ref characterSettings.hideWeapons, onWeaponChanged);
             ChooseToggle("Hide Sheaths/Scabbards",ref characterSettings.hideSheaths,onWeaponChanged);
             ChooseToggle("Hide Belt Slots", ref characterSettings.hideBeltSlots, onWeaponChanged);
-            ChooseToggle("Hide Quiver", ref characterSettings.hideQuiver, onWeaponChanged);
+            ChooseToggle("Hide Quiver", ref characterSettings.hidequiver, onWeaponChanged);
             ChooseToggle("Hide Weapon Enchantments", ref characterSettings.hideWeaponEnchantments, onWeaponChanged);
             ChooseToggle("Hide Wings", ref characterSettings.hideWings, onHideBuff);
             ChooseToggle("Hide Horns", ref characterSettings.hideHorns, onHideEquipment);
@@ -1716,8 +1748,8 @@ namespace VisualAdjustments
         {
             void onEquipment()
             {
-                CharacterManager.RebuildCharacter(unitEntityData);
                 CharacterManager.UpdateModel(unitEntityData.View);
+                CharacterManager.RebuildCharacter(unitEntityData);
             }
             ModKit.UI.Label("Equipment",  GUILayout.Width(DefaultLabelWidth));
             void onView() => ViewManager.ReplaceView(unitEntityData, characterSettings.overrideView);

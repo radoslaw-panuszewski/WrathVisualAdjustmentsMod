@@ -21,6 +21,7 @@ using System.Threading.Tasks;
 using Kingmaker.UI.MVVM._VM.Common;
 using UnityEngine;
 using static VisualAdjustments.Settings;
+using Kingmaker.UnitLogic.Class.LevelUp;
 
 namespace VisualAdjustments
 {
@@ -35,8 +36,9 @@ namespace VisualAdjustments
         {
             try
             {
+                if (unitEntityData == null) return;
                 if (unitEntityData.IsPet) return;
-                Main.SetEELs(unitEntityData, DollResourcesManager.GetDoll(unitEntityData),false);
+                Main.SetEELs(unitEntityData, DollResourcesManager.GetDoll(unitEntityData), false);
                 var Settings = Main.settings.GetCharacterSettings(unitEntityData);
                 DollData doll = null;
                 if (DollResourcesManager.GetDoll(unitEntityData) != null) doll = DollResourcesManager.GetDoll(unitEntityData).CreateData();
@@ -60,14 +62,12 @@ namespace VisualAdjustments
                     character.RemoveAllEquipmentEntities(savedEquipment);
                     if (doll.RacePreset != null)
                     {
-                      /*  if()
-                        {
-
-                        }
-                        else
-                        {
-
-                        }*/
+                        /*  if()
+                          {
+                          }
+                          else
+                          {
+                          }*/
                         character.Skeleton = (doll.Gender != Gender.Male) ? doll.RacePreset.FemaleSkeleton : doll.RacePreset.MaleSkeleton;
                         character.AddEquipmentEntities(doll.RacePreset.Skin.Load(doll.Gender, doll.RacePreset.RaceId), savedEquipment);
                         /// Main.logger.Log(character.name);
@@ -80,7 +80,7 @@ namespace VisualAdjustments
                         character.AddEquipmentEntity(ee, savedEquipment);
                     }
                     doll.ApplyRampIndices(character);
-                   // Main.SetEELs(unitEntityData, DollResourcesManager.GetDoll(unitEntityData), false);
+                    // Main.SetEELs(unitEntityData, DollResourcesManager.GetDoll(unitEntityData), false);
                     Traverse.Create(unitEntityData.View).Field("m_EquipmentClass").SetValue(null); //UpdateClassEquipment won't update if the class doesn't change
                                                                                                    //Adds Armor
                     unitEntityData.View.UpdateBodyEquipmentModel();
@@ -120,7 +120,7 @@ namespace VisualAdjustments
                     h.HandleUnitViewAttached();
                 });
             }
-            catch(Exception e)
+            catch (Exception e)
             {
 
                 Main.logger.Log(e.ToString() + " " + unitEntityData.CharacterName);
@@ -401,7 +401,6 @@ namespace VisualAdjustments
 
                 if (characterSettings == null) return;
                 var doll = DollResourcesManager.GetDoll(view.EntityData);
-                var hideq = view.Data.UISettings.ShowClassEquipment;
                 bool dirty = view.CharacterAvatar.IsDirty;
                 if (doll == null &&
                     characterSettings.classOutfit.Name !=
@@ -419,7 +418,7 @@ namespace VisualAdjustments
                 }
 
                 var equipmentClass = view.EntityData.Progression.GetEquipmentClass();
-                if (characterSettings.hideItemCloak || hideq)
+                if (characterSettings.hideItemCloak )
                 {
                     /*   if(equipmentClass.NameForAcronym.Contains("Ranger") || equipmentClass.NameForAcronym.Contains("Rogue") || equipmentClass.NameForAcronym.Contains("Inquisitor"))
                        {
@@ -504,22 +503,22 @@ namespace VisualAdjustments
                     view.CharacterAvatar.EquipmentEntities.First(b => b.name.Contains("Ranger_") || b.name.Contains("Rogue_") || b.name.Contains("Inquisitor_")).OutfitParts.Add(Main.CapeOutfitParts[equipmentClass.NameForAcronym]);
                   }
                 }*/
-                if (characterSettings.hideArmor || hideq)
+                if (characterSettings.hideArmor )
                 {
                     HideSlot(view, view.EntityData.Body.Armor, ref dirty);
                 }
 
-                if (characterSettings.hideGloves || hideq)
+                if (characterSettings.hideGloves )
                 {
                     HideSlot(view, view.EntityData.Body.Gloves, ref dirty);
                 }
 
-                if (characterSettings.hideBracers || hideq)
+                if (characterSettings.hideBracers )
                 {
                     HideSlot(view, view.EntityData.Body.Wrist, ref dirty);
                 }
 
-                if (characterSettings.hideBoots || hideq)
+                if (characterSettings.hideBoots )
                 {
                     HideSlot(view, view.EntityData.Body.Feet, ref dirty);
                 }
@@ -564,7 +563,7 @@ namespace VisualAdjustments
                     }
                 }
 
-                if (characterSettings.hideCap || hideq)
+                if (characterSettings.hideCap )
                 {
                     foreach (var ee in view.CharacterAvatar.EquipmentEntities.ToArray())
                     {
@@ -689,7 +688,10 @@ namespace VisualAdjustments
                 try
                 {
                     if (!Main.enabled) return;
+                    if (!__instance.Data.IsPlayerFaction) return;
+                   // Main.logger.Log("UpdateBody");
                     UpdateModel(__instance);
+                  //  RebuildCharacter(__instance.Data);
                 }
                 catch (Exception ex)
                 {
@@ -714,12 +716,13 @@ namespace VisualAdjustments
                     var b = ResourcesLibrary.TryGetBlueprint<KingmakerEquipmentEntity>(characterSettings.overrideArmor.assetId).Load(__instance.Data.Gender, __instance.Data.Progression.Race.RaceId);
                     var c = __instance.EntityData.View.CharacterAvatar.m_EquipmentEntities.Intersect(b);/// != characterSettings.overrideArmor.assetId;*/
                     if (!Main.enabled) return;
-                    if(__instance.EntityData != null)
+                    if (__instance.EntityData != null)
                     {
                         if (__instance.EntityData.Body.CurrentEquipmentSlots.Contains(slot))
                         {
                             ///DollResourcesManager.GetDoll(__instance.EntityData).Updated();
                             UpdateModel(__instance);
+                            RebuildCharacter(__instance.Data);
                         }
                     }
                   /*  if(slot.ToString().Contains("HandSlot") || slot.ToString().Contains("UsableSlot") || )
@@ -765,7 +768,9 @@ namespace VisualAdjustments
                 try
                 {
                     if (!Main.enabled) return;
+                    if (!__instance.Data.IsPlayerFaction) return;
                     UpdateModel(__instance);
+                   // RebuildCharacter(__instance.EntityData);
                 }
                 catch (Exception ex)
                 {
@@ -782,6 +787,7 @@ namespace VisualAdjustments
                 {
                     if (!Main.enabled) return true;
                     if (disableEquipmentClassPatch) return true;
+
                     if (!__instance.Owner.IsPlayerFaction) return true;
                     var characterSettings = Main.settings.GetCharacterSettings(__instance.Owner.Unit);
                     if (characterSettings == null) return true;
@@ -980,6 +986,21 @@ namespace VisualAdjustments
     }
 }
 }*/
+       /* [HarmonyPatch(typeof(DollState), "Updated")]
+        static class DollStateUpdated
+        {
+            static void Postfix(DollState __instance)
+            {
+                if(Main.enabled)
+                {
+                    foreach (var asd in Game.Instance.Player.AllCharacters)
+                    {
+                        CharacterManager.RebuildCharacter(asd);
+                    }
+                }
+            }
+        }*/
+
         [HarmonyPatch(typeof(CommonVM), "HideLoadingScreen")]
         static class Game_loadcomplete_Patch
         {
