@@ -91,13 +91,19 @@ namespace VisualAdjustments
             public float[] skinColor = new float[] { 0, 0, 0 };
             public bool customHairColor;
             public bool customSkinColor;
+            public bool customWarpaintColor;
+            public bool customHornColor;
             public bool showSkin;
             public bool showHair;
             public float[] primColor = new float[] { 0, 0, 0 };
             public float[] secondColor = new float[] { 0, 0, 0 };
+            public float[] hornColor = new float[] { 0, 0, 0 };
+            public float[] warpaintColor = new float[] { 0, 0, 0 };
             public bool customOutfitColors;
             public bool showPrimColor;
             public bool showSecondColor;
+            public bool showWarpaintColor;
+            public bool showHornColor;
             public bool hideSheaths;
         }
         [JsonProperty]

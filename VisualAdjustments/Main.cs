@@ -54,11 +54,12 @@ namespace VisualAdjustments
         {
             if (logger != null) logger.Log(msg);
         }
-        public static Texture2D dot;
         public static ColorPicker HairColorPicker = new ColorPicker();
         public static ColorPicker SkinColorPicker = new ColorPicker();
         public static ColorPicker PrimaryColorPicker = new ColorPicker();
         public static ColorPicker SecondaryColorPicker = new ColorPicker();
+        public static ColorPicker HornColorPicker = new ColorPicker();
+        public static ColorPicker WarpaintColorPicker  = new ColorPicker();
         public static bool unlockcustomization;
         public static bool enabled;
         public static bool showsettings = true;
@@ -214,6 +215,81 @@ namespace VisualAdjustments
                     doll.Hair.m_Entity.PrimaryColorsProfile.Ramps.Add(texture);
                 }*/
                 /// doll.SetHairColor(doll.Hair.m_Entity.PrimaryColorsProfile.Ramps.IndexOf(texture));
+            }
+            catch (Exception e)
+            {
+                Main.logger.Log(e.ToString());
+            }
+        }
+        public static void GenerateHornColor(UnitEntityData data)
+        {
+            try
+            {
+                var doll = DollResourcesManager.GetDoll(data);
+                if (doll == null) return;
+                if (doll.Horn.m_Entity == null) return;
+                var settings = Main.settings.GetCharacterSettings(data);
+                var colornum = settings.hornColor;
+                var settingcol = new Color(colornum[0], colornum[1], colornum[2]);
+                if (!doll.Horn.m_Entity.PrimaryColorsProfile.Ramps.Where(b => b.isReadable).Any(a => a.GetPixel(1, 1).ToString() == settingcol.ToString()))
+                {
+                    var texture = new Texture2D(256, 1, TextureFormat.ARGB32, false)
+                    {
+                        filterMode = FilterMode.Bilinear
+                    };
+                    for (var y = 0; y < 1; y++)
+                    {
+                        for (var x = 0; x < 256; x++)
+                        {
+                            texture.SetPixel(x, y, settingcol);
+                        }
+                    }
+                    texture.Apply();
+                    if (!doll.Horn.m_Entity.PrimaryColorsProfile.Ramps.Where(b => b.isReadable).Any(a => a.GetPixel(1, 1).ToString() == texture.GetPixel(1, 1).ToString()))
+                    {
+                        doll.Horn.m_Entity.PrimaryColorsProfile.Ramps.Add(texture);
+                    }
+                }
+                var index = doll.Horn.m_Entity.PrimaryColorsProfile.Ramps.Where(b => b.isReadable).First(a => a.GetPixel(1, 1).ToString() == settingcol.ToString());
+                settings.HornsColor = doll.Horn.m_Entity.PrimaryColorsProfile.Ramps.IndexOf(index);
+                doll.SetHornsColor(settings.HornsColor);
+            }
+            catch (Exception e)
+            {
+                Main.logger.Log(e.ToString());
+            }
+        }
+        public static void GenerateWarpaintColor(UnitEntityData data)
+        {
+            try
+            {
+                var doll = DollResourcesManager.GetDoll(data);
+                if (doll == null) return;
+                var settings = Main.settings.GetCharacterSettings(data);
+                var colornum = settings.warpaintColor;
+                var settingcol = new Color(colornum[0], colornum[1], colornum[2]);
+                if (!doll.Warpaint.m_Entity.PrimaryColorsProfile.Ramps.Where(b => b.isReadable).Any(a => a.GetPixel(1, 1).ToString() == settingcol.ToString()))
+                {
+                    var texture = new Texture2D(256, 1, TextureFormat.ARGB32, false)
+                    {
+                        filterMode = FilterMode.Bilinear
+                    };
+                    for (var y = 0; y < 1; y++)
+                    {
+                        for (var x = 0; x < 256; x++)
+                        {
+                            texture.SetPixel(x, y, settingcol);
+                        }
+                    }
+                    texture.Apply();
+                    if (!doll.Warpaint.m_Entity.PrimaryColorsProfile.Ramps.Where(b => b.isReadable).Any(a => a.GetPixel(1, 1).ToString() == texture.GetPixel(1, 1).ToString()))
+                    {
+                        doll.Warpaint.m_Entity.PrimaryColorsProfile.Ramps.Add(texture);
+                    }
+                }
+                var index = doll.Warpaint.m_Entity.PrimaryColorsProfile.Ramps.Where(b => b.isReadable).First(a => a.GetPixel(1, 1).ToString() == settingcol.ToString());
+                settings.WarpaintCol = doll.Warpaint.m_Entity.PrimaryColorsProfile.Ramps.IndexOf(index);
+                doll.SetWarpaintColor(settings.WarpaintCol);
             }
             catch (Exception e)
             {
@@ -508,13 +584,13 @@ namespace VisualAdjustments
             try
             {
                 if (!enabled) return;
-               /* if(GUILayout.Button("Fix Grey Characters",GUILayout.Width(200f)))
+                if(GUILayout.Button("Fix Grey Characters (Rebuild)",GUILayout.Width(200f)))
                 {
-                    foreach (var ch in Game.Instance.Player.AllCharacters)
+                    foreach (var ch in Game.Instance.Player.PartyAndPets.Concat(Game.Instance.Player.PartyAndPetsDetached))
                     {
                       CharacterManager.RebuildCharacter(ch);
                     }
-                }*/
+                }
                 ModKit.UI.DisclosureToggle("Settings",ref showsettings);
                 if(showsettings)
                 {
@@ -1313,6 +1389,8 @@ namespace VisualAdjustments
 
                 if (doll.Scars.Count > 0) Settings.Scar = Main.EELIndex(Settings.Scar, doll.Scars.Count);
                 if (doll.Scars.Count > 0) doll.SetScar(doll.Scars[Settings.Scar]);
+                if (doll.Warpaints.Count > 0) Settings.Warpaint = Main.EELIndex(Settings.Warpaint, doll.Warpaints.Count);
+                if (doll.Warpaints.Count > 0) Settings.WarpaintCol = Main.EELIndex(Settings.Warpaint, doll.Warpaints.Count);
                 if (doll.Warpaints.Count > 0)
                 {
                     if (doll.Warpaints.Count > 0) doll.SetWarpaint(doll.Warpaints[Settings.Warpaint]);
@@ -1435,9 +1513,10 @@ namespace VisualAdjustments
                 }
                 ReferenceArrayProxy<BlueprintRaceVisualPreset, BlueprintRaceVisualPresetReference> presets = doll.Race.Presets;
                 BlueprintRaceVisualPreset racePreset = doll.RacePreset;
-                /*if (unitEntityData.Descriptor.LeftHandedOverride == true && GUILayout.Button("Set Right Handed", GUILayout.Width(DefaultLabelWidth)))
+              /*if (unitEntityData.Descriptor.LeftHandedOverride == true && GUILayout.Button("Set Right Handed", GUILayout.Width(DefaultLabelWidth)))
                 {
                     unitEntityData.Descriptor.LeftHandedOverride = false;
+                    unitEntityData.Parts.Get<UnitPartDollData>().Default = doll.CreateData();
                     unitEntityData.Descriptor.m_LoadedDollData = doll.CreateData();
                     ViewManager.ReplaceView(unitEntityData, null);
                     unitEntityData.View.HandsEquipment.HandleEquipmentSetChanged();
@@ -1445,6 +1524,7 @@ namespace VisualAdjustments
                 else if (unitEntityData.Descriptor.LeftHandedOverride == false && GUILayout.Button("Set Left Handed", GUILayout.Width(DefaultLabelWidth)))
                 {
                     unitEntityData.Descriptor.LeftHandedOverride = true;
+                    unitEntityData.Parts.Get<UnitPartDollData>().Default = doll.CreateData();
                     unitEntityData.Descriptor.m_LoadedDollData = doll.CreateData();
                     ViewManager.ReplaceView(unitEntityData, null);
                     unitEntityData.View.HandsEquipment.HandleEquipmentSetChanged();
@@ -1496,6 +1576,35 @@ namespace VisualAdjustments
                     if (Settings.showSecondColor)
                     {
                         SecondaryColorPicker.OnGUI(Settings, unitEntityData, new Color(Settings.secondColor[0], Settings.secondColor[1], Settings.secondColor[2]), ref Settings.secondColor, Main.GenerateOutfitcolor);
+                    }
+                    GUILayout.Space(5f);
+                }
+                ModKit.UI.Toggle("Custom Horn Color", ref Settings.customHornColor);
+                    if (Settings.customHornColor)
+                    {
+                        GUILayout.BeginHorizontal();
+                        GUILayout.Space(15f);
+                        ModKit.UI.DisclosureToggle("Show Picker", ref Settings.showHornColor);
+                        GUILayout.EndHorizontal();
+                        if (Settings.showHornColor)
+                        {
+                            HornColorPicker.OnGUI(Settings, unitEntityData,
+                                new Color(Settings.hornColor[0], Settings.hornColor[1], Settings.hornColor[2]),
+                                ref Settings.hornColor, Main.GenerateHornColor);
+                        }
+
+                        GUILayout.Space(5f);
+                    }
+                    ModKit.UI.Toggle("Custom Warpaint Color", ref Settings.customWarpaintColor);
+                if (Settings.customHornColor)
+                {
+                    GUILayout.BeginHorizontal();
+                    GUILayout.Space(15f);
+                    ModKit.UI.DisclosureToggle("Show Picker", ref Settings.showWarpaintColor);
+                    GUILayout.EndHorizontal();
+                    if (Settings.showWarpaintColor)
+                    {
+                        WarpaintColorPicker.OnGUI(Settings, unitEntityData, new Color(Settings.warpaintColor[0], Settings.warpaintColor[1], Settings.warpaintColor[2]), ref Settings.warpaintColor, Main.GenerateWarpaintColor);
                     }
                     GUILayout.Space(5f);
                 }

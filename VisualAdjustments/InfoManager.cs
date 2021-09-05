@@ -23,6 +23,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using Kingmaker.Blueprints.Items.Weapons;
 using UnityEngine;
 namespace VisualAdjustments
 {
@@ -180,7 +181,7 @@ namespace VisualAdjustments
                     GUILayout.BeginHorizontal();
                     if (GUILayout.Button("Set EEL's",GUILayout.Width(175f)))
                     {
-                        Main.SetEELs(unitEntityData,DollResourcesManager.GetDoll(unitEntityData));
+                        Main.SetEELs(unitEntityData,DollResourcesManager.GetDoll(unitEntityData),false);
                     }
                     if(GUILayout.Button("Generate Procedural Hair",GUILayout.Width(175f)))
                     {
@@ -197,6 +198,10 @@ namespace VisualAdjustments
                     if (GUILayout.Button("Toggle Stance",GUILayout.Width(175f)))
                     {
                         unitEntityData.View.HandsEquipment.ForceSwitch(!unitEntityData.View.HandsEquipment.InCombat);
+                    }
+                    if (GUILayout.Button("Toggle Stance", GUILayout.Width(175f)))
+                    {
+                        unitEntityData.View.HandsEquipment.m_ActiveSet.MainHand.SheathVisualModel.transform.localRotation = unitEntityData.View.HandsEquipment.m_ActiveSet.MainHand.VisualModel.transform.localRotation;
                     }
                     GUILayout.EndHorizontal();
                     GUILayout.BeginHorizontal();
