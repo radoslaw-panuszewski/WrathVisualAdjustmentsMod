@@ -1,4 +1,4 @@
-ne# WrathVisualAdjustmentsMod
+# WrathVisualAdjustmentsMod
 Mod to adjust character appearance for the Game Pathfinder Wrath of the Righteous.
 
 * Change Class Outfit
