@@ -179,10 +179,10 @@ namespace VisualAdjustments
                     }
                     GUILayout.EndHorizontal();
                     GUILayout.BeginHorizontal();
-                    if (GUILayout.Button("Set EEL's",GUILayout.Width(175f)))
+                    /*if (GUILayout.Button("Set EEL's",GUILayout.Width(175f)))
                     {
                         Main.SetEELs(unitEntityData,DollResourcesManager.GetDoll(unitEntityData),false);
-                    }
+                    }*/
                     if(GUILayout.Button("Generate Procedural Hair",GUILayout.Width(175f)))
                     {
                       Main.GenerateHairColor(unitEntityData);
@@ -198,10 +198,6 @@ namespace VisualAdjustments
                     if (GUILayout.Button("Toggle Stance",GUILayout.Width(175f)))
                     {
                         unitEntityData.View.HandsEquipment.ForceSwitch(!unitEntityData.View.HandsEquipment.InCombat);
-                    }
-                    if (GUILayout.Button("Toggle Stance", GUILayout.Width(175f)))
-                    {
-                        unitEntityData.View.HandsEquipment.m_ActiveSet.MainHand.SheathVisualModel.transform.localRotation = unitEntityData.View.HandsEquipment.m_ActiveSet.MainHand.VisualModel.transform.localRotation;
                     }
                     GUILayout.EndHorizontal();
                     GUILayout.BeginHorizontal();
@@ -573,7 +569,7 @@ namespace VisualAdjustments
             {
                 buffIndex = buffIndex >= blueprintBuffs.Length - 1 ? blueprintBuffs.Length - 1 : buffIndex + 1;
             }
-            ModKit.UI.Label($"{blueprintBuffs[buffIndex].Name}, {blueprintBuffs[buffIndex].name}", GUILayout.Width(300));
+            ModKit.UI.Label($"{blueprintBuffs[buffIndex].NameForAcronym}, {blueprintBuffs[buffIndex].Name}", GUILayout.Width(300));
             if (GUILayout.Button("Apply", GUILayout.Width(200f)))
             {
                 GameHelper.ApplyBuff(unitEntityData, blueprintBuffs[buffIndex]);
@@ -582,7 +578,7 @@ namespace VisualAdjustments
             foreach(var buff in unitEntityData.Buffs)
             {
                 GUILayout.BeginHorizontal();
-                ModKit.UI.Label($"{buff.Blueprint.name}, {buff.Name}", GUILayout.Width(300));
+                ModKit.UI.Label($"{buff.Blueprint.NameForAcronym}, {buff.Name}", GUILayout.Width(300));
                 if (GUILayout.Button("Remove", GUILayout.Width(200f)))
                 {
                     GameHelper.RemoveBuff(unitEntityData, buff.Blueprint);   
@@ -623,10 +619,12 @@ namespace VisualAdjustments
                     .ReadAllLines($"{Main.ModEntry.Path}/fxlookup.txt")
                     .Where(id => LibraryThing.GetResourceGuidMap().ContainsKey(id))
                     .ToArray();
+               // var asd = ;
             } else { 
                 var idList = new List<string>();
                 foreach (var kv in LibraryThing.GetResourceGuidMap())
                 {
+                    Main.logger.Log(kv.ToString());
                     var obj = ResourcesLibrary.TryGetResource<UnityEngine.Object>(kv.Key);
                     var go = obj as GameObject;
                     if (go != null && go.GetComponent<PooledFx>() != null)

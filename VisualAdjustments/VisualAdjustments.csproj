@@ -58,15 +58,15 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="Accessors.cs" />
-    <Compile Include="CabariusModKitUI\GUIHelper.cs" />
-    <Compile Include="CabariusModKitUI\RichText.cs" />
-    <Compile Include="CabariusModKitUI\Toggle.cs" />
-    <Compile Include="CabariusModKitUI\UI+Builders.cs" />
-    <Compile Include="CabariusModKitUI\UI+Controls.cs" />
-    <Compile Include="CabariusModKitUI\UI+Elements.cs" />
-    <Compile Include="CabariusModKitUI\UI+Pickers.cs" />
-    <Compile Include="CabariusModKitUI\UI+Toggles.cs" />
-    <Compile Include="CabariusModKitUI\UI+Wrappers.cs" />
+    <Compile Include="CabariusModKitUII\GUIHelper.cs" />
+    <Compile Include="CabariusModKitUII\Private\Toggle.cs" />
+    <Compile Include="CabariusModKitUII\RichText.cs" />
+    <Compile Include="CabariusModKitUII\UI+Builders.cs" />
+    <Compile Include="CabariusModKitUII\UI+Controls.cs" />
+    <Compile Include="CabariusModKitUII\UI+Elements.cs" />
+    <Compile Include="CabariusModKitUII\UI+Pickers.cs" />
+    <Compile Include="CabariusModKitUII\UI+Toggles.cs" />
+    <Compile Include="CabariusModKitUII\UI+Wrappers.cs" />
     <Compile Include="CharacterManager.cs" />
     <Compile Include="ColorPicker.cs" />
     <Compile Include="CustomTypes.cs" />

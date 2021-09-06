@@ -64,7 +64,7 @@ namespace VisualAdjustments
             {
                 if (unitEntityData == null) return;
                 if (unitEntityData.IsPet) return;
-                Main.SetEELs(unitEntityData, DollResourcesManager.GetDoll(unitEntityData), false);
+                //Main.SetEELs(unitEntityData, DollResourcesManager.GetDoll(unitEntityData), false);
                 var Settings = Main.settings.GetCharacterSettings(unitEntityData);
                 DollData doll = null;
                 if (DollResourcesManager.GetDoll(unitEntityData) != null) doll = DollResourcesManager.GetDoll(unitEntityData).CreateData();
@@ -107,7 +107,7 @@ namespace VisualAdjustments
                         character.AddEquipmentEntity(ee, savedEquipment);
                     }
                     doll.ApplyRampIndices(character); 
-                    Main.SetEELs(unitEntityData, DollResourcesManager.GetDoll(unitEntityData), false);
+                   // Main.SetEELs(unitEntityData, DollResourcesManager.GetDoll(unitEntityData), false);
                     Traverse.Create(unitEntityData.View).Field("m_EquipmentClass").SetValue(null); //UpdateClassEquipment won't update if the class doesn't change
                     unitEntityData.View.HandsEquipment.UpdateAll();                                                                                                   //Adds Armor
                     unitEntityData.View.UpdateBodyEquipmentModel();
@@ -140,10 +140,10 @@ namespace VisualAdjustments
                                         unitEntityData.View.HandsEquipment.UpdateAll();                                                                                                   //Adds Armor
                                         unitEntityData.View.UpdateClassEquipment();
                 }
-                Main.SetEELs(unitEntityData, DollResourcesManager.GetDoll(unitEntityData), false);
+                //Main.SetEELs(unitEntityData, DollResourcesManager.GetDoll(unitEntityData), false);
                //  DollResourcesManager.GetDoll(unitEntityData).SetHairColor(Settings.HairColor);
                 //Add Kineticist Tattoos
-               Main.SetEELs(unitEntityData, DollResourcesManager.GetDoll(unitEntityData), false);
+               //Main.SetEELs(unitEntityData, DollResourcesManager.GetDoll(unitEntityData), false);
                 EventBus.RaiseEvent<IUnitViewAttachedHandler>(unitEntityData, delegate (IUnitViewAttachedHandler h)
                 {
                     h.HandleUnitViewAttached();
@@ -709,7 +709,7 @@ namespace VisualAdjustments
                     view.CharacterAvatar.IsDirty = dirty;
                 }
 
-                Main.SetEELs(view.EntityData, DollResourcesManager.GetDoll(view.EntityData), false);
+               // Main.SetEELs(view.EntityData, DollResourcesManager.GetDoll(view.EntityData), false);
             }
             catch (Exception e)
             {
@@ -940,17 +940,8 @@ namespace VisualAdjustments
             var characterSettings = Main.settings.GetCharacterSettings(unit);
             if (characterSettings == null) return;
             var races = BlueprintRoot.Instance.Progression.CharacterRaces.ToArray<BlueprintRace>();
-            BlueprintRace blueprintRace;
-            if (characterSettings.RaceIndex != -1)
-            {
-                blueprintRace = races[characterSettings.RaceIndex];
-            }
-            else
-            {
-                blueprintRace = unit.Progression.Race;
-                characterSettings.RaceIndex = Array.IndexOf(races, blueprintRace);
-            }
-            var race = blueprintRace.RaceId;
+            var blueprintRace = unit.Descriptor.Progression.Race;
+            var race = blueprintRace?.RaceId ?? Race.Human;
             var gender = unit.Gender;
             if(characterSettings.overrideHelm != null)TryPreloadKEE(characterSettings.overrideHelm, gender, race);
             if (characterSettings.overrideShirt != null)TryPreloadKEE(characterSettings.overrideShirt, gender, race);
@@ -1062,7 +1053,7 @@ namespace VisualAdjustments
                         ///Main.SetEELs(character,doll);
                         ///character.View.UpdateClassEquipment();
                         //  Main.GenerateHairColor(character);
-                        Main.SetEELs(character, doll, true);
+                        //Main.SetEELs(character, doll, true);
                         RebuildCharacter(character);
                         UpdateModel(character.View);
                         RebuildCharacter(character);
@@ -1095,7 +1086,7 @@ namespace VisualAdjustments
                         ///Main.SetEELs(character,doll);
                         ///character.View.UpdateClassEquipment();
                       //  Main.GenerateHairColor(character);
-                        Main.SetEELs(character,doll,true);
+                      //  Main.SetEELs(character,doll,true);
                         RebuildCharacter(character);
                         UpdateModel(character.View);
                         RebuildCharacter(character);

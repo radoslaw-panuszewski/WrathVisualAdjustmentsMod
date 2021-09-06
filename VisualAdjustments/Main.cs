@@ -156,8 +156,7 @@ namespace VisualAdjustments
                 ///var index = doll.Hair.m_Entity.PrimaryColorsProfile.Ramps.Where(b => b.isReadable).First(a => a.GetPixel(1,1).ToString() == texture.GetPixel(1,1).ToString());
                 }
                 var index = doll.Hair.m_Entity.PrimaryColorsProfile.Ramps.Where(b => b.isReadable).First(a => a.GetPixel(1, 1).ToString() == settingcol.ToString());
-                settings.HairColor = doll.Hair.m_Entity.PrimaryColorsProfile.Ramps.IndexOf(index);
-                doll.SetHairColor(settings.HairColor);
+                doll.SetHairColor(doll.Hair.m_Entity.PrimaryColorsProfile.Ramps.IndexOf(index));
                 //Main.logger.Log(settings.HairColor.ToString());
                 ///Main.logger.Log(jas.ToString());
                 /*if(!doll.Hair.m_Entity.PrimaryColorsProfile.Ramps.Any(a => a == texture))
@@ -206,8 +205,7 @@ namespace VisualAdjustments
                     ///var index = doll.Hair.m_Entity.PrimaryColorsProfile.Ramps.Where(b => b.isReadable).First(a => a.GetPixel(1,1).ToString() == texture.GetPixel(1,1).ToString());
                 }
                 var index = doll.Head.m_Entity.PrimaryColorsProfile.Ramps.Where(b => b.isReadable).First(a => a.GetPixel(1, 1).ToString() == settingcol.ToString());
-                settings.SkinColor = doll.Head.m_Entity.PrimaryColorsProfile.Ramps.IndexOf(index);
-                doll.SetSkinColor(settings.SkinColor);
+                doll.SetSkinColor(doll.Head.m_Entity.PrimaryColorsProfile.Ramps.IndexOf(index));
                 //Main.logger.Log(settings.SkinColor.ToString());
                 ///Main.logger.Log(jas.ToString());
                 /*if(!doll.Hair.m_Entity.PrimaryColorsProfile.Ramps.Any(a => a == texture))
@@ -251,8 +249,7 @@ namespace VisualAdjustments
                     }
                 }
                 var index = doll.Horn.m_Entity.PrimaryColorsProfile.Ramps.Where(b => b.isReadable).First(a => a.GetPixel(1, 1).ToString() == settingcol.ToString());
-                settings.HornsColor = doll.Horn.m_Entity.PrimaryColorsProfile.Ramps.IndexOf(index);
-                doll.SetHornsColor(settings.HornsColor);
+                doll.SetHornsColor(doll.Horn.m_Entity.PrimaryColorsProfile.Ramps.IndexOf(index));
             }
             catch (Exception e)
             {
@@ -288,8 +285,8 @@ namespace VisualAdjustments
                     }
                 }
                 var index = doll.Warpaint.m_Entity.PrimaryColorsProfile.Ramps.Where(b => b.isReadable).First(a => a.GetPixel(1, 1).ToString() == settingcol.ToString());
-                settings.WarpaintCol = doll.Warpaint.m_Entity.PrimaryColorsProfile.Ramps.IndexOf(index);
-                doll.SetWarpaintColor(settings.WarpaintCol);
+                doll.Warpaint.m_Entity.PrimaryColorsProfile.Ramps.IndexOf(index);
+                doll.SetWarpaintColor(doll.Warpaint.m_Entity.PrimaryColorsProfile.Ramps.IndexOf(index));
             }
             catch (Exception e)
             {
@@ -368,11 +365,12 @@ namespace VisualAdjustments
                                 }
                             }
                             var index = a.PrimaryColorsProfile.Ramps.Where(b => b.isReadable).First(w => w.GetPixel(1, 1).ToString() == settingcol.ToString());
-                            settings.PrimaryColor = a.PrimaryColorsProfile.Ramps.IndexOf(index);
+                            doll.SetPrimaryEquipColor(a.PrimaryColorsProfile.Ramps.IndexOf(index));
                             settings.companionPrimary = a.PrimaryColorsProfile.Ramps.IndexOf(index);
                             var indexsec = a.PrimaryColorsProfile.Ramps.Where(b => b.isReadable).First(w => w.GetPixel(1, 1).ToString() == settingcolsecondary.ToString());
-                            settings.SecondaryColor = a.PrimaryColorsProfile.Ramps.IndexOf(indexsec);
-                            settings.companionSecondary = a.PrimaryColorsProfile.Ramps.IndexOf(indexsec);
+                            settings.companionSecondary = a.PrimaryColorsProfile.Ramps.IndexOf(index);
+                            doll.SetSecondaryEquipColor(a.PrimaryColorsProfile.Ramps.IndexOf(indexsec));
+
                             // doll.SetSkinColor(settings.SkinColor);
                             /*if (a.PrimaryColorsProfile.Ramps.Where(b => b.isReadable).Any(c => c.GetPixel(1, 1).ToString() == settingcol.ToString()))
                             {
@@ -544,7 +542,7 @@ namespace VisualAdjustments
                 ///Main.logger.Log("bru");
                 foreach (BlueprintCharacterClass c in Main.blueprints.OfType<BlueprintCharacterClass>())
                 {
-                    if (!c.PrestigeClass && c.ComponentsArray.Length != 0 && !c.IsMythic && !c.ToString().Contains("Mythic") && !c.ToString().Contains("Animal") && !c.ToString().Contains("Scion"))
+                    if (!c.PrestigeClass && !c.IsMythic && !c.ToString().Contains("Mythic") && !c.ToString().Contains("Animal") && !c.ToString().Contains("Scion"))
                     {
                         try
                         {
@@ -638,8 +636,8 @@ namespace VisualAdjustments
                                     uniqueid = unitEntityData.UniqueId
                                 };
                                 settings.AddCharacterSettings(unitEntityData, fb);
-                                Main.GetIndices(unitEntityData);
-                                Main.SetEELs(unitEntityData, DollResourcesManager.GetDoll(unitEntityData));
+                               // Main.GetIndices(unitEntityData);
+                               // Main.SetEELs(unitEntityData, DollResourcesManager.GetDoll(unitEntityData));
                                 /* Settings.CharacterSettings characterSettings = new CharacterSettings{
                                  characterSettings.characterName = unitEntityData.CharacterName;
                                  characterSettings.classOutfit = new CharInfo
@@ -1005,6 +1003,19 @@ namespace VisualAdjustments
             }
             ///GUILayout.EndHorizontal();
         }
+        static void ChooseEEL(UnitEntityData unitEntityData, DollState doll, string label, EquipmentEntityLink[] links, EquipmentEntityLink link, Action<EquipmentEntityLink> setter)
+        {
+            if (links.Length == 0)
+            {
+                GUILayout.Label($"Missing equipment for {label}");
+            }
+            var index = links.ToList().FindIndex((eel) => eel != null && eel.AssetId == link?.AssetId);
+            ChooseFromList(label, links, ref index, () => {
+                setter(links[index]);
+                unitEntityData.Descriptor.Doll = doll.CreateData();
+                CharacterManager.RebuildCharacter(unitEntityData);
+            });
+        }
         static void ChooseEEL(ref int setting, UnitEntityData unitEntityData, DollState doll, string label, EquipmentEntityLink[] links, EquipmentEntityLink link, Action<EquipmentEntityLink> setter)
         {
             var settings = Main.settings.GetCharacterSettings(unitEntityData);
@@ -1027,7 +1038,7 @@ namespace VisualAdjustments
                 setting = index;
                // unitEntityData.Parts.Get<UnitPartDollData>().Default = doll.CreateData();
                 // CharacterManager.RebuildCharacter(unitEntityData);
-                Main.SetEELs(unitEntityData, doll);
+                //Main.SetEELs(unitEntityData, doll);
             }
         }
         static void ChooseEEL(ref int setting, UnitEntityData unitEntityData, DollState doll, string label, EquipmentEntityLink[] links, EquipmentEntityLink link)
@@ -1044,7 +1055,7 @@ namespace VisualAdjustments
             if (setting != index)
             {
                 setting = index;
-                SetEELs(unitEntityData, doll);
+                //SetEELs(unitEntityData, doll);
                 //CharacterManager.RebuildCharacter(unitEntityData);
             }
         }
@@ -1065,7 +1076,7 @@ namespace VisualAdjustments
                 {
                     setting = currentRamp;
                    // CharacterManager.RebuildCharacter(unitEntityData);
-                    SetEELs(unitEntityData, DollResourcesManager.GetDoll(unitEntityData));
+                   // SetEELs(unitEntityData, DollResourcesManager.GetDoll(unitEntityData));
                 }
                 GUILayout.EndHorizontal();
             }
@@ -1074,18 +1085,16 @@ namespace VisualAdjustments
                 Main.logger.Log(e.ToString());
             }
         }
-       /* static void ChooseRamp(UnitEntityData unitEntityData, DollState doll, string label, List<Texture2D> textures, int currentRamp, Action<int> setter)
+        static void ChooseRamp(UnitEntityData unitEntityData, DollState doll, string label, List<Texture2D> textures, int currentRamp, Action<int> setter)
         {
             ChooseFromList(label, textures, ref currentRamp, () =>
             {
-                SetEELs(unitEntityData, doll);
                 setter(currentRamp);
                 unitEntityData.Descriptor.Doll = doll.CreateData();
                 CharacterManager.RebuildCharacter(unitEntityData);
-                SetEELs(unitEntityData, doll);
             });
-        }*/
-        public static int GetRaceIndex(UnitEntityData data)
+        }
+        /*public static int GetRaceIndex(UnitEntityData data)
         {
             var race = data.Progression.Race;
             var Settings = settings.GetCharacterSettings(data);
@@ -1142,7 +1151,7 @@ namespace VisualAdjustments
             Settings.RaceIndex = result;
             Main.logger.Log(result.ToString());
             return result;
-        }
+        }*/
         // still doesnt move the silder
       /*  static void ChooseRace(UnitEntityData unitEntityData, DollState doll)
         {
@@ -1204,38 +1213,38 @@ namespace VisualAdjustments
         }*/
         static void ChooseRace(UnitEntityData unitEntityData, DollState doll)
         {
-            var Settings = settings.GetCharacterSettings(unitEntityData);
+            var currentRace = doll.Race;
             var races = BlueprintRoot.Instance.Progression.CharacterRaces.ToArray<BlueprintRace>();
-            var currentRace = races.ElementAt(Settings.RaceIndex);
-            if (doll.Race != currentRace)
-            {
-                doll.SetRace(currentRace);
-            }
-            var initindx = Settings.RaceIndex;
+            var index = Array.FindIndex(races, (race) => race == currentRace);
+            /* var currentRace = races.ElementAt(Settings.RaceIndex);
+             if (doll.Race != currentRace)
+             {
+                 doll.SetRace(currentRace);
+             }
+             var initindx = Settings.RaceIndex;*/
             GUILayout.BeginHorizontal();
             ModKit.UI.Label("Race" + " ", GUILayout.Width(DefaultLabelWidth));
-            Settings.RaceIndex = (int)Math.Round(GUILayout.HorizontalSlider((float)Settings.RaceIndex, 0, races.Length - 1, GUILayout.Width(DefaultSliderWidth)));
+            index = (int)Math.Round(GUILayout.HorizontalSlider((float)index, 0, races.Length - 1, GUILayout.Width(DefaultSliderWidth)));
             /// ModKit.UI.Label(asdd.ToString()+ " " + races[asdd].Name);
-            ModKit.UI.Label(" " + Settings.RaceIndex, GUILayout.ExpandWidth(false));
-            ModKit.UI.Label(" " + races[Settings.RaceIndex].Name, GUILayout.ExpandWidth(false));
-            if (GUILayout.Button("Prev", GUILayout.Width(55f)) && Settings.RaceIndex > 0) Settings.RaceIndex--;
-            if (GUILayout.Button("Next", GUILayout.Width(55f)) && Settings.RaceIndex < races.Length - 1) Settings.RaceIndex++;
+            ModKit.UI.Label(" " + index, GUILayout.ExpandWidth(false));
+            ModKit.UI.Label(" " + races[index].Name, GUILayout.ExpandWidth(false));
+            if (GUILayout.Button("Prev", GUILayout.Width(55f)) && index > 0) index--;
+            if (GUILayout.Button("Next", GUILayout.Width(55f)) && index < races.Length - 1) index++;
             GUILayout.EndHorizontal();
-            if (Settings.RaceIndex != initindx && Settings.RaceIndex < races.Count())
+            if (index != races.IndexOf(currentRace) && index < races.Count())
             {
-                doll.SetRace(races[Settings.RaceIndex]);
+                doll.SetRace(races[index]);
                 unitEntityData.Descriptor.Doll = doll.CreateData();
                 CharacterManager.RebuildCharacter(unitEntityData);
             }
         }
 
         static void ChooseVisualPreset(UnitEntityData unitEntityData, DollState doll, string label, BlueprintRaceVisualPreset[] presets,
-            BlueprintRaceVisualPreset currentPreset, CharacterSettings settings)
+            BlueprintRaceVisualPreset currentPreset)
         {
             var index = Array.FindIndex(presets, (vp) => vp == currentPreset);
             ChooseFromList(label, presets, ref index, () =>
             {
-                settings.BodyType = index;
                 doll.SetRacePreset(presets[index]);
                 unitEntityData.Parts.Get<UnitPartDollData>().Default = doll.CreateData();
                 unitEntityData.Descriptor.Doll = doll.CreateData();
@@ -1243,7 +1252,7 @@ namespace VisualAdjustments
                 CharacterManager.RebuildCharacter(unitEntityData);
             });
         }
-        public static void GetIndices(UnitEntityData dat)
+       /* public static void GetIndices(UnitEntityData dat)
         {
             try
             {
@@ -1279,7 +1288,7 @@ namespace VisualAdjustments
                         Horns = race.FemaleOptions.Beards,
                         TailSkinColors = race.FemaleOptions.TailSkinColors
                     };
-                }*/
+                }*//*
                 ///var doll = dat.Descriptor.m_LoadedDollData;
                 /// var doll = DollResourcesManager.CreateDollState(dat);
 
@@ -1320,11 +1329,12 @@ namespace VisualAdjustments
                 Main.logger.Log(e.Source);
                 Main.logger.Log(e.InnerException.Message);
             };
-        }
-        public static void SetEELs(UnitEntityData dat, DollState doll, bool shouldRebuild = true)
+        }*/
+       /* public static void SetEELs(UnitEntityData dat, DollState doll, bool shouldRebuild = true)
         {
             try
             {
+                return;
                 if (doll == null) return;
                 var Settings = settings.GetCharacterSettings(dat);
                 var gender = dat.Gender;
@@ -1421,7 +1431,7 @@ namespace VisualAdjustments
                 }
             }
             catch (Exception e) { Main.logger.Log(e.ToString()); }
-        }
+        }*/
         static void ChooseDoll(UnitEntityData unitEntityData)
         {
             try
@@ -1448,8 +1458,8 @@ namespace VisualAdjustments
                 var Settings = settings.GetCharacterSettings(unitEntityData);
                 var races = BlueprintRoot.Instance.Progression.CharacterRaces.ToArray<BlueprintRace>();
                 var gender = unitEntityData.Gender;
-                BlueprintRace race;
-                if (Settings.RaceIndex == -1)
+               
+               /* if (Settings.RaceIndex == -1)
                 {
                     if (!unitEntityData.Descriptor.Progression.Race.NameForAcronym.Contains("Mongrel"))
                     {
@@ -1471,8 +1481,8 @@ namespace VisualAdjustments
                 else
                 {
                     race = races[Settings.RaceIndex];
-                }
-                ///var race = unitEntityData.Progression.Race;
+                }*/
+                var race = unitEntityData.Progression.Race;
                 CustomizationOptions customizationOptions = gender != Gender.Male ? race.FemaleOptions : race.MaleOptions;
                 /* if (Settings.Beards == -1 || Settings.Face == -1 || Settings.Hair == -1 || Settings.HairColor == -1 || Settings.Horns == -1 || Settings.HornsColor == -1 || Settings.PrimaryColor == -1 || Settings.SecondaryColor == -1 || Settings.SkinColor == -1)
                  {
@@ -1487,32 +1497,32 @@ namespace VisualAdjustments
                 {
                   
                 }
-                var doll2 = DollResourcesManager.GetDoll(unitEntityData);
+                //var doll2 = DollResourcesManager.GetDoll(unitEntityData);
                 /// var race = doll.Race;
-                doll2.SetRace(race);
-                ChooseRace(unitEntityData, doll2);
-                if (doll2.Race != races[Settings.RaceIndex]) doll2.SetRace(races[Settings.RaceIndex]);
+                //doll2.SetRace(race);
                 var doll = DollResourcesManager.GetDoll(unitEntityData);
-                ChooseVisualPreset(unitEntityData,doll,"Body Type",doll.Race.m_Presets.Select(a => (BlueprintRaceVisualPreset)a.GetBlueprint()).ToArray(),doll.RacePreset,Settings);
-                ChooseEEL(ref Settings.Face, unitEntityData, doll, "Face", customizationOptions.Heads, doll.Head.m_Link, (EquipmentEntityLink ee) => doll.SetHead(ee));
-                if(doll.Scars.Count > 0)ChooseEEL(ref Settings.Scar, unitEntityData, doll, "Scar", doll.Scars.ToArray(), doll.Scar.m_Link, (EquipmentEntityLink ee) => doll.SetScar(ee));
-                ChooseEEL(ref Settings.Warpaint, unitEntityData, doll, "Warpaint", doll.Warpaints.ToArray(), doll.Warpaint.m_Link, (EquipmentEntityLink ee) => doll.SetWarpaint(ee));
-                if (customizationOptions.Hair.Count() > 0) ChooseEEL(ref Settings.Hair, unitEntityData, doll, "Hair", customizationOptions.Hair, doll.Hair.m_Link, (EquipmentEntityLink ee) => doll.SetHair(ee));
-                if (customizationOptions.Beards.Count() > 0) ChooseEEL(ref Settings.Beards, unitEntityData, doll, "Beards", customizationOptions.Beards, doll.Beard.m_Link, (EquipmentEntityLink ee) => doll.SetBeard(ee));
-                if (customizationOptions.Horns.Count() > 0) ChooseEEL(ref Settings.Horns, unitEntityData, doll, "Horns", customizationOptions.Horns, doll.Horn.m_Link, (EquipmentEntityLink ee) => doll.SetHorn(ee));
-                if (doll.Warpaints.Count > 0) ChooseRamp(ref Settings.WarpaintCol, unitEntityData, doll, "Warpaint Color", doll.GetWarpaintRamps(), Settings.WarpaintCol, (int index) => doll.SetWarpaintColor(index));
-                ChooseRamp(ref Settings.HairColor, unitEntityData, doll, "Hair Color", doll.GetHairRamps(), Settings.HairColor, (int index) => doll.SetHairColor(index));
-                ChooseRamp(ref Settings.SkinColor, unitEntityData, doll, "Skin Color", doll.GetSkinRamps(), Settings.SkinColor, (int index) => doll.SetSkinColor(index));
-                ChooseRamp(ref Settings.HornsColor, unitEntityData, doll, "Horn Color", doll.GetHornsRamps(), Settings.HornsColor, (int index) => doll.SetHornsColor(index));
+                ChooseRace(unitEntityData, doll);
+                //if (doll2.Race != races[Settings.RaceIndex]) doll2.SetRace(races[Settings.RaceIndex]);
+                ChooseVisualPreset(unitEntityData,doll,"Body Type",doll.Race.m_Presets.Select(a => (BlueprintRaceVisualPreset)a.GetBlueprint()).ToArray(),doll.RacePreset);
+                ChooseEEL(unitEntityData, doll, "Face", customizationOptions.Heads, doll.Head.m_Link, (EquipmentEntityLink ee) => doll.SetHead(ee));
+                if(doll.Scars.Count > 0)ChooseEEL( unitEntityData, doll, "Scar", doll.Scars.ToArray(), doll.Scar.m_Link, (EquipmentEntityLink ee) => doll.SetScar(ee));
+                ChooseEEL( unitEntityData, doll, "Warpaint", doll.Warpaints.ToArray(), doll.Warpaint.m_Link, (EquipmentEntityLink ee) => doll.SetWarpaint(ee));
+                if (customizationOptions.Hair.Any()) ChooseEEL( unitEntityData, doll, "Hair", customizationOptions.Hair, doll.Hair.m_Link, (EquipmentEntityLink ee) => doll.SetHair(ee));
+                if (customizationOptions.Beards.Any()) ChooseEEL( unitEntityData, doll, "Beards", customizationOptions.Beards, doll.Beard.m_Link, (EquipmentEntityLink ee) => doll.SetBeard(ee));
+                if (customizationOptions.Horns.Any()) ChooseEEL(unitEntityData, doll, "Horns", customizationOptions.Horns, doll.Horn.m_Link, (EquipmentEntityLink ee) => doll.SetHorn(ee));
+                if (doll.Warpaints.Count > 0) ChooseRamp( unitEntityData, doll, "Warpaint Color", doll.GetWarpaintRamps(), doll.WarpaintRampIndex, (int index) => doll.SetWarpaintColor(index));
+                ChooseRamp( unitEntityData, doll, "Hair Color", doll.GetHairRamps(), doll.HairRampIndex, (int index) => doll.SetHairColor(index));
+                ChooseRamp( unitEntityData, doll, "Skin Color", doll.GetSkinRamps(), doll.SkinRampIndex, (int index) => doll.SetSkinColor(index));
+                ChooseRamp( unitEntityData, doll, "Horn Color", doll.GetHornsRamps(), doll.HornsRampIndex, (int index) => doll.SetHornsColor(index));
                // Main.logger.Log(doll.GetHornsRamps().Count.ToString());;
-                ChooseRamp(ref Settings.PrimaryColor, unitEntityData, doll, "Primary Outfit Color", doll.GetOutfitRampsPrimary(), Settings.PrimaryColor, (int index) => doll.SetPrimaryEquipColor(index));
-                ChooseRamp(ref Settings.SecondaryColor, unitEntityData, doll, "Secondary Outfit Color", doll.GetOutfitRampsSecondary(), Settings.SecondaryColor, (int index) => doll.SetSecondaryEquipColor(index));
-                if(Settings.PrimaryColor != doll.EquipmentRampIndex || Settings.SecondaryColor != doll.EquipmentRampIndexSecondary)
+                ChooseRamp( unitEntityData, doll, "Primary Outfit Color", doll.GetOutfitRampsPrimary(), doll.EquipmentRampIndex, (int index) => doll.SetPrimaryEquipColor(index));
+                ChooseRamp(unitEntityData, doll, "Secondary Outfit Color", doll.GetOutfitRampsSecondary(),doll.EquipmentRampIndexSecondary ,(int index) => doll.SetSecondaryEquipColor(index));
+               /* if(Settings.PrimaryColor != doll.EquipmentRampIndex || Settings.SecondaryColor != doll.EquipmentRampIndexSecondary)
                 {
                     doll.SetEquipColors(Settings.PrimaryColor,Settings.SecondaryColor);
-                }
-                ReferenceArrayProxy<BlueprintRaceVisualPreset, BlueprintRaceVisualPresetReference> presets = doll.Race.Presets;
-                BlueprintRaceVisualPreset racePreset = doll.RacePreset;
+                }*/
+              //  ReferenceArrayProxy<BlueprintRaceVisualPreset, BlueprintRaceVisualPresetReference> presets = doll.Race.Presets;
+               // BlueprintRaceVisualPreset racePreset = doll.RacePreset;
               /*if (unitEntityData.Descriptor.LeftHandedOverride == true && GUILayout.Button("Set Right Handed", GUILayout.Width(DefaultLabelWidth)))
                 {
                     unitEntityData.Descriptor.LeftHandedOverride = false;
@@ -1641,7 +1651,7 @@ namespace VisualAdjustments
                     if (options.Heads.Length > 0) dollState.SetHead(options.Hair[0]);
                     if (options.Beards.Length > 0) dollState.SetBeard(options.Hair[0]);
                     //dollState.Validate();
-                    SetEELs(unitEntityData, dollState);
+                    //SetEELs(unitEntityData, dollState);
                     // unitEntityData.Descriptor.Doll = dollState.CreateData();
                     unitEntityData.Parts.Add<UnitPartDollData>();
                     unitEntityData.Parts.Get<UnitPartDollData>().Default = dollState.CreateData();

@@ -43,7 +43,7 @@ namespace VisualAdjustments
             public bool hideShirt = false;
             public bool hideAll = false;
             public bool ReloadStuff = false;
-            public int RaceIndex = -1;
+            /*public int RaceIndex = -1;
             public int Face = -1;
             public int Hair = -1;
             public int Beards = -1;
@@ -56,7 +56,7 @@ namespace VisualAdjustments
             public int BodyType = -1;
             public int Scar = -1;
             public int Warpaint = -1;
-            public int WarpaintCol = -1;
+            public int WarpaintCol = -1;*/
 
             public BlueprintRef overrideHelm = null;
             public BlueprintRef overrideCloak = null;
@@ -87,7 +87,7 @@ namespace VisualAdjustments
             public CharInfo classOutfit;
             public int companionPrimary = -1;
             public int companionSecondary = -1;
-            public float[] hairColor = new float[] {0,0,0};
+            public float[] hairColor = new float[] { 0, 0, 0};
             public float[] skinColor = new float[] { 0, 0, 0 };
             public bool customHairColor;
             public bool customSkinColor;

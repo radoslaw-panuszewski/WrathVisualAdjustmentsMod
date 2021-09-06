@@ -286,6 +286,7 @@ namespace imColorPicker
             }
             GUILayout.EndHorizontal();
         }
+
         public void DrawSVHandler(Rect rect, ref Color c)
         {
             const float size = 10f;
