@@ -9,6 +9,9 @@ using Kingmaker.View.Equipment;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Kingmaker.Blueprints.Items.Weapons;
+using Kingmaker.UI.Common;
+using Kingmaker.View.Animation;
 using UnityEngine;
 
 namespace VisualAdjustments
@@ -39,7 +42,7 @@ namespace VisualAdjustments
                 }
                 catch (Exception ex)
                 {
-                    Main.Error(ex);
+                    Main.logger.Error(ex.StackTrace);
                 }
 
             }
@@ -82,7 +85,7 @@ namespace VisualAdjustments
         /*
          * Hide Quiver
          */
-        [HarmonyPatch(typeof(UnitViewHandSlotData), "ReattachSheath")]
+       // [HarmonyPatch(typeof(UnitViewHandSlotData), "ReattachSheath")]
         static class UnitViewHandsSlotData_ReattachSheath_Patch
         {
             static bool HasQuiver(UnitViewHandSlotData slotData)
@@ -101,7 +104,7 @@ namespace VisualAdjustments
                     var characterSettings = Main.settings.GetCharacterSettings(__instance.Owner);
                     if (characterSettings == null) return true;
                     if (!HasQuiver(__instance)) return true;
-                    updateSheaths(__instance.Owner.View);
+                   // updateSheaths(__instance.Owner.View);
                     if (characterSettings.hidequiver)
                     {
                         UnitViewHandSlotData unitViewHandSlotData = ___m_Equipment.QuiverHandSlot;
@@ -117,11 +120,11 @@ namespace VisualAdjustments
                 }
                 catch (Exception ex)
                 {
-                    Main.Error(ex);
+                    Main.logger.Error(ex.StackTrace);
                 }
                 return true;
             }
-            static void Postfix(UnitViewHandSlotData __instance)
+           /* static void Postfix(UnitViewHandSlotData __instance)
             {
                 try
                 {
@@ -131,7 +134,7 @@ namespace VisualAdjustments
                 {
                     Main.logger.Error(e.StackTrace);
                 }
-            }
+            }*/
         }
         /*
          * Hide Weapon Models 
@@ -155,10 +158,15 @@ namespace VisualAdjustments
                             __instance.ShowItem(false);
                         }
                     }
+                    else
+                    {
+                        //__instance.Owner.View.HandsEquipment.UpdateAll();
+                       // updateSheaths(__instance.Owner.View);
+                    }
                 }
                 catch (Exception ex)
                 {
-                    Main.Error(ex);
+                    Main.logger.Error(ex.StackTrace);
                 }
             }
         }
@@ -166,7 +174,7 @@ namespace VisualAdjustments
          * Override Weapon Model
          * 
          */
-        [HarmonyPatch(typeof(UnitViewHandSlotData), "VisibleItemBlueprint", MethodType.Getter)]
+      //  [HarmonyPatch(typeof(UnitViewHandSlotData), "VisibleItemBlueprint", MethodType.Getter)]
         static class UnitViewHandsSlotData_VisibleItemBlueprint_Patch
         {
             static void Postfix(UnitViewHandSlotData __instance, ref BlueprintItemEquipmentHand __result)
@@ -217,18 +225,18 @@ namespace VisualAdjustments
                 }
             }
         }
-        [HarmonyPatch(typeof(UnitViewHandsEquipment), "UpdateAll")]
+       /* [HarmonyPatch(typeof(UnitViewHandsEquipment), "UpdateAll")]
         static class unitViewHandsEquipment_Patch
         {
             static bool Prefix(UnitViewHandsEquipment __instance)
             {
 
-                if (!Main.enabled && !__instance.Owner.IsPlayerFaction || !Main.enabled || !__instance.Active) return true;
+                if (!Main.enabled && !__instance.Owner.IsPlayerFaction || !__instance.Active) return true;
                 try
                 {
                       foreach (var slot in __instance.m_SlotsByVisualSlot)
                       {
-                          if (slot != null && slot.SheathVisualModel != null && __instance.Active)
+                          if (slot != null && slot.SheathVisualModel != null &&  slot.VisualModel != null &&__instance.Active)
                           {
                                   foreach (Transform sheath in slot.SheathVisualModel.transform)
                                   {
@@ -248,7 +256,7 @@ namespace VisualAdjustments
                       }
                       if (__instance.Active)
                       {
-                          __instance.RedistributeSlots();
+                         //__instance.RedistributeSlots();
                       }
                       __instance.UpdateLocatorTrackers();
                       return true;
@@ -302,9 +310,9 @@ namespace VisualAdjustments
                 {
                     Main.logger.Error(e.ToString());
                 }
-            }*/
-        }
-        static void updateSheaths(UnitEntityView data)
+            }*//*
+        }*/
+       /* static void updateSheaths(UnitEntityView data)
         {
             try
             {
@@ -323,7 +331,7 @@ namespace VisualAdjustments
                             {
                                 if (slot.VisualModel != null)
                                 {
-                                    slot.SheathVisualModel.transform.localPosition = slot.VisualModel.transform.localPosition;
+                                    slot.SheathVisualModel.transform.position = slot.VisualModel.transform.position;
                                 }
                             }
                         }
@@ -334,8 +342,43 @@ namespace VisualAdjustments
             {
                 Main.logger.Error(e.ToString());
             }
+        }*/
+      /*  [HarmonyPatch(typeof(UnitViewHandsEquipment), "HandleEquipmentSetChanged")]
+        static class unitViewHandSlotData_Patch_HandleEquipChanged
+        {
+            static void Postfix(UnitViewHandSlotData __instance)
+            {
+                try
+                {
+                    if (__instance.Owner != null && __instance.Owner.IsPlayerFaction && Main.enabled && __instance.Owner.View != null)
+                    {
+                        updateSheaths(__instance.Owner.View);
+                        __instance.Owner.View.HandsEquipment.UpdateAll();
+                    }
+                }
+                catch (Exception e)
+                {
+                    Main.logger.Error(e.StackTrace);
+                    throw;
+                }
+            }
+        }*/
+
+        //[HarmonyPatch(typeof(UnitViewHandSlotData), "IkRaceOffsetApply")]
+      /*static class unitViewHandSlotData_Patcha
+        {
+            public static bool Prefix(UnitViewHandSlotData __instance)
+            {
+                Main.logger.Log("raceoffset");
+                if (__instance.SheathVisualModel != null && __instance.VisualModel != null)
+                {
+                    __instance.VisualModel.transform.position = __instance.SheathVisualModel.transform.position;
+                }
+                return false;
+            }
         }
-        [HarmonyPatch(typeof(UnitViewHandSlotData), "MatchVisuals")]
+
+       // [HarmonyPatch(typeof(UnitViewHandSlotData), "MatchVisuals")]
         static class unitViewHandSlotData_Patch
         {
             /*static bool Prefix(UnitViewHandSlotData __instance)
@@ -363,7 +406,7 @@ namespace VisualAdjustments
                     Main.logger.Error(e.ToString());
                     return true;
                 }
-            */
+            }*//*
             static void Postfix(UnitViewHandSlotData __instance)
             {
                 try
@@ -373,7 +416,7 @@ namespace VisualAdjustments
                     //if (__instance.Owner == null) return;
                     if (Main.enabled && __instance.Owner.IsPlayerFaction)
                     {
-                        /*if (!Main.settings.GetCharacterSettings(__instance.Owner).hideSheaths)*/
+                        /*if (!Main.settingsR.GetCharacterSettings(__instance.Owner).hideSheaths)*//*
                         /// Main.logger.Log(__instance.Owner.CharacterName);
                         updateSheaths(__instance.Owner.View);
                     }
@@ -384,19 +427,22 @@ namespace VisualAdjustments
                 }
             }
         }
-     /*)   [HarmonyPatch(typeof(UnitViewHandsEquipment), "ForceSwitch", new Type[] {typeof(bool) })]
+        //[HarmonyPatch(typeof(UnitViewHandsEquipment), "ForceSwitch", new Type[] {typeof(bool) })]
         static class UnitViewHandsSlotData_ForceSwitch_Patch
         {
-            static bool Prefix(UnitViewHandSlotData __instance)
+            static void Postfix(UnitViewHandSlotData __instance)
             {
                 try
                 {
-                   // return false;
+                    if (__instance.Owner != null && __instance.Owner.IsPlayerFaction)
+                    {
+                        __instance.Owner.View.HandsEquipment.UpdateAll();
+                        updateSheaths(__instance.Owner.View);
+                    }
                 }
                 catch (Exception ex)
                 {
                     Main.Error(ex);
-                    return true;
                 }
             }
         }*/

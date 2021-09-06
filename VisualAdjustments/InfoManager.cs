@@ -23,6 +23,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using Kingmaker.Blueprints.Items.Weapons;
 using UnityEngine;
 namespace VisualAdjustments
 {
@@ -178,10 +179,10 @@ namespace VisualAdjustments
                     }
                     GUILayout.EndHorizontal();
                     GUILayout.BeginHorizontal();
-                    if (GUILayout.Button("Set EEL's",GUILayout.Width(175f)))
+                    /*if (GUILayout.Button("Set EEL's",GUILayout.Width(175f)))
                     {
-                        Main.SetEELs(unitEntityData,DollResourcesManager.GetDoll(unitEntityData));
-                    }
+                        Main.SetEELs(unitEntityData,DollResourcesManager.GetDoll(unitEntityData),false);
+                    }*/
                     if(GUILayout.Button("Generate Procedural Hair",GUILayout.Width(175f)))
                     {
                       Main.GenerateHairColor(unitEntityData);
@@ -560,15 +561,15 @@ namespace VisualAdjustments
             }
             GUILayout.BeginHorizontal();
             buffIndex = (int)GUILayout.HorizontalSlider(buffIndex, 0, blueprintBuffs.Length - 1, GUILayout.Width(300));
-            if(GUILayout.Button("Prev", GUILayout.Width(45)))
+            if(GUILayout.Button("<", GUILayout.Width(45)))
             {
                 buffIndex = buffIndex == 0 ? 0 : buffIndex - 1;
             }
-            if (GUILayout.Button("Next", GUILayout.Width(45)))
+            if (GUILayout.Button(">", GUILayout.Width(45)))
             {
                 buffIndex = buffIndex >= blueprintBuffs.Length - 1 ? blueprintBuffs.Length - 1 : buffIndex + 1;
             }
-            ModKit.UI.Label($"{blueprintBuffs[buffIndex].Name}, {blueprintBuffs[buffIndex].name}", GUILayout.Width(300));
+            ModKit.UI.Label($"{blueprintBuffs[buffIndex].NameForAcronym}, {blueprintBuffs[buffIndex].Name}", GUILayout.Width(300));
             if (GUILayout.Button("Apply", GUILayout.Width(200f)))
             {
                 GameHelper.ApplyBuff(unitEntityData, blueprintBuffs[buffIndex]);
@@ -577,7 +578,7 @@ namespace VisualAdjustments
             foreach(var buff in unitEntityData.Buffs)
             {
                 GUILayout.BeginHorizontal();
-                ModKit.UI.Label($"{buff.Blueprint.name}, {buff.Name}", GUILayout.Width(300));
+                ModKit.UI.Label($"{buff.Blueprint.NameForAcronym}, {buff.Name}", GUILayout.Width(300));
                 if (GUILayout.Button("Remove", GUILayout.Width(200f)))
                 {
                     GameHelper.RemoveBuff(unitEntityData, buff.Blueprint);   
@@ -618,10 +619,12 @@ namespace VisualAdjustments
                     .ReadAllLines($"{Main.ModEntry.Path}/fxlookup.txt")
                     .Where(id => LibraryThing.GetResourceGuidMap().ContainsKey(id))
                     .ToArray();
+               // var asd = ;
             } else { 
                 var idList = new List<string>();
                 foreach (var kv in LibraryThing.GetResourceGuidMap())
                 {
+                    Main.logger.Log(kv.ToString());
                     var obj = ResourcesLibrary.TryGetResource<UnityEngine.Object>(kv.Key);
                     var go = obj as GameObject;
                     if (go != null && go.GetComponent<PooledFx>() != null)
@@ -644,11 +647,11 @@ namespace VisualAdjustments
             if(FXIds.Length == 0) LoadFxLookup();
             GUILayout.BeginHorizontal();
             fxIndex = (int)GUILayout.HorizontalSlider(fxIndex, 0, FXIds.Length - 1, GUILayout.Width(300));
-            if (GUILayout.Button("Prev", GUILayout.Width(45)))
+            if (GUILayout.Button("<", GUILayout.Width(45)))
             {
                 fxIndex = fxIndex == 0 ? 0 : fxIndex - 1;
             }
-            if (GUILayout.Button("Next", GUILayout.Width(45)))
+            if (GUILayout.Button(">", GUILayout.Width(45)))
             {
                 fxIndex = fxIndex >= FXIds.Length - 1 ? FXIds.Length - 1 : fxIndex + 1;
             }

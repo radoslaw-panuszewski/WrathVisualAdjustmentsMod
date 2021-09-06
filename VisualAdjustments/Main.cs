@@ -52,11 +52,12 @@ namespace VisualAdjustments {
             if (logger != null)
                 logger.Log(msg);
         }
-        public static Texture2D dot;
         public static ColorPicker HairColorPicker = new ColorPicker();
         public static ColorPicker SkinColorPicker = new ColorPicker();
         public static ColorPicker PrimaryColorPicker = new ColorPicker();
         public static ColorPicker SecondaryColorPicker = new ColorPicker();
+        public static ColorPicker HornColorPicker = new ColorPicker();
+        public static ColorPicker WarpaintColorPicker = new ColorPicker();
         public static bool unlockcustomization;
         public static bool enabled;
         public static bool showsettings = true;
@@ -145,8 +146,7 @@ namespace VisualAdjustments {
                     ///var index = doll.Hair.m_Entity.PrimaryColorsProfile.Ramps.Where(b => b.isReadable).First(a => a.GetPixel(1,1).ToString() == texture.GetPixel(1,1).ToString());
                 }
                 var index = doll.Hair.m_Entity.PrimaryColorsProfile.Ramps.Where(b => b.isReadable).First(a => a.GetPixel(1, 1).ToString() == settingcol.ToString());
-                settings.HairColor = doll.Hair.m_Entity.PrimaryColorsProfile.Ramps.IndexOf(index);
-                doll.SetHairColor(settings.HairColor);
+                doll.SetHairColor(doll.Hair.m_Entity.PrimaryColorsProfile.Ramps.IndexOf(index));
                 //Main.logger.Log(settings.HairColor.ToString());
                 ///Main.logger.Log(jas.ToString());
                 /*if(!doll.Hair.m_Entity.PrimaryColorsProfile.Ramps.Any(a => a == texture))
@@ -189,8 +189,7 @@ namespace VisualAdjustments {
                     ///var index = doll.Hair.m_Entity.PrimaryColorsProfile.Ramps.Where(b => b.isReadable).First(a => a.GetPixel(1,1).ToString() == texture.GetPixel(1,1).ToString());
                 }
                 var index = doll.Head.m_Entity.PrimaryColorsProfile.Ramps.Where(b => b.isReadable).First(a => a.GetPixel(1, 1).ToString() == settingcol.ToString());
-                settings.SkinColor = doll.Head.m_Entity.PrimaryColorsProfile.Ramps.IndexOf(index);
-                doll.SetSkinColor(settings.SkinColor);
+                doll.SetSkinColor(doll.Head.m_Entity.PrimaryColorsProfile.Ramps.IndexOf(index));
                 //Main.logger.Log(settings.SkinColor.ToString());
                 ///Main.logger.Log(jas.ToString());
                 /*if(!doll.Hair.m_Entity.PrimaryColorsProfile.Ramps.Any(a => a == texture))
@@ -198,6 +197,67 @@ namespace VisualAdjustments {
                     doll.Hair.m_Entity.PrimaryColorsProfile.Ramps.Add(texture);
                 }*/
                 /// doll.SetHairColor(doll.Hair.m_Entity.PrimaryColorsProfile.Ramps.IndexOf(texture));
+            }
+            catch (Exception e) {
+                Main.logger.Log(e.ToString());
+            }
+        }
+        public static void GenerateHornColor(UnitEntityData data) {
+            try {
+                var doll = DollResourcesManager.GetDoll(data);
+                if (doll == null)
+                    return;
+                if (doll.Horn.m_Entity == null)
+                    return;
+                var settings = Main.settings.GetCharacterSettings(data);
+                var colornum = settings.hornColor;
+                var settingcol = new Color(colornum[0], colornum[1], colornum[2]);
+                if (!doll.Horn.m_Entity.PrimaryColorsProfile.Ramps.Where(b => b.isReadable).Any(a => a.GetPixel(1, 1).ToString() == settingcol.ToString())) {
+                    var texture = new Texture2D(256, 1, TextureFormat.ARGB32, false) {
+                        filterMode = FilterMode.Bilinear
+                    };
+                    for (var y = 0; y < 1; y++) {
+                        for (var x = 0; x < 256; x++) {
+                            texture.SetPixel(x, y, settingcol);
+                        }
+                    }
+                    texture.Apply();
+                    if (!doll.Horn.m_Entity.PrimaryColorsProfile.Ramps.Where(b => b.isReadable).Any(a => a.GetPixel(1, 1).ToString() == texture.GetPixel(1, 1).ToString())) {
+                        doll.Horn.m_Entity.PrimaryColorsProfile.Ramps.Add(texture);
+                    }
+                }
+                var index = doll.Horn.m_Entity.PrimaryColorsProfile.Ramps.Where(b => b.isReadable).First(a => a.GetPixel(1, 1).ToString() == settingcol.ToString());
+                doll.SetHornsColor(doll.Horn.m_Entity.PrimaryColorsProfile.Ramps.IndexOf(index));
+            }
+            catch (Exception e) {
+                Main.logger.Log(e.ToString());
+            }
+        }
+        public static void GenerateWarpaintColor(UnitEntityData data) {
+            try {
+                var doll = DollResourcesManager.GetDoll(data);
+                if (doll == null)
+                    return;
+                var settings = Main.settings.GetCharacterSettings(data);
+                var colornum = settings.warpaintColor;
+                var settingcol = new Color(colornum[0], colornum[1], colornum[2]);
+                if (!doll.Warpaint.m_Entity.PrimaryColorsProfile.Ramps.Where(b => b.isReadable).Any(a => a.GetPixel(1, 1).ToString() == settingcol.ToString())) {
+                    var texture = new Texture2D(256, 1, TextureFormat.ARGB32, false) {
+                        filterMode = FilterMode.Bilinear
+                    };
+                    for (var y = 0; y < 1; y++) {
+                        for (var x = 0; x < 256; x++) {
+                            texture.SetPixel(x, y, settingcol);
+                        }
+                    }
+                    texture.Apply();
+                    if (!doll.Warpaint.m_Entity.PrimaryColorsProfile.Ramps.Where(b => b.isReadable).Any(a => a.GetPixel(1, 1).ToString() == texture.GetPixel(1, 1).ToString())) {
+                        doll.Warpaint.m_Entity.PrimaryColorsProfile.Ramps.Add(texture);
+                    }
+                }
+                var index = doll.Warpaint.m_Entity.PrimaryColorsProfile.Ramps.Where(b => b.isReadable).First(a => a.GetPixel(1, 1).ToString() == settingcol.ToString());
+                doll.Warpaint.m_Entity.PrimaryColorsProfile.Ramps.IndexOf(index);
+                doll.SetWarpaintColor(doll.Warpaint.m_Entity.PrimaryColorsProfile.Ramps.IndexOf(index));
             }
             catch (Exception e) {
                 Main.logger.Log(e.ToString());
@@ -264,11 +324,12 @@ namespace VisualAdjustments {
                                 }
                             }
                             var index = a.PrimaryColorsProfile.Ramps.Where(b => b.isReadable).First(w => w.GetPixel(1, 1).ToString() == settingcol.ToString());
-                            settings.PrimaryColor = a.PrimaryColorsProfile.Ramps.IndexOf(index);
+                            doll.SetPrimaryEquipColor(a.PrimaryColorsProfile.Ramps.IndexOf(index));
                             settings.companionPrimary = a.PrimaryColorsProfile.Ramps.IndexOf(index);
                             var indexsec = a.PrimaryColorsProfile.Ramps.Where(b => b.isReadable).First(w => w.GetPixel(1, 1).ToString() == settingcolsecondary.ToString());
-                            settings.SecondaryColor = a.PrimaryColorsProfile.Ramps.IndexOf(indexsec);
-                            settings.companionSecondary = a.PrimaryColorsProfile.Ramps.IndexOf(indexsec);
+                            settings.companionSecondary = a.PrimaryColorsProfile.Ramps.IndexOf(index);
+                            doll.SetSecondaryEquipColor(a.PrimaryColorsProfile.Ramps.IndexOf(indexsec));
+
                             // doll.SetSkinColor(settings.SkinColor);
                             /*if (a.PrimaryColorsProfile.Ramps.Where(b => b.isReadable).Any(c => c.GetPixel(1, 1).ToString() == settingcol.ToString()))
                             {
@@ -433,7 +494,7 @@ namespace VisualAdjustments {
             if (classes.Count == 0) {
                 ///Main.logger.Log("bru");
                 foreach (BlueprintCharacterClass c in Main.blueprints.OfType<BlueprintCharacterClass>()) {
-                    if (!c.PrestigeClass && c.ComponentsArray.Length != 0 && !c.IsMythic && !c.ToString().Contains("Mythic") && !c.ToString().Contains("Animal") && !c.ToString().Contains("Scion")) {
+                    if (!c.PrestigeClass && !c.IsMythic && !c.ToString().Contains("Mythic") && !c.ToString().Contains("Animal") && !c.ToString().Contains("Scion")) {
                         try {
                             var charinfo = new CharInfo();
                             charinfo.Name = c.Name;
@@ -467,13 +528,11 @@ namespace VisualAdjustments {
             try {
                 if (!enabled)
                     return;
-                /* if(GUILayout.Button("Fix Grey Characters",GUILayout.Width(200f)))
-                 {
-                     foreach (var ch in Game.Instance.Player.AllCharacters)
-                     {
-                       CharacterManager.RebuildCharacter(ch);
-                     }
-                 }*/
+                if (GUILayout.Button("Fix Grey Characters (Rebuild)", UI.AutoWidth())) {
+                    foreach (var ch in Game.Instance.Player.PartyAndPets.Concat(Game.Instance.Player.PartyAndPetsDetached)) {
+                        CharacterManager.RebuildCharacter(ch);
+                    }
+                }
                 UI.Label("Settings");
                 using (UI.HorizontalScope()) {
                     GUILayout.Space(20f);
@@ -511,8 +570,8 @@ namespace VisualAdjustments {
                                     uniqueid = unitEntityData.UniqueId
                                 };
                                 settings.AddCharacterSettings(unitEntityData, fb);
-                                Main.GetIndices(unitEntityData);
-                                Main.SetEELs(unitEntityData, DollResourcesManager.GetDoll(unitEntityData));
+                                // Main.GetIndices(unitEntityData);
+                                // Main.SetEELs(unitEntityData, DollResourcesManager.GetDoll(unitEntityData));
                                 /* Settings.CharacterSettings characterSettings = new CharacterSettings{
                                  characterSettings.characterName = unitEntityData.CharacterName;
                                  characterSettings.classOutfit = new CharInfo
@@ -838,6 +897,17 @@ namespace VisualAdjustments {
             }
             ///GUILayout.EndHorizontal();
         }
+        static void ChooseEEL(UnitEntityData unitEntityData, DollState doll, string label, EquipmentEntityLink[] links, EquipmentEntityLink link, Action<EquipmentEntityLink> setter) {
+            if (links.Length == 0) {
+                GUILayout.Label($"Missing equipment for {label}");
+            }
+            var index = links.ToList().FindIndex((eel) => eel != null && eel.AssetId == link?.AssetId);
+            ChooseFromList(label, links, ref index, () => {
+                setter(links[index]);
+                unitEntityData.Descriptor.Doll = doll.CreateData();
+                CharacterManager.RebuildCharacter(unitEntityData);
+            });
+        }
         static void ChooseEEL(ref int setting, UnitEntityData unitEntityData, DollState doll, string label, EquipmentEntityLink[] links, EquipmentEntityLink link, Action<EquipmentEntityLink> setter) {
             var settings = Main.settings.GetCharacterSettings(unitEntityData);
             if (links.Length == 0) {
@@ -856,7 +926,7 @@ namespace VisualAdjustments {
                 setting = index;
                 // unitEntityData.Parts.Get<UnitPartDollData>().Default = doll.CreateData();
                 // CharacterManager.RebuildCharacter(unitEntityData);
-                Main.SetEELs(unitEntityData, doll);
+                //Main.SetEELs(unitEntityData, doll);
             }
         }
         static void ChooseEEL(ref int setting, UnitEntityData unitEntityData, DollState doll, string label, EquipmentEntityLink[] links, EquipmentEntityLink link) {
@@ -869,7 +939,7 @@ namespace VisualAdjustments {
             });
             if (setting != index) {
                 setting = index;
-                SetEELs(unitEntityData, doll);
+                //SetEELs(unitEntityData, doll);
                 //CharacterManager.RebuildCharacter(unitEntityData);
             }
         }
@@ -886,7 +956,7 @@ namespace VisualAdjustments {
                 if (setting != currentRamp) {
                     setting = currentRamp;
                     // CharacterManager.RebuildCharacter(unitEntityData);
-                    SetEELs(unitEntityData, DollResourcesManager.GetDoll(unitEntityData));
+                    // SetEELs(unitEntityData, DollResourcesManager.GetDoll(unitEntityData));
                 }
                 GUILayout.EndHorizontal();
             }
@@ -894,18 +964,15 @@ namespace VisualAdjustments {
                 Main.logger.Log(e.ToString());
             }
         }
-        /* static void ChooseRamp(UnitEntityData unitEntityData, DollState doll, string label, List<Texture2D> textures, int currentRamp, Action<int> setter)
-         {
-             ChooseFromList(label, textures, ref currentRamp, () =>
-             {
-                 SetEELs(unitEntityData, doll);
-                 setter(currentRamp);
-                 unitEntityData.Descriptor.Doll = doll.CreateData();
-                 CharacterManager.RebuildCharacter(unitEntityData);
-                 SetEELs(unitEntityData, doll);
-             });
-         }*/
-        public static int GetRaceIndex(UnitEntityData data) {
+        static void ChooseRamp(UnitEntityData unitEntityData, DollState doll, string label, List<Texture2D> textures, int currentRamp, Action<int> setter) {
+            ChooseFromList(label, textures, ref currentRamp, () => {
+                setter(currentRamp);
+                unitEntityData.Descriptor.Doll = doll.CreateData();
+                CharacterManager.RebuildCharacter(unitEntityData);
+            });
+        }
+        /*public static int GetRaceIndex(UnitEntityData data)
+        {
             var race = data.Progression.Race;
             var Settings = settings.GetCharacterSettings(data);
             //Main.logger.Log(race.Name.ToString());
@@ -949,7 +1016,7 @@ namespace VisualAdjustments {
             Settings.RaceIndex = result;
             Main.logger.Log(result.ToString());
             return result;
-        }
+        }*/
         // still doesnt move the silder
         /*  static void ChooseRace(UnitEntityData unitEntityData, DollState doll)
           {
@@ -1010,36 +1077,37 @@ namespace VisualAdjustments {
             GUILayout.EndHorizontal();
         }*/
         static void ChooseRace(UnitEntityData unitEntityData, DollState doll) {
-            var Settings = settings.GetCharacterSettings(unitEntityData);
+            var currentRace = doll.Race;
             var races = BlueprintRoot.Instance.Progression.CharacterRaces.ToArray<BlueprintRace>();
-            var currentRace = races.ElementAt(Settings.RaceIndex);
-            if (doll.Race != currentRace) {
-                doll.SetRace(currentRace);
-            }
-            var initindx = Settings.RaceIndex;
+            var index = Array.FindIndex(races, (race) => race == currentRace);
+            /* var currentRace = races.ElementAt(Settings.RaceIndex);
+             if (doll.Race != currentRace)
+             {
+                 doll.SetRace(currentRace);
+             }
+             var initindx = Settings.RaceIndex;*/
             GUILayout.BeginHorizontal();
             ModKit.UI.Label("Race" + " ", GUILayout.Width(DefaultLabelWidth));
-            Settings.RaceIndex = (int)Math.Round(GUILayout.HorizontalSlider((float)Settings.RaceIndex, 0, races.Length - 1, GUILayout.Width(DefaultSliderWidth)));
+            index = (int)Math.Round(GUILayout.HorizontalSlider((float)index, 0, races.Length - 1, GUILayout.Width(DefaultSliderWidth)));
             /// ModKit.UI.Label(asdd.ToString()+ " " + races[asdd].Name);
-            UI.Label($"  {Settings.RaceIndex}".orange() + $" ({races.Length})".cyan(), UI.Width(85));
-            ModKit.UI.Label(" " + races[Settings.RaceIndex].Name, UI.Width(115));
-            if (GUILayout.Button("<", GUILayout.Width(55f)) && Settings.RaceIndex > 0)
-                Settings.RaceIndex--;
-            if (GUILayout.Button(">", GUILayout.Width(55f)) && Settings.RaceIndex < races.Length - 1)
-                Settings.RaceIndex++;
+            UI.Label($"  {index}".orange() + $" ({races.Length})".cyan(), UI.Width(85));
+            ModKit.UI.Label(" " + races[index].Name, UI.Width(115));
+            if (GUILayout.Button("<", GUILayout.Width(55f)) && index > 0)
+                index--;
+            if (GUILayout.Button(">", GUILayout.Width(55f)) && index < races.Length - 1)
+                index++;
             GUILayout.EndHorizontal();
-            if (Settings.RaceIndex != initindx && Settings.RaceIndex < races.Count()) {
-                doll.SetRace(races[Settings.RaceIndex]);
+            if (index != races.IndexOf(currentRace) && index < races.Count()) {
+                doll.SetRace(races[index]);
                 unitEntityData.Descriptor.Doll = doll.CreateData();
                 CharacterManager.RebuildCharacter(unitEntityData);
             }
         }
 
         static void ChooseVisualPreset(UnitEntityData unitEntityData, DollState doll, string label, BlueprintRaceVisualPreset[] presets,
-            BlueprintRaceVisualPreset currentPreset, CharacterSettings settings) {
+            BlueprintRaceVisualPreset currentPreset) {
             var index = Array.FindIndex(presets, (vp) => vp == currentPreset);
             ChooseFromList(label, presets, ref index, () => {
-                settings.BodyType = index;
                 doll.SetRacePreset(presets[index]);
                 unitEntityData.Parts.Get<UnitPartDollData>().Default = doll.CreateData();
                 unitEntityData.Descriptor.Doll = doll.CreateData();
@@ -1047,188 +1115,197 @@ namespace VisualAdjustments {
                 CharacterManager.RebuildCharacter(unitEntityData);
             });
         }
-        public static void GetIndices(UnitEntityData dat) {
-            try {
-                var doll2 = DollResourcesManager.GetDoll(dat);
-                if (dat.IsStoryCompanion() && doll2 == null)
-                    return;
-                // Main.logger.Log("triedgetindices");
-                var doll = DollResourcesManager.GetDoll(dat);
-                var gender = dat.Gender;
-                var race = doll.Race;
-                CustomizationOptions customizationOptions = gender != Gender.Male ? race.FemaleOptions : race.MaleOptions;
-                ///CustomizationOptions customizationOptions = new CustomizationOptions();
-                var charsettings = settings.GetCharacterSettings(dat);
-                /*if (gender == Gender.Male)
-                {
-                    customizationOptions = new CustomizationOptions
-                    {
-                        Beards = race.MaleOptions.Beards,
-                        Eyebrows = race.MaleOptions.Eyebrows,
-                        Hair = race.MaleOptions.Hair,
-                        Heads = race.MaleOptions.Beards,
-                        Horns = race.MaleOptions.Beards,
-                        TailSkinColors = race.MaleOptions.TailSkinColors
-                    };
-                }
-                else if (gender == Gender.Female)
-                {
-                    customizationOptions = new CustomizationOptions
-                    {
-                        Beards = race.FemaleOptions.Beards,
-                        Eyebrows = race.FemaleOptions.Eyebrows,
-                        Hair = race.FemaleOptions.Hair,
-                        Heads = race.FemaleOptions.Beards,
-                        Horns = race.FemaleOptions.Beards,
-                        TailSkinColors = race.FemaleOptions.TailSkinColors
-                    };
-                }*/
-                ///var doll = dat.Descriptor.m_LoadedDollData;
-                /// var doll = DollResourcesManager.CreateDollState(dat);
+        /* public static void GetIndices(UnitEntityData dat)
+         {
+             try
+             {
+                 var doll2 = DollResourcesManager.GetDoll(dat);
+                 if (dat.IsStoryCompanion() && doll2 == null)
+                     return;
+                 // Main.logger.Log("triedgetindices");
+                 var doll = DollResourcesManager.GetDoll(dat);
+                 var gender = dat.Gender;
+                 var race = doll.Race;
+                 CustomizationOptions customizationOptions = gender != Gender.Male ? race.FemaleOptions : race.MaleOptions;
+                 ///CustomizationOptions customizationOptions = new CustomizationOptions();
+                 var charsettings = settings.GetCharacterSettings(dat);
+                 /*if (gender == Gender.Male)
+                 {
+                     customizationOptions = new CustomizationOptions
+                     {
+                         Beards = race.MaleOptions.Beards,
+                         Eyebrows = race.MaleOptions.Eyebrows,
+                         Hair = race.MaleOptions.Hair,
+                         Heads = race.MaleOptions.Beards,
+                         Horns = race.MaleOptions.Beards,
+                         TailSkinColors = race.MaleOptions.TailSkinColors
+                     };
+                 }
+                 else if (gender == Gender.Female)
+                 {
+                     customizationOptions = new CustomizationOptions
+                     {
+                         Beards = race.FemaleOptions.Beards,
+                         Eyebrows = race.FemaleOptions.Eyebrows,
+                         Hair = race.FemaleOptions.Hair,
+                         Heads = race.FemaleOptions.Beards,
+                         Horns = race.FemaleOptions.Beards,
+                         TailSkinColors = race.FemaleOptions.TailSkinColors
+                     };
+                 }*//*
+                 ///var doll = dat.Descriptor.m_LoadedDollData;
+                 /// var doll = DollResourcesManager.CreateDollState(dat);
 
-                if (doll == null) {
-                    try {
-                        doll = DollResourcesManager.CreateDollState(dat);
-                    }
-                    catch (Exception e) { Main.logger.Error(e.Message + "  " + e.StackTrace); }
-                }
-                charsettings.Face = Array.IndexOf(customizationOptions.Heads, doll.Head.m_Link);
-                Main.Log($"hairCount: {customizationOptions.Hair.Count()}");
-                if (customizationOptions.Hair.Count() > 0)
-                    charsettings.Hair = Array.IndexOf(customizationOptions.Hair, doll.Hair.m_Link);
-                if (customizationOptions.Beards.Count() > 0)
-                    charsettings.Beards = Array.IndexOf(customizationOptions.Beards, doll.Beard.m_Link);
-                if (customizationOptions.Horns.Count() > 0)
-                    charsettings.Horns = Array.IndexOf(customizationOptions.Horns, doll.Horn.m_Link);
-                /// Main.logger.Log("hornpassed");
-                if (customizationOptions.Hair.Count() > 0)
-                    charsettings.HairColor = doll.HairRampIndex;
-                /// Main.logger.Log("haircolorpassed");
-                charsettings.SkinColor = doll.SkinRampIndex;
-                ///charsettings.SkinColor = 1;
-                ///Main.logger.Log("skincolorpassed");
-                if (customizationOptions.Horns.Count() > 0)
-                    charsettings.HornsColor = doll.HornsRampIndex;
-                /// Main.logger.Log("horncolorpassed");
-                charsettings.PrimaryColor = doll.EquipmentRampIndex;
-                charsettings.SecondaryColor = doll.EquipmentRampIndexSecondary;
-                charsettings.RaceIndex = Array.IndexOf(BlueprintRoot.Instance.Progression.CharacterRaces.ToArray<BlueprintRace>(), doll.Race);
-                // charsettings.BodyType = doll.;
-                charsettings.Warpaint = doll.Warpaints.IndexOf(doll.Warpaint.m_Link);
-                charsettings.WarpaintCol = doll.WarpaintRampIndex;
-                charsettings.Scar = doll.Scars.IndexOf(doll.Scar.m_Link);
-                ///Main.logger.Log("Got Indices");
-            }
-            catch (Exception e) {
-                Main.logger.Log(e.Message);
-                Main.logger.Log(e.StackTrace);
-                Main.logger.Log(e.Source);
-                Main.logger.Log(e.InnerException.Message);
-            };
-        }
-        public static void SetEELs(UnitEntityData dat, DollState doll, bool shouldRebuild = true) {
-            try {
-                if (doll == null)
-                    return;
-                var Settings = settings.GetCharacterSettings(dat);
-                var gender = dat.Gender;
-                var races = BlueprintRoot.Instance.Progression.CharacterRaces.ToArray<BlueprintRace>();
-                BlueprintRace race;
-                if (Settings.RaceIndex != -1) {
-                    race = races[Settings.RaceIndex];
-                }
-                else {
-                    if (!dat.Descriptor.Progression.Race.NameForAcronym.Contains("Mongrel")) {
-                        race = dat.Progression.Race;
-                    }
-                    else {
-                        race = Utilities.GetBlueprint<BlueprintRace>("0a5d473ead98b0646b94495af250fdc4");
-                    }
-                }
-                doll.SetRace(race);
-                Settings.BodyType = EELIndex(Settings.BodyType, doll.Race.Presets.Length);
-                doll.SetRacePreset(doll.Race.Presets[Settings.BodyType]);
-                if (dat.Gender == Gender.Male) {
-                    dat.View.CharacterAvatar.Skeleton = doll.RacePreset.MaleSkeleton;
-                    dat.View.CharacterAvatar.m_Skeleton = doll.RacePreset.MaleSkeleton;
-                    dat.View.CharacterAvatar.m_SkeletonChanged = true;
-                }
-                else {
-                    dat.View.CharacterAvatar.Skeleton = doll.RacePreset.FemaleSkeleton;
-                    dat.View.CharacterAvatar.m_Skeleton = doll.RacePreset.FemaleSkeleton;
-                    dat.View.CharacterAvatar.m_SkeletonChanged = true;
-                }
-                dat.View.CharacterAvatar.UpdateSkeleton();
-                // dat.View.CharacterAvatar.m_Skeleton = (doll.Gender != Gender.Male) ? doll.RacePreset.FemaleSkeleton : doll.RacePreset.MaleSkeleton;
+                 if (doll == null) {
+                     try {
+                         doll = DollResourcesManager.CreateDollState(dat);
+                     }
+                     catch (Exception e) { Main.logger.Error(e.Message + "  " + e.StackTrace); }
+                 }
+                 charsettings.Face = Array.IndexOf(customizationOptions.Heads, doll.Head.m_Link);
+                 Main.Log($"hairCount: {customizationOptions.Hair.Count()}");
+                 if (customizationOptions.Hair.Count() > 0)
+                     charsettings.Hair = Array.IndexOf(customizationOptions.Hair, doll.Hair.m_Link);
+                 if (customizationOptions.Beards.Count() > 0)
+                     charsettings.Beards = Array.IndexOf(customizationOptions.Beards, doll.Beard.m_Link);
+                 if (customizationOptions.Horns.Count() > 0)
+                     charsettings.Horns = Array.IndexOf(customizationOptions.Horns, doll.Horn.m_Link);
+                 /// Main.logger.Log("hornpassed");
+                 if (customizationOptions.Hair.Count() > 0)
+                     charsettings.HairColor = doll.HairRampIndex;
+                 /// Main.logger.Log("haircolorpassed");
+                 charsettings.SkinColor = doll.SkinRampIndex;
+                 ///charsettings.SkinColor = 1;
+                 ///Main.logger.Log("skincolorpassed");
+                 if (customizationOptions.Horns.Count() > 0)
+                     charsettings.HornsColor = doll.HornsRampIndex;
+                 /// Main.logger.Log("horncolorpassed");
+                 charsettings.PrimaryColor = doll.EquipmentRampIndex;
+                 charsettings.SecondaryColor = doll.EquipmentRampIndexSecondary;
+                 charsettings.RaceIndex = Array.IndexOf(BlueprintRoot.Instance.Progression.CharacterRaces.ToArray<BlueprintRace>(), doll.Race);
+                 // charsettings.BodyType = doll.;
+                 charsettings.Warpaint = doll.Warpaints.IndexOf(doll.Warpaint.m_Link);
+                 charsettings.WarpaintCol = doll.WarpaintRampIndex;
+                 charsettings.Scar = doll.Scars.IndexOf(doll.Scar.m_Link);
+                 ///Main.logger.Log("Got Indices");
+             }
+             catch (Exception e) {
+                 Main.logger.Log(e.Message);
+                 Main.logger.Log(e.StackTrace);
+                 Main.logger.Log(e.Source);
+                 Main.logger.Log(e.InnerException.Message);
+             };
+         }
+         public static void SetEELs(UnitEntityData dat, DollState doll, bool shouldRebuild = true) {
+             try {
+                 if (doll == null)
+                     return;
+         }*/
+        /* public static void SetEELs(UnitEntityData dat, DollState doll, bool shouldRebuild = true)
+         {
+             try
+             {
+                 return;
+                 if (doll == null) return;
+                 var Settings = settings.GetCharacterSettings(dat);
+                 var gender = dat.Gender;
+                 var races = BlueprintRoot.Instance.Progression.CharacterRaces.ToArray<BlueprintRace>();
+                 BlueprintRace race;
+                 if (Settings.RaceIndex != -1) {
+                     race = races[Settings.RaceIndex];
+                 }
+                 else {
+                     if (!dat.Descriptor.Progression.Race.NameForAcronym.Contains("Mongrel")) {
+                         race = dat.Progression.Race;
+                     }
+                     else {
+                         race = Utilities.GetBlueprint<BlueprintRace>("0a5d473ead98b0646b94495af250fdc4");
+                     }
+                 }
+                 doll.SetRace(race);
+                 Settings.BodyType = EELIndex(Settings.BodyType, doll.Race.Presets.Length);
+                 doll.SetRacePreset(doll.Race.Presets[Settings.BodyType]);
+                 if (dat.Gender == Gender.Male) {
+                     dat.View.CharacterAvatar.Skeleton = doll.RacePreset.MaleSkeleton;
+                     dat.View.CharacterAvatar.m_Skeleton = doll.RacePreset.MaleSkeleton;
+                     dat.View.CharacterAvatar.m_SkeletonChanged = true;
+                 }
+                 else {
+                     dat.View.CharacterAvatar.Skeleton = doll.RacePreset.FemaleSkeleton;
+                     dat.View.CharacterAvatar.m_Skeleton = doll.RacePreset.FemaleSkeleton;
+                     dat.View.CharacterAvatar.m_SkeletonChanged = true;
+                 }
+                 dat.View.CharacterAvatar.UpdateSkeleton();
+                 // dat.View.CharacterAvatar.m_Skeleton = (doll.Gender != Gender.Male) ? doll.RacePreset.FemaleSkeleton : doll.RacePreset.MaleSkeleton;
 
 
-                CustomizationOptions customizationOptions = gender != Gender.Male ? race.FemaleOptions : race.MaleOptions;
-                Settings.Face = Main.EELIndex(Settings.Face, customizationOptions.Heads.Length);
-                doll.SetHead(customizationOptions.Heads[Settings.Face]);
-                if (customizationOptions.Hair.Length > 0)
-                    Settings.Hair = Main.EELIndex(Settings.Hair, customizationOptions.Hair.Length);
+                 CustomizationOptions customizationOptions = gender != Gender.Male ? race.FemaleOptions : race.MaleOptions;
+                 Settings.Face = Main.EELIndex(Settings.Face, customizationOptions.Heads.Length);
+                 doll.SetHead(customizationOptions.Heads[Settings.Face]);
+                 if (customizationOptions.Hair.Length > 0)
+                     Settings.Hair = Main.EELIndex(Settings.Hair, customizationOptions.Hair.Length);
 
-                if (customizationOptions.Hair.Length > 0)
-                    doll.SetHair(customizationOptions.Hair[Settings.Hair]);
+                 if (customizationOptions.Hair.Length > 0)
+                     doll.SetHair(customizationOptions.Hair[Settings.Hair]);
 
-                if (customizationOptions.Beards.Length > 0)
-                    Settings.Beards = Main.EELIndex(Settings.Beards, customizationOptions.Beards.Length);
+                 if (customizationOptions.Beards.Length > 0)
+                     Settings.Beards = Main.EELIndex(Settings.Beards, customizationOptions.Beards.Length);
 
-                if (customizationOptions.Beards.Length > 0)
-                    doll.SetBeard(customizationOptions.Beards[Settings.Beards]);
+                 if (customizationOptions.Beards.Length > 0)
+                     doll.SetBeard(customizationOptions.Beards[Settings.Beards]);
 
-                if (customizationOptions.Horns.Length > 0)
-                    Settings.Horns = Main.EELIndex(Settings.Horns, customizationOptions.Horns.Length);
+                 if (customizationOptions.Horns.Length > 0)
+                     Settings.Horns = Main.EELIndex(Settings.Horns, customizationOptions.Horns.Length);
 
-                if (customizationOptions.Horns.Length > 0)
-                    doll.SetHorn(customizationOptions.Horns[Settings.Horns]);
+                 if (customizationOptions.Horns.Length > 0)
+                     doll.SetHorn(customizationOptions.Horns[Settings.Horns]);
 
-                if (customizationOptions.Hair.Length > 0)
-                    Settings.HairColor = Main.EELIndex(Settings.HairColor, doll.Hair.m_Entity.PrimaryColorsProfile.Ramps.Count);
+                 if (customizationOptions.Hair.Length > 0)
+                     Settings.HairColor = Main.EELIndex(Settings.HairColor, doll.Hair.m_Entity.PrimaryColorsProfile.Ramps.Count);
 
-                if (customizationOptions.Hair.Length > 0)
-                    doll.SetHairColor(Settings.HairColor);
+                 if (customizationOptions.Hair.Length > 0)
+                     doll.SetHairColor(Settings.HairColor);
 
-                if (customizationOptions.Horns.Length > 0)
-                    Settings.HornsColor = Main.EELIndex(Settings.HornsColor, doll.GetHornsRamps().Count);
+                 if (customizationOptions.Horns.Length > 0)
+                     Settings.HornsColor = Main.EELIndex(Settings.HornsColor, doll.GetHornsRamps().Count);
 
-                if (customizationOptions.Horns.Length > 0)
-                    doll.SetHornsColor(Settings.HornsColor);
+                 if (customizationOptions.Horns.Length > 0)
+                     doll.SetHornsColor(Settings.HornsColor);
 
-                if (doll.Scars.Count > 0)
-                    Settings.Scar = Main.EELIndex(Settings.Scar, doll.Scars.Count);
-                if (doll.Scars.Count > 0)
-                    doll.SetScar(doll.Scars[Settings.Scar]);
-                if (doll.Warpaints.Count > 0) {
-                    if (doll.Warpaints.Count > 0)
-                        doll.SetWarpaint(doll.Warpaints[Settings.Warpaint]);
-                    if (doll.Warpaints.Count > 0)
-                        doll.SetWarpaintColor(Settings.WarpaintCol);
-                }
 
-                Settings.SkinColor = Main.EELIndex(Settings.SkinColor, doll.Head.m_Entity.PrimaryColorsProfile.Ramps.Count);
+                 if (doll.Scars.Count > 0) Settings.Scar = Main.EELIndex(Settings.Scar, doll.Scars.Count);
+                 if (doll.Scars.Count > 0) doll.SetScar(doll.Scars[Settings.Scar]);
+                 if (doll.Warpaints.Count > 0) Settings.Warpaint = Main.EELIndex(Settings.Warpaint, doll.Warpaints.Count);
+                 if (doll.Warpaints.Count > 0) Settings.WarpaintCol = Main.EELIndex(Settings.Warpaint, doll.Warpaints.Count);
+                 if (doll.Warpaints.Count > 0)
+                 {
+                     if (doll.Warpaints.Count > 0) doll.SetWarpaint(doll.Warpaints[Settings.Warpaint]);
+                     if (doll.Warpaints.Count > 0) doll.SetWarpaintColor(Settings.WarpaintCol);
+                 }
 
-                doll.SetSkinColor(Settings.SkinColor);
+                 Settings.SkinColor = Main.EELIndex(Settings.SkinColor, doll.Head.m_Entity.PrimaryColorsProfile.Ramps.Count);
 
-                Settings.PrimaryColor = EELIndex(Settings.PrimaryColor, doll.GetOutfitRampsPrimary().Count);
+                 doll.SetSkinColor(Settings.SkinColor);
 
-                Settings.SecondaryColor = EELIndex(Settings.SecondaryColor, doll.GetOutfitRampsSecondary().Count);
+                 Settings.PrimaryColor = EELIndex(Settings.PrimaryColor, doll.GetOutfitRampsPrimary().Count);
 
-                //doll.SetHair(customizationOptions.Hair[Settings.Hair]);
+                 Settings.SecondaryColor = EELIndex(Settings.SecondaryColor, doll.GetOutfitRampsSecondary().Count);
 
-                doll.SetEquipColors(Settings.PrimaryColor, Settings.SecondaryColor);
-                if (Settings.classOutfit.Name != "Default") {
-                    doll.SetPrimaryEquipColor(Settings.PrimaryColor);
-                    doll.SetSecondaryEquipColor(Settings.SecondaryColor);
-                }
-                dat.Parts.Get<UnitPartDollData>().Default = doll.CreateData();
-                ///  CharacterManager.UpdateModel(dat.View);
-                if (shouldRebuild) {
-                    CharacterManager.RebuildCharacter(dat);
-                }
-            }
-            catch (Exception e) { Main.logger.Log(e.ToString()); }
-        }
+                 //doll.SetHair(customizationOptions.Hair[Settings.Hair]);
+
+                 doll.SetEquipColors(Settings.PrimaryColor, Settings.SecondaryColor);
+                 if (Settings.classOutfit.Name != "Default") {
+                     doll.SetPrimaryEquipColor(Settings.PrimaryColor);
+                     doll.SetSecondaryEquipColor(Settings.SecondaryColor);
+                 }
+                 dat.Parts.Get<UnitPartDollData>().Default = doll.CreateData();
+                 ///  CharacterManager.UpdateModel(dat.View);
+                 if (shouldRebuild) {
+                     CharacterManager.RebuildCharacter(dat);
+                 }
+             }
+             catch (Exception e) { Main.logger.Log(e.ToString()); }
+         }*/
         static void ChooseDoll(UnitEntityData unitEntityData) {
             try {
                 if (!unitEntityData.IsMainCharacter && !unitEntityData.IsCustomCompanion() && GUILayout.Button("Destroy Doll", GUILayout.Width(DefaultLabelWidth))) {
@@ -1252,25 +1329,27 @@ namespace VisualAdjustments {
                 var Settings = settings.GetCharacterSettings(unitEntityData);
                 var races = BlueprintRoot.Instance.Progression.CharacterRaces.ToArray<BlueprintRace>();
                 var gender = unitEntityData.Gender;
-                BlueprintRace race;
-                if (Settings.RaceIndex == -1) {
-                    if (!unitEntityData.Descriptor.Progression.Race.NameForAcronym.Contains("Mongrel")) {
-                        race = unitEntityData.Progression.Race;
-                        if (Settings.RaceIndex == -1) {
-                            Settings.RaceIndex = races.IndexOf(race);
-                        }
-                    }
-                    else {
-                        race = (Utilities.GetBlueprint<BlueprintRace>("0a5d473ead98b0646b94495af250fdc4"));
-                        if (Settings.RaceIndex == -1) {
-                            Settings.RaceIndex = races.IndexOf(race);
-                        }
-                    }
-                }
-                else {
-                    race = races[Settings.RaceIndex];
-                }
-                ///var race = unitEntityData.Progression.Race;
+
+                /* if (Settings.RaceIndex == -1)
+                 {
+                     if (!unitEntityData.Descriptor.Progression.Race.NameForAcronym.Contains("Mongrel"))
+                     {
+                         race = unitEntityData.Progression.Race;
+                         if (Settings.RaceIndex == -1) {
+                             Settings.RaceIndex = races.IndexOf(race);
+                         }
+                     }
+                     else {
+                         race = (Utilities.GetBlueprint<BlueprintRace>("0a5d473ead98b0646b94495af250fdc4"));
+                         if (Settings.RaceIndex == -1) {
+                             Settings.RaceIndex = races.IndexOf(race);
+                         }
+                     }
+                 }
+                 else {
+                     race = races[Settings.RaceIndex];
+                 }*/
+                var race = unitEntityData.Progression.Race;
                 CustomizationOptions customizationOptions = gender != Gender.Male ? race.FemaleOptions : race.MaleOptions;
                 /* if (Settings.Beards == -1 || Settings.Face == -1 || Settings.Hair == -1 || Settings.HairColor == -1 || Settings.Horns == -1 || Settings.HornsColor == -1 || Settings.PrimaryColor == -1 || Settings.SecondaryColor == -1 || Settings.SkinColor == -1)
                  {
@@ -1284,7 +1363,7 @@ namespace VisualAdjustments {
                 if (Main.unlockcustomization) {
 
                 }
-                var doll2 = DollResourcesManager.GetDoll(unitEntityData);
+                //var doll2 = DollResourcesManager.GetDoll(unitEntityData);
                 /// var race = doll.Race;
                 var doll = DollResourcesManager.GetDoll(unitEntityData);
                 ReferenceArrayProxy<BlueprintRaceVisualPreset, BlueprintRaceVisualPresetReference> presets = doll.Race.Presets;
@@ -1292,59 +1371,60 @@ namespace VisualAdjustments {
                 UI.Div(154, 30, 1200);
                 UI.HStack("Doll", 1,
                     () => {
-                        doll2.SetRace(race);
-                        ChooseRace(unitEntityData, doll2);
-                        if (doll2.Race != races[Settings.RaceIndex])
-                            doll2.SetRace(races[Settings.RaceIndex]);
+                        ChooseRace(unitEntityData, doll);
                     },
-                    () => ChooseVisualPreset(unitEntityData, doll, "Body Type", doll.Race.m_Presets.Select(a => (BlueprintRaceVisualPreset)a.GetBlueprint()).ToArray(), doll.RacePreset, Settings),
-                    () => ChooseEEL(ref Settings.Face, unitEntityData, doll, "Face", customizationOptions.Heads, doll.Head.m_Link, (EquipmentEntityLink ee) => doll.SetHead(ee)),
+                    () => ChooseVisualPreset(unitEntityData, doll, "Body Type", doll.Race.m_Presets.Select(a => (BlueprintRaceVisualPreset)a.GetBlueprint()).ToArray(), doll.RacePreset),
+                    () => ChooseEEL(unitEntityData, doll, "Face", customizationOptions.Heads, doll.Head.m_Link, (EquipmentEntityLink ee) => doll.SetHead(ee)),
                     () => {
                         if (doll.Scars.Count > 0)
-                            ChooseEEL(ref Settings.Scar, unitEntityData, doll, "Scar", doll.Scars.ToArray(), doll.Scar.m_Link, (EquipmentEntityLink ee) => doll.SetScar(ee));
+                            ChooseEEL(unitEntityData, doll, "Scar", doll.Scars.ToArray(), doll.Scar.m_Link, (EquipmentEntityLink ee) => doll.SetScar(ee));
                     },
-                    () => ChooseEEL(ref Settings.Warpaint, unitEntityData, doll, "Warpaint", doll.Warpaints.ToArray(), doll.Warpaint.m_Link, (EquipmentEntityLink ee) => doll.SetWarpaint(ee)),
+                    () => ChooseEEL(unitEntityData, doll, "Warpaint", doll.Warpaints.ToArray(), doll.Warpaint.m_Link, (EquipmentEntityLink ee) => doll.SetWarpaint(ee)),
                     () => {
-                        if (customizationOptions.Hair.Count() > 0)
-                            ChooseEEL(ref Settings.Hair, unitEntityData, doll, "Hair", customizationOptions.Hair, doll.Hair.m_Link, (EquipmentEntityLink ee) => doll.SetHair(ee));
-                    },
-                    () => {
-                        if (customizationOptions.Beards.Count() > 0)
-                            ChooseEEL(ref Settings.Beards, unitEntityData, doll, "Beards", customizationOptions.Beards, doll.Beard.m_Link, (EquipmentEntityLink ee) => doll.SetBeard(ee));
+                        if (customizationOptions.Hair.Any())
+                            ChooseEEL(unitEntityData, doll, "Hair", customizationOptions.Hair, doll.Hair.m_Link, (EquipmentEntityLink ee) => doll.SetHair(ee));
                     },
                     () => {
-                        if (customizationOptions.Horns.Count() > 0)
-                            ChooseEEL(ref Settings.Horns, unitEntityData, doll, "Horns", customizationOptions.Horns, doll.Horn.m_Link, (EquipmentEntityLink ee) => doll.SetHorn(ee));
+                        if (customizationOptions.Beards.Any())
+                            ChooseEEL(unitEntityData, doll, "Beards", customizationOptions.Beards, doll.Beard.m_Link, (EquipmentEntityLink ee) => doll.SetBeard(ee));
+                    },
+                    () => {
+                        if (customizationOptions.Horns.Any())
+                            ChooseEEL(unitEntityData, doll, "Horns", customizationOptions.Horns, doll.Horn.m_Link, (EquipmentEntityLink ee) => doll.SetHorn(ee));
                     },
                     () => {
                         if (doll.Warpaints.Count > 0)
-                            ChooseRamp(ref Settings.WarpaintCol, unitEntityData, doll, "Warpaint Color", doll.GetWarpaintRamps(), Settings.WarpaintCol, (int index) => doll.SetWarpaintColor(index));
+                            ChooseRamp(unitEntityData, doll, "Warpaint Color", doll.GetWarpaintRamps(), doll.WarpaintRampIndex, (int index) => doll.SetWarpaintColor(index));
                     },
-                    () => ChooseRamp(ref Settings.HairColor, unitEntityData, doll, "Hair Color", doll.GetHairRamps(), Settings.HairColor, (int index) => doll.SetHairColor(index)),
-                    () => ChooseRamp(ref Settings.SkinColor, unitEntityData, doll, "Skin Color", doll.GetSkinRamps(), Settings.SkinColor, (int index) => doll.SetSkinColor(index)),
-                    () => ChooseRamp(ref Settings.HornsColor, unitEntityData, doll, "Horn Color", doll.GetHornsRamps(), Settings.HornsColor, (int index) => doll.SetHornsColor(index)),
-                // Main.logger.Log(doll.GetHornsRamps().Count.ToString());;
-                    () => ChooseRamp(ref Settings.PrimaryColor, unitEntityData, doll, "Primary Outfit Color", doll.GetOutfitRampsPrimary(), Settings.PrimaryColor, (int index) => doll.SetPrimaryEquipColor(index)),
-                    () => ChooseRamp(ref Settings.SecondaryColor, unitEntityData, doll, "Secondary Outfit Color", doll.GetOutfitRampsSecondary(), Settings.SecondaryColor, (int index) => doll.SetSecondaryEquipColor(index)),
-                    () => {
-                        if (Settings.PrimaryColor != doll.EquipmentRampIndex || Settings.SecondaryColor != doll.EquipmentRampIndexSecondary) {
-                            doll.SetEquipColors(Settings.PrimaryColor, Settings.SecondaryColor);
-                        }
-                    },
+                    () => ChooseRamp(unitEntityData, doll, "Hair Color", doll.GetHairRamps(), doll.HairRampIndex, (int index) => {
+                        doll.SetHairColor(index);
+                    }),
+                    () => ChooseRamp(unitEntityData, doll, "Skin Color", doll.GetSkinRamps(), doll.SkinRampIndex, (int index) => doll.SetSkinColor(index)),
+                    () => ChooseRamp(unitEntityData, doll, "Horn Color", doll.GetHornsRamps(), doll.HornsRampIndex, (int index) => doll.SetHornsColor(index)),
+                    () => ChooseRamp(unitEntityData, doll, "Primary Outfit Color", doll.GetOutfitRampsPrimary(), doll.EquipmentRampIndex, (int index) => doll.SetPrimaryEquipColor(index)),
+                    () => ChooseRamp(unitEntityData, doll, "Secondary Outfit Color", doll.GetOutfitRampsSecondary(), doll.EquipmentRampIndexSecondary, (int index) => doll.SetSecondaryEquipColor(index)),
+                /* if(Settings.PrimaryColor != doll.EquipmentRampIndex || Settings.SecondaryColor != doll.EquipmentRampIndexSecondary)
+                 {
+                     doll.SetEquipColors(Settings.PrimaryColor,Settings.SecondaryColor);
+                 }*/
+                //  ReferenceArrayProxy<BlueprintRaceVisualPreset, BlueprintRaceVisualPresetReference> presets = doll.Race.Presets;
+                // BlueprintRaceVisualPreset racePreset = doll.RacePreset;
                 /*if (unitEntityData.Descriptor.LeftHandedOverride == true && GUILayout.Button("Set Right Handed", GUILayout.Width(DefaultLabelWidth)))
-                {
-                    unitEntityData.Descriptor.LeftHandedOverride = false;
-                    unitEntityData.Descriptor.m_LoadedDollData = doll.CreateData();
-                    ViewManager.ReplaceView(unitEntityData, null);
-                    unitEntityData.View.HandsEquipment.HandleEquipmentSetChanged();
-                }
-                else if (unitEntityData.Descriptor.LeftHandedOverride == false && GUILayout.Button("Set Left Handed", GUILayout.Width(DefaultLabelWidth)))
-                {
-                    unitEntityData.Descriptor.LeftHandedOverride = true;
-                    unitEntityData.Descriptor.m_LoadedDollData = doll.CreateData();
-                    ViewManager.ReplaceView(unitEntityData, null);
-                    unitEntityData.View.HandsEquipment.HandleEquipmentSetChanged();
-                }*/
+                  {
+                      unitEntityData.Descriptor.LeftHandedOverride = false;
+                      unitEntityData.Parts.Get<UnitPartDollData>().Default = doll.CreateData();
+                      unitEntityData.Descriptor.m_LoadedDollData = doll.CreateData();
+                      ViewManager.ReplaceView(unitEntityData, null);
+                      unitEntityData.View.HandsEquipment.HandleEquipmentSetChanged();
+                  }
+                  else if (unitEntityData.Descriptor.LeftHandedOverride == false && GUILayout.Button("Set Left Handed", GUILayout.Width(DefaultLabelWidth)))
+                  {
+                      unitEntityData.Descriptor.LeftHandedOverride = true;
+                      unitEntityData.Parts.Get<UnitPartDollData>().Default = doll.CreateData();
+                      unitEntityData.Descriptor.m_LoadedDollData = doll.CreateData();
+                      ViewManager.ReplaceView(unitEntityData, null);
+                      unitEntityData.View.HandsEquipment.HandleEquipmentSetChanged();
+                  }*/
                 () => ChoosePortrait(unitEntityData),
                 () => ChooseAsks(unitEntityData),
                 () => UI.Space(),
@@ -1410,6 +1490,39 @@ namespace VisualAdjustments {
                                         ref Settings.secondColor,
                                         Main.GenerateOutfitcolor
                                         );
+                                }                        SecondaryColorPicker.OnGUI(Settings, unitEntityData, new Color(Settings.secondColor[0], Settings.secondColor[1], Settings.secondColor[2]), ref Settings.secondColor, Main.GenerateOutfitcolor);
+
+                            }
+                        }
+                    }
+                },
+                () => UI.Div(0, 30, 1200),
+                () => {
+                    using (UI.HorizontalScope()) {
+                        UI.Label("Custom", UI.AutoWidth());
+                        using (UI.VerticalScope()) {
+                            using (UI.HorizontalScope(UI.Width(800))) {
+                                using (UI.VerticalScope()) {
+                                    UI.Toggle("Horn Color", ref Settings.customHornColor);
+                                    if (Settings.customHornColor) {
+                                        HornColorPicker.OnGUI(
+                                            Settings, unitEntityData,
+                                            new Color(Settings.hornColor[0], Settings.hornColor[1], Settings.hornColor[2]),
+                                            ref Settings.hornColor,
+                                            Main.GenerateHornColor
+                                            );
+                                    }
+                                }
+                                using (UI.VerticalScope()) {
+                                    UI.Toggle("Warpaint Color", ref Settings.customWarpaintColor);
+                                    if (Settings.customWarpaintColor) {
+                                        WarpaintColorPicker.OnGUI(
+                                            Settings,
+                                            unitEntityData, new Color(Settings.warpaintColor[0], Settings.warpaintColor[1], Settings.warpaintColor[2]),
+                                            ref Settings.warpaintColor,
+                                            Main.GenerateWarpaintColor
+                                            );
+                                    }
                                 }
                             }
                         }
@@ -1422,311 +1535,311 @@ namespace VisualAdjustments {
         }
 
         static void ChooseCompanionColor(CharacterSettings characterSettings, UnitEntityData unitEntityData) {
-    try {
-        if (GUILayout.Button("Create Doll", GUILayout.Width(DefaultLabelWidth))) {
-            var race = unitEntityData.Descriptor.Progression.Race;
-            var options = unitEntityData.Descriptor.Gender == Gender.Male ? race.MaleOptions : race.FemaleOptions;
-            var dollState = new DollState();
-            if (unitEntityData.Descriptor.Progression.Race.name != "MongrelmanRace") {
-                dollState.SetRace(unitEntityData.Descriptor.Progression.Race); //Race must be set before class
-                                                                               //This is a hack to work around harmony not allowing calls to the unpatched   
+            try {
+                if (GUILayout.Button("Create Doll", GUILayout.Width(DefaultLabelWidth))) {
+                    var race = unitEntityData.Descriptor.Progression.Race;
+                    var options = unitEntityData.Descriptor.Gender == Gender.Male ? race.MaleOptions : race.FemaleOptions;
+                    var dollState = new DollState();
+                    if (unitEntityData.Descriptor.Progression.Race.name != "MongrelmanRace") {
+                        dollState.SetRace(unitEntityData.Descriptor.Progression.Race); //Race must be set before class
+                                                                                       //This is a hack to work around harmony not allowing calls to the unpatched   
+                    }
+                    else {
+                        dollState.SetRace(Utilities.GetBlueprint<BlueprintRace>("0a5d473ead98b0646b94495af250fdc4"));
+                    }
+                    CharacterManager.disableEquipmentClassPatch = true;
+                    dollState.SetClass(unitEntityData.Descriptor.Progression.GetEquipmentClass());
+                    CharacterManager.disableEquipmentClassPatch = false;
+                    dollState.SetGender(unitEntityData.Descriptor.Gender);
+                    dollState.SetRacePreset(race.Presets[0]);
+                    unitEntityData.Descriptor.LeftHandedOverride = false;
+                    if (options.Hair.Length > 0)
+                        dollState.SetHair(options.Hair[0]);
+                    if (options.Heads.Length > 0)
+                        dollState.SetHead(options.Hair[0]);
+                    if (options.Beards.Length > 0)
+                        dollState.SetBeard(options.Hair[0]);
+                    //dollState.Validate();
+                    //SetEELs(unitEntityData, dollState);
+                    // unitEntityData.Descriptor.Doll = dollState.CreateData();
+                    unitEntityData.Parts.Add<UnitPartDollData>();
+                    unitEntityData.Parts.Get<UnitPartDollData>().Default = dollState.CreateData();
+                    unitEntityData.Parts.Get<UnitPartDollData>().OnDidAttachToEntity();
+                    unitEntityData.Parts.Get<UnitPartDollData>().OnViewDidAttach();
+                    unitEntityData.View.HandsEquipment.UpdateLocatorTrackers();
+                    // Traverse.Create(unitEntityData.Parts.Get<UnitPartDollData>()).Field("ActiveDoll").SetValue(dollState.CreateData()); 
+                    //    unitEntityData.Descriptor.ForcceUseClassEquipment = true;
+                    CharacterManager.RebuildCharacter(unitEntityData);
+                    // SetEELs(unitEntityData,dollState);
+                    ///SetEELs(unitEntityData, dollState);
+                    //  CharacterManager.RebuildCharacter(unitEntityData);
+                    //SetEELs(unitEntityData, dollState);
+                    //  CharacterManager.UpdateModel(unitEntityData.View);
+                    // SetEELs(unitEntityData, dollState);
+                    //CharacterManager.RebuildCharacter(unitEntityData);
+                    // SetEELs(unitEntityData, dollState);
+                    // SetEELs(unitEntityData, dollState, true);
+                }
             }
-            else {
-                dollState.SetRace(Utilities.GetBlueprint<BlueprintRace>("0a5d473ead98b0646b94495af250fdc4"));
+            catch (Exception e) {
+                Main.logger.Log(e.ToString());
             }
-            CharacterManager.disableEquipmentClassPatch = true;
-            dollState.SetClass(unitEntityData.Descriptor.Progression.GetEquipmentClass());
-            CharacterManager.disableEquipmentClassPatch = false;
-            dollState.SetGender(unitEntityData.Descriptor.Gender);
-            dollState.SetRacePreset(race.Presets[0]);
-            unitEntityData.Descriptor.LeftHandedOverride = false;
-            if (options.Hair.Length > 0)
-                dollState.SetHair(options.Hair[0]);
-            if (options.Heads.Length > 0)
-                dollState.SetHead(options.Hair[0]);
-            if (options.Beards.Length > 0)
-                dollState.SetBeard(options.Hair[0]);
-            //dollState.Validate();
-            SetEELs(unitEntityData, dollState);
-            // unitEntityData.Descriptor.Doll = dollState.CreateData();
-            unitEntityData.Parts.Add<UnitPartDollData>();
-            unitEntityData.Parts.Get<UnitPartDollData>().Default = dollState.CreateData();
-            unitEntityData.Parts.Get<UnitPartDollData>().OnDidAttachToEntity();
-            unitEntityData.Parts.Get<UnitPartDollData>().OnViewDidAttach();
-            unitEntityData.View.HandsEquipment.UpdateLocatorTrackers();
-            // Traverse.Create(unitEntityData.Parts.Get<UnitPartDollData>()).Field("ActiveDoll").SetValue(dollState.CreateData()); 
-            //    unitEntityData.Descriptor.ForcceUseClassEquipment = true;
-            CharacterManager.RebuildCharacter(unitEntityData);
-            // SetEELs(unitEntityData,dollState);
-            ///SetEELs(unitEntityData, dollState);
-            //  CharacterManager.RebuildCharacter(unitEntityData);
-            //SetEELs(unitEntityData, dollState);
-            //  CharacterManager.UpdateModel(unitEntityData.View);
-            // SetEELs(unitEntityData, dollState);
-            //CharacterManager.RebuildCharacter(unitEntityData);
-            // SetEELs(unitEntityData, dollState);
-            // SetEELs(unitEntityData, dollState, true);
-        }
-    }
-    catch (Exception e) {
-        Main.logger.Log(e.ToString());
-    }
-    ModKit.UI.Label("Note: Colors only applies to non-default outfits, the default companion custom voice is None");
-    {
-        GUILayout.BeginHorizontal();
-        ModKit.UI.Label("Primary Outfit Color ", GUILayout.Width(DefaultLabelWidth));
-        var newIndex = (int)Math.Round(GUILayout.HorizontalSlider(characterSettings.companionPrimary, -1, 90, GUILayout.Width(DefaultSliderWidth)), 0);
-        ModKit.UI.Label(" " + newIndex, GUILayout.ExpandWidth(false));
-        GUILayout.EndHorizontal();
-        if (newIndex != characterSettings.companionPrimary) {
-            characterSettings.companionPrimary = newIndex;
-            CharacterManager.UpdateModel(unitEntityData.View);
-            CharacterManager.RebuildCharacter(unitEntityData);
-        }
-    }
-    {
-        GUILayout.BeginHorizontal();
-        ModKit.UI.Label("Secondary Outfit Color ", GUILayout.Width(DefaultLabelWidth));
-        var newIndex = (int)Math.Round(GUILayout.HorizontalSlider(characterSettings.companionSecondary, -1, 90, GUILayout.Width(DefaultSliderWidth)), 0);
-        ModKit.UI.Label(" " + newIndex, GUILayout.ExpandWidth(false));
-        GUILayout.EndHorizontal();
-        if (newIndex != characterSettings.companionSecondary) {
-            characterSettings.companionSecondary = newIndex;
+            ModKit.UI.Label("Note: Colors only applies to non-default outfits, the default companion custom voice is None");
+            {
+                GUILayout.BeginHorizontal();
+                ModKit.UI.Label("Primary Outfit Color ", GUILayout.Width(DefaultLabelWidth));
+                var newIndex = (int)Math.Round(GUILayout.HorizontalSlider(characterSettings.companionPrimary, -1, 90, GUILayout.Width(DefaultSliderWidth)), 0);
+                ModKit.UI.Label(" " + newIndex, GUILayout.ExpandWidth(false));
+                GUILayout.EndHorizontal();
+                if (newIndex != characterSettings.companionPrimary) {
+                    characterSettings.companionPrimary = newIndex;
+                    CharacterManager.UpdateModel(unitEntityData.View);
+                    CharacterManager.RebuildCharacter(unitEntityData);
+                }
+            }
+            {
+                GUILayout.BeginHorizontal();
+                ModKit.UI.Label("Secondary Outfit Color ", GUILayout.Width(DefaultLabelWidth));
+                var newIndex = (int)Math.Round(GUILayout.HorizontalSlider(characterSettings.companionSecondary, -1, 90, GUILayout.Width(DefaultSliderWidth)), 0);
+                ModKit.UI.Label(" " + newIndex, GUILayout.ExpandWidth(false));
+                GUILayout.EndHorizontal();
+                if (newIndex != characterSettings.companionSecondary) {
+                    characterSettings.companionSecondary = newIndex;
+                    if (characterSettings.customOutfitColors) {
+                        Main.GenerateOutfitcolor(unitEntityData);
+                    }
+                    CharacterManager.UpdateModel(unitEntityData.View);
+                    CharacterManager.RebuildCharacter(unitEntityData);
+                }
+            }
+            ModKit.UI.Toggle("Custom Outfit Colors", ref characterSettings.customOutfitColors);
             if (characterSettings.customOutfitColors) {
-                Main.GenerateOutfitcolor(unitEntityData);
+                GUILayout.BeginHorizontal();
+                GUILayout.Space(15f);
+                ModKit.UI.DisclosureToggle("Show Primary Picker", ref characterSettings.showPrimColor);
+                GUILayout.EndHorizontal();
+                if (characterSettings.showPrimColor) {
+                    PrimaryColorPicker.OnGUI(characterSettings, unitEntityData, new Color(characterSettings.primColor[0], characterSettings.primColor[1], characterSettings.primColor[2]), ref characterSettings.primColor, Main.GenerateOutfitcolor);
+                }
+                GUILayout.Space(5f);
+                GUILayout.BeginHorizontal();
+                GUILayout.Space(15f);
+                ModKit.UI.DisclosureToggle("Show Secondary Picker", ref characterSettings.showSecondColor);
+                GUILayout.EndHorizontal();
+                if (characterSettings.showSecondColor) {
+                    SecondaryColorPicker.OnGUI(characterSettings, unitEntityData, new Color(characterSettings.secondColor[0], characterSettings.secondColor[1], characterSettings.secondColor[2]), ref characterSettings.secondColor, Main.GenerateOutfitcolor);
+                }
+                GUILayout.Space(5f);
             }
-            CharacterManager.UpdateModel(unitEntityData.View);
-            CharacterManager.RebuildCharacter(unitEntityData);
+            ChoosePortrait(unitEntityData);
+            ChooseAsks(unitEntityData);
         }
-    }
-    ModKit.UI.Toggle("Custom Outfit Colors", ref characterSettings.customOutfitColors);
-    if (characterSettings.customOutfitColors) {
-        GUILayout.BeginHorizontal();
-        GUILayout.Space(15f);
-        ModKit.UI.DisclosureToggle("Show Primary Picker", ref characterSettings.showPrimColor);
-        GUILayout.EndHorizontal();
-        if (characterSettings.showPrimColor) {
-            PrimaryColorPicker.OnGUI(characterSettings, unitEntityData, new Color(characterSettings.primColor[0], characterSettings.primColor[1], characterSettings.primColor[2]), ref characterSettings.primColor, Main.GenerateOutfitcolor);
+        static void ChooseToggle(string label, ref bool currentValue, Action onChoose) {
+            bool temp = currentValue;
+            ModKit.UI.Toggle(label, ref temp);
+            if (temp != currentValue) {
+                currentValue = temp;
+                onChoose();
+            }
         }
-        GUILayout.Space(5f);
-        GUILayout.BeginHorizontal();
-        GUILayout.Space(15f);
-        ModKit.UI.DisclosureToggle("Show Secondary Picker", ref characterSettings.showSecondColor);
-        GUILayout.EndHorizontal();
-        if (characterSettings.showSecondColor) {
-            SecondaryColorPicker.OnGUI(characterSettings, unitEntityData, new Color(characterSettings.secondColor[0], characterSettings.secondColor[1], characterSettings.secondColor[2]), ref characterSettings.secondColor, Main.GenerateOutfitcolor);
+        public static int EELIndex(int setting, int length) {
+            if (setting >= 0 && setting < length)
+                return setting;
+            else
+                return 0;
         }
-        GUILayout.Space(5f);
-    }
-    ChoosePortrait(unitEntityData);
-    ChooseAsks(unitEntityData);
-}
-static void ChooseToggle(string label, ref bool currentValue, Action onChoose) {
-    bool temp = currentValue;
-    ModKit.UI.Toggle(label, ref temp);
-    if (temp != currentValue) {
-        currentValue = temp;
-        onChoose();
-    }
-}
-public static int EELIndex(int setting, int length) {
-    if (setting >= 0 && setting < length)
-        return setting;
-    else
-        return 0;
-}
-static void ChooseEquipment(UnitEntityData unitEntityData, CharacterSettings characterSettings) {
-    void onHideEquipment() {
-        CharacterManager.UpdateModel(unitEntityData.View);
-        CharacterManager.RebuildCharacter(unitEntityData);
-    }
-    void onHideBuff() {
-        foreach (var buff in unitEntityData.Buffs)
-            buff.ClearParticleEffect();
-        /*beta3*/
-        //unitEntityData.SpawnBuffsFxs();
-    }
-    void onWeaponChanged() {
-        ///if(unitEntityData.View.HandsEquipment.GetWeaponModel(false) != characterSettings.overrideWeapons)
-        unitEntityData.View.HandsEquipment.UpdateAll();
-    }
-    // characterSettings.hideAll = unitEntityData.UISettings.ShowClassEquipment;
-    /* ChooseToggle("Hide All Equipment", ref characterSettings.hideAll, onHideEquipment);
-     unitEntityData.UISettings.ShowClassEquipment = !characterSettings.hideAll;
-     if(characterSettings.hideAll)
-     {
-         if (!characterSettings.hideArmor) characterSettings.hideArmor = true;
-         if (!characterSettings.hideHelmet) characterSettings.hideHelmet = true;
-         if (!characterSettings.hideGlasses) characterSettings.hideGlasses = true;
-         if (!characterSettings.hideShirt) characterSettings.hideShirt = true;
-         if (!characterSettings.hideItemCloak) characterSettings.hideItemCloak = true;
-         if (!characterSettings.hideBracers) characterSettings.hideBracers = true;
-         if (!characterSettings.hideGloves) characterSettings.hideGloves = true;
-         if (!characterSettings.hideBoots) characterSettings.hideBoots = true;
-         if (!characterSettings.hideCap) characterSettings.hideCap = true;
-     }*/
-    /*else
-    {
-        if (characterSettings.hideArmor) characterSettings.hideArmor = false;
-        if (characterSettings.hideHelmet) characterSettings.hideHelmet = false;
-        if (characterSettings.hideGlasses) characterSettings.hideGlasses = false;
-        if (characterSettings.hideShirt) characterSettings.hideShirt = false;
-        if (characterSettings.hideItemCloak) characterSettings.hideItemCloak = false;
-        if (characterSettings.hideBracers) characterSettings.hideBracers = false;
-        if (characterSettings.hideGloves) characterSettings.hideGloves = false;
-        if (characterSettings.hideBoots) characterSettings.hideBoots = false;
-        if (characterSettings.hideCap) characterSettings.hideCap = false;
-    }*/
-    ChooseToggle("Hide Cap", ref characterSettings.hideCap, onHideEquipment);
-    ChooseToggle("Hide Helmet", ref characterSettings.hideHelmet, onHideEquipment);
-    ChooseToggle("Hide Glasses", ref characterSettings.hideGlasses, onHideEquipment);
-    ChooseToggle("Hide Shirt", ref characterSettings.hideShirt, onHideEquipment);
-    ChooseToggle("Hide Class Equipment", ref characterSettings.hideClassCloak, onHideEquipment);
-    ChooseToggle("Hide Cloak", ref characterSettings.hideItemCloak, onHideEquipment);
-    ChooseToggle("Hide Armor", ref characterSettings.hideArmor, onHideEquipment);
-    ChooseToggle("Hide Bracers", ref characterSettings.hideBracers, onHideEquipment);
-    ChooseToggle("Hide Gloves", ref characterSettings.hideGloves, onHideEquipment);
-    ChooseToggle("Hide Boots", ref characterSettings.hideBoots, onHideEquipment);
-    ChooseToggle("Hide Inactive Weapons", ref characterSettings.hideWeapons, onWeaponChanged);
-    ChooseToggle("Hide Sheaths/Scabbards", ref characterSettings.hideSheaths, onWeaponChanged);
-    ChooseToggle("Hide Belt Slots", ref characterSettings.hideBeltSlots, onWeaponChanged);
-    ChooseToggle("Hide Quiver", ref characterSettings.hidequiver, onWeaponChanged);
-    ChooseToggle("Hide Weapon Enchantments", ref characterSettings.hideWeaponEnchantments, onWeaponChanged);
-    ChooseToggle("Hide Wings", ref characterSettings.hideWings, onHideBuff);
-    ChooseToggle("Hide Horns", ref characterSettings.hideHorns, onHideEquipment);
-    ChooseToggle("Hide Tail", ref characterSettings.hideTail, onHideEquipment);
-}
+        static void ChooseEquipment(UnitEntityData unitEntityData, CharacterSettings characterSettings) {
+            void onHideEquipment() {
+                CharacterManager.UpdateModel(unitEntityData.View);
+                CharacterManager.RebuildCharacter(unitEntityData);
+            }
+            void onHideBuff() {
+                foreach (var buff in unitEntityData.Buffs)
+                    buff.ClearParticleEffect();
+                /*beta3*/
+                //unitEntityData.SpawnBuffsFxs();
+            }
+            void onWeaponChanged() {
+                ///if(unitEntityData.View.HandsEquipment.GetWeaponModel(false) != characterSettings.overrideWeapons)
+                unitEntityData.View.HandsEquipment.UpdateAll();
+            }
+            // characterSettings.hideAll = unitEntityData.UISettings.ShowClassEquipment;
+            /* ChooseToggle("Hide All Equipment", ref characterSettings.hideAll, onHideEquipment);
+             unitEntityData.UISettings.ShowClassEquipment = !characterSettings.hideAll;
+             if(characterSettings.hideAll)
+             {
+                 if (!characterSettings.hideArmor) characterSettings.hideArmor = true;
+                 if (!characterSettings.hideHelmet) characterSettings.hideHelmet = true;
+                 if (!characterSettings.hideGlasses) characterSettings.hideGlasses = true;
+                 if (!characterSettings.hideShirt) characterSettings.hideShirt = true;
+                 if (!characterSettings.hideItemCloak) characterSettings.hideItemCloak = true;
+                 if (!characterSettings.hideBracers) characterSettings.hideBracers = true;
+                 if (!characterSettings.hideGloves) characterSettings.hideGloves = true;
+                 if (!characterSettings.hideBoots) characterSettings.hideBoots = true;
+                 if (!characterSettings.hideCap) characterSettings.hideCap = true;
+             }*/
+            /*else
+            {
+                if (characterSettings.hideArmor) characterSettings.hideArmor = false;
+                if (characterSettings.hideHelmet) characterSettings.hideHelmet = false;
+                if (characterSettings.hideGlasses) characterSettings.hideGlasses = false;
+                if (characterSettings.hideShirt) characterSettings.hideShirt = false;
+                if (characterSettings.hideItemCloak) characterSettings.hideItemCloak = false;
+                if (characterSettings.hideBracers) characterSettings.hideBracers = false;
+                if (characterSettings.hideGloves) characterSettings.hideGloves = false;
+                if (characterSettings.hideBoots) characterSettings.hideBoots = false;
+                if (characterSettings.hideCap) characterSettings.hideCap = false;
+            }*/
+            ChooseToggle("Hide Cap", ref characterSettings.hideCap, onHideEquipment);
+            ChooseToggle("Hide Helmet", ref characterSettings.hideHelmet, onHideEquipment);
+            ChooseToggle("Hide Glasses", ref characterSettings.hideGlasses, onHideEquipment);
+            ChooseToggle("Hide Shirt", ref characterSettings.hideShirt, onHideEquipment);
+            ChooseToggle("Hide Class Equipment", ref characterSettings.hideClassCloak, onHideEquipment);
+            ChooseToggle("Hide Cloak", ref characterSettings.hideItemCloak, onHideEquipment);
+            ChooseToggle("Hide Armor", ref characterSettings.hideArmor, onHideEquipment);
+            ChooseToggle("Hide Bracers", ref characterSettings.hideBracers, onHideEquipment);
+            ChooseToggle("Hide Gloves", ref characterSettings.hideGloves, onHideEquipment);
+            ChooseToggle("Hide Boots", ref characterSettings.hideBoots, onHideEquipment);
+            ChooseToggle("Hide Inactive Weapons", ref characterSettings.hideWeapons, onWeaponChanged);
+            ChooseToggle("Hide Sheaths/Scabbards", ref characterSettings.hideSheaths, onWeaponChanged);
+            ChooseToggle("Hide Belt Slots", ref characterSettings.hideBeltSlots, onWeaponChanged);
+            ChooseToggle("Hide Quiver", ref characterSettings.hidequiver, onWeaponChanged);
+            ChooseToggle("Hide Weapon Enchantments", ref characterSettings.hideWeaponEnchantments, onWeaponChanged);
+            ChooseToggle("Hide Wings", ref characterSettings.hideWings, onHideBuff);
+            ChooseToggle("Hide Horns", ref characterSettings.hideHorns, onHideEquipment);
+            ChooseToggle("Hide Tail", ref characterSettings.hideTail, onHideEquipment);
+        }
 
-/*
- * m_Size is updated from GetSizeScale (EntityData.Descriptor.State.Size) and 
- * is with m_OriginalScale to adjust the transform.localScale 
- * Adjusting GetSizeScale will effect character corpulence and cause gameplay sideeffects
- * Changing m_OriginalScale will effect ParticlesSnapMap.AdditionalScaleGUID
- */
-static void ChooseSizeAdditive(UnitEntityData unitEntityData, CharacterSettings characterSettings) {
-    GUILayout.BeginHorizontal();
-    ModKit.UI.Label("Additive Scale Factor", GUILayout.Width(300));
-    var sizeModifier = GUILayout.HorizontalSlider(characterSettings.additiveScaleFactor, -4, 4, GUILayout.Width(DefaultSliderWidth));
-    if (!characterSettings.overrideScaleFloatMode)
-        sizeModifier = (int)sizeModifier;
-    characterSettings.additiveScaleFactor = sizeModifier;
-    var sign = sizeModifier >= 0 ? "+" : "";
-    ModKit.UI.Label($" {sign}{sizeModifier:0.##}", GUILayout.ExpandWidth(false));
-    GUILayout.EndHorizontal();
-}
-static void ChooseSizeOverride(UnitEntityData unitEntityData, CharacterSettings characterSettings) {
-    GUILayout.BeginHorizontal();
-    ModKit.UI.Label("Override Scale Factor", GUILayout.Width(300));
-    var sizeModifier = GUILayout.HorizontalSlider(characterSettings.overrideScaleFactor, 0, 8, GUILayout.Width(DefaultSliderWidth));
-    if (!characterSettings.overrideScaleFloatMode)
-        sizeModifier = (int)sizeModifier;
-    characterSettings.overrideScaleFactor = sizeModifier;
-    ModKit.UI.Label($" {(Size)(sizeModifier)}", GUILayout.ExpandWidth(false));
-    GUILayout.EndHorizontal();
-}
-static void ChooseEquipmentOverridePet(UnitEntityData unitEntityData, CharacterSettings characterSettings) {
-    ModKit.UI.Label("View", GUILayout.Width(DefaultLabelWidth));
-    void onView() => ViewManager.ReplaceView(unitEntityData, characterSettings.overrideView);
-    Util.ChooseSlider("Override View", EquipmentResourcesManager.Units, ref characterSettings.overrideView, onView);
-    void onChooseScale() {
-        Traverse.Create(unitEntityData.View).Field("m_Scale").SetValue(unitEntityData.View.GetSizeScale() + 0.01f);
-    }
-    ModKit.UI.Label("Scale", GUILayout.Width(DefaultLabelWidth));
-    GUILayout.BeginHorizontal();
-    ChooseToggle("Enable Override Scale", ref characterSettings.overrideScale, onChooseScale);
-    ChooseToggle("Restrict to polymorph", ref characterSettings.overrideScaleShapeshiftOnly, onChooseScale);
-    ChooseToggle("Use Additive Factor", ref characterSettings.overrideScaleAdditive, onChooseScale);
-    ChooseToggle("Use Cheat Mode", ref characterSettings.overrideScaleCheatMode, onChooseScale);
-    ChooseToggle("Use Continuous Factor", ref characterSettings.overrideScaleFloatMode, onChooseScale);
-    GUILayout.Space(10f);
-    GUILayout.EndHorizontal();
-    if (characterSettings.overrideScale && characterSettings.overrideScaleAdditive)
-        ChooseSizeAdditive(unitEntityData, characterSettings);
-    if (characterSettings.overrideScale && !characterSettings.overrideScaleAdditive)
-        ChooseSizeOverride(unitEntityData, characterSettings);
-    ModKit.UI.Label("Portrait/Voice", GUILayout.Width(DefaultLabelWidth));
-    ChoosePortrait(unitEntityData);
-    ChooseAsks(unitEntityData);
-}
-static void ChooseEquipmentOverride(UnitEntityData unitEntityData, CharacterSettings characterSettings) {
-    void onEquipment() {
-        CharacterManager.UpdateModel(unitEntityData.View);
-        CharacterManager.RebuildCharacter(unitEntityData);
-    }
-    ModKit.UI.Label("Equipment", GUILayout.Width(DefaultLabelWidth));
-    void onView() => ViewManager.ReplaceView(unitEntityData, characterSettings.overrideView);
-    Util.ChooseSlider("Override Helm", EquipmentResourcesManager.Helm, ref characterSettings.overrideHelm, onEquipment);
-    Util.ChooseSlider("Override Cloak", EquipmentResourcesManager.Cloak, ref characterSettings.overrideCloak, onEquipment);
-    Util.ChooseSlider("Override Shirt", EquipmentResourcesManager.Shirt, ref characterSettings.overrideShirt, onEquipment);
-    Util.ChooseSlider("Override Glasses/Mask", EquipmentResourcesManager.Glasses, ref characterSettings.overrideGlasses, onEquipment);
-    Util.ChooseSlider("Override Armor", EquipmentResourcesManager.Armor, ref characterSettings.overrideArmor, onEquipment);
-    Util.ChooseSlider("Override Bracers", EquipmentResourcesManager.Bracers, ref characterSettings.overrideBracers, onEquipment);
-    Util.ChooseSlider("Override Gloves", EquipmentResourcesManager.Gloves, ref characterSettings.overrideGloves, onEquipment);
-    Util.ChooseSlider("Override Boots", EquipmentResourcesManager.Boots, ref characterSettings.overrideBoots, onEquipment);
-    Util.ChooseSlider("Override Tattoos", EquipmentResourcesManager.Tattoos, ref characterSettings.overrideTattoo, onEquipment);
-    // Util.ChooseSlider("Override Misc", EquipmentResourcesManager.Tattoos, ref characterSettings.overrideOther, onEquipment);
-    ModKit.UI.Label("Weapons", GUILayout.Width(DefaultLabelWidth));
-    foreach (var kv in EquipmentResourcesManager.Weapons) {
-        var animationStyle = kv.Key;
-        var weaponLookup = kv.Value;
-        characterSettings.overrideWeapons.TryGetValue(animationStyle, out BlueprintRef currentValue);
-        void onWeapon() {
-            characterSettings.overrideWeapons[animationStyle] = currentValue;
-            unitEntityData.View.HandsEquipment.UpdateAll();
+        /*
+         * m_Size is updated from GetSizeScale (EntityData.Descriptor.State.Size) and 
+         * is with m_OriginalScale to adjust the transform.localScale 
+         * Adjusting GetSizeScale will effect character corpulence and cause gameplay sideeffects
+         * Changing m_OriginalScale will effect ParticlesSnapMap.AdditionalScaleGUID
+         */
+        static void ChooseSizeAdditive(UnitEntityData unitEntityData, CharacterSettings characterSettings) {
+            GUILayout.BeginHorizontal();
+            ModKit.UI.Label("Additive Scale Factor", GUILayout.Width(300));
+            var sizeModifier = GUILayout.HorizontalSlider(characterSettings.additiveScaleFactor, -4, 4, GUILayout.Width(DefaultSliderWidth));
+            if (!characterSettings.overrideScaleFloatMode)
+                sizeModifier = (int)sizeModifier;
+            characterSettings.additiveScaleFactor = sizeModifier;
+            var sign = sizeModifier >= 0 ? "+" : "";
+            ModKit.UI.Label($" {sign}{sizeModifier:0.##}", GUILayout.ExpandWidth(false));
+            GUILayout.EndHorizontal();
         }
-        Util.ChooseSlider($"Override {animationStyle} ", weaponLookup, ref currentValue, onWeapon);
-    }
-    GUILayout.BeginHorizontal();
-    ModKit.UI.Label("Main Weapon Enchantments", GUILayout.Width(DefaultLabelWidth));
-    if (GUILayout.Button("Add Enchantment", GUILayout.ExpandWidth(false))) {
-        characterSettings.overrideMainWeaponEnchantments.Add(null);
-    }
-    GUILayout.EndHorizontal();
-    void onWeaponEnchantment() {
-        unitEntityData.View.HandsEquipment.UpdateAll();
-    }
-    for (int i = 0; i < characterSettings.overrideMainWeaponEnchantments.Count; i++) {
-        Util.ChooseSliderList($"Override Main Hand", EquipmentResourcesManager.WeaponEnchantments,
-            characterSettings.overrideMainWeaponEnchantments, i, onWeaponEnchantment);
-    }
-    GUILayout.BeginHorizontal();
-    ModKit.UI.Label("Offhand Weapon Enchantments", GUILayout.Width(DefaultLabelWidth));
-    if (GUILayout.Button("Add Enchantment", GUILayout.ExpandWidth(false))) {
-        characterSettings.overrideOffhandWeaponEnchantments.Add("");
-    }
-    GUILayout.EndHorizontal();
-    for (int i = 0; i < characterSettings.overrideOffhandWeaponEnchantments.Count; i++) {
-        Util.ChooseSliderList($"Override Off Hand", EquipmentResourcesManager.WeaponEnchantments,
-            characterSettings.overrideOffhandWeaponEnchantments, i, onWeaponEnchantment);
-    }
-    ModKit.UI.Label("View", GUILayout.Width(DefaultLabelWidth));
-    Util.ChooseSlider("Override View", EquipmentResourcesManager.Units, ref characterSettings.overrideView, onView);
-    void onChooseScale() {
-        Traverse.Create(unitEntityData.View).Field("m_Scale").SetValue(unitEntityData.View.GetSizeScale() + 0.01f);
-    }
-    ModKit.UI.Label("Scale", GUILayout.Width(DefaultLabelWidth));
-    GUILayout.BeginHorizontal();
-    ChooseToggle("Enable Override Scale", ref characterSettings.overrideScale, onChooseScale);
-    ChooseToggle("Restrict to polymorph", ref characterSettings.overrideScaleShapeshiftOnly, onChooseScale);
-    ChooseToggle("Use Additive Factor", ref characterSettings.overrideScaleAdditive, onChooseScale);
-    ChooseToggle("Use Cheat Mode", ref characterSettings.overrideScaleCheatMode, onChooseScale);
-    ChooseToggle("Use Continuous Factor", ref characterSettings.overrideScaleFloatMode, onChooseScale);
-    GUILayout.Space(10f);
-    GUILayout.EndHorizontal();
-    if (characterSettings.overrideScale && characterSettings.overrideScaleAdditive)
-        ChooseSizeAdditive(unitEntityData, characterSettings);
-    if (characterSettings.overrideScale && !characterSettings.overrideScaleAdditive)
-        ChooseSizeOverride(unitEntityData, characterSettings);
-}
+        static void ChooseSizeOverride(UnitEntityData unitEntityData, CharacterSettings characterSettings) {
+            GUILayout.BeginHorizontal();
+            ModKit.UI.Label("Override Scale Factor", GUILayout.Width(300));
+            var sizeModifier = GUILayout.HorizontalSlider(characterSettings.overrideScaleFactor, 0, 8, GUILayout.Width(DefaultSliderWidth));
+            if (!characterSettings.overrideScaleFloatMode)
+                sizeModifier = (int)sizeModifier;
+            characterSettings.overrideScaleFactor = sizeModifier;
+            ModKit.UI.Label($" {(Size)(sizeModifier)}", GUILayout.ExpandWidth(false));
+            GUILayout.EndHorizontal();
+        }
+        static void ChooseEquipmentOverridePet(UnitEntityData unitEntityData, CharacterSettings characterSettings) {
+            ModKit.UI.Label("View", GUILayout.Width(DefaultLabelWidth));
+            void onView() => ViewManager.ReplaceView(unitEntityData, characterSettings.overrideView);
+            Util.ChooseSlider("Override View", EquipmentResourcesManager.Units, ref characterSettings.overrideView, onView);
+            void onChooseScale() {
+                Traverse.Create(unitEntityData.View).Field("m_Scale").SetValue(unitEntityData.View.GetSizeScale() + 0.01f);
+            }
+            ModKit.UI.Label("Scale", GUILayout.Width(DefaultLabelWidth));
+            GUILayout.BeginHorizontal();
+            ChooseToggle("Enable Override Scale", ref characterSettings.overrideScale, onChooseScale);
+            ChooseToggle("Restrict to polymorph", ref characterSettings.overrideScaleShapeshiftOnly, onChooseScale);
+            ChooseToggle("Use Additive Factor", ref characterSettings.overrideScaleAdditive, onChooseScale);
+            ChooseToggle("Use Cheat Mode", ref characterSettings.overrideScaleCheatMode, onChooseScale);
+            ChooseToggle("Use Continuous Factor", ref characterSettings.overrideScaleFloatMode, onChooseScale);
+            GUILayout.Space(10f);
+            GUILayout.EndHorizontal();
+            if (characterSettings.overrideScale && characterSettings.overrideScaleAdditive)
+                ChooseSizeAdditive(unitEntityData, characterSettings);
+            if (characterSettings.overrideScale && !characterSettings.overrideScaleAdditive)
+                ChooseSizeOverride(unitEntityData, characterSettings);
+            ModKit.UI.Label("Portrait/Voice", GUILayout.Width(DefaultLabelWidth));
+            ChoosePortrait(unitEntityData);
+            ChooseAsks(unitEntityData);
+        }
+        static void ChooseEquipmentOverride(UnitEntityData unitEntityData, CharacterSettings characterSettings) {
+            void onEquipment() {
+                CharacterManager.UpdateModel(unitEntityData.View);
+                CharacterManager.RebuildCharacter(unitEntityData);
+            }
+            ModKit.UI.Label("Equipment", GUILayout.Width(DefaultLabelWidth));
+            void onView() => ViewManager.ReplaceView(unitEntityData, characterSettings.overrideView);
+            Util.ChooseSlider("Override Helm", EquipmentResourcesManager.Helm, ref characterSettings.overrideHelm, onEquipment);
+            Util.ChooseSlider("Override Cloak", EquipmentResourcesManager.Cloak, ref characterSettings.overrideCloak, onEquipment);
+            Util.ChooseSlider("Override Shirt", EquipmentResourcesManager.Shirt, ref characterSettings.overrideShirt, onEquipment);
+            Util.ChooseSlider("Override Glasses/Mask", EquipmentResourcesManager.Glasses, ref characterSettings.overrideGlasses, onEquipment);
+            Util.ChooseSlider("Override Armor", EquipmentResourcesManager.Armor, ref characterSettings.overrideArmor, onEquipment);
+            Util.ChooseSlider("Override Bracers", EquipmentResourcesManager.Bracers, ref characterSettings.overrideBracers, onEquipment);
+            Util.ChooseSlider("Override Gloves", EquipmentResourcesManager.Gloves, ref characterSettings.overrideGloves, onEquipment);
+            Util.ChooseSlider("Override Boots", EquipmentResourcesManager.Boots, ref characterSettings.overrideBoots, onEquipment);
+            Util.ChooseSlider("Override Tattoos", EquipmentResourcesManager.Tattoos, ref characterSettings.overrideTattoo, onEquipment);
+            // Util.ChooseSlider("Override Misc", EquipmentResourcesManager.Tattoos, ref characterSettings.overrideOther, onEquipment);
+            ModKit.UI.Label("Weapons", GUILayout.Width(DefaultLabelWidth));
+            foreach (var kv in EquipmentResourcesManager.Weapons) {
+                var animationStyle = kv.Key;
+                var weaponLookup = kv.Value;
+                characterSettings.overrideWeapons.TryGetValue(animationStyle, out BlueprintRef currentValue);
+                void onWeapon() {
+                    characterSettings.overrideWeapons[animationStyle] = currentValue;
+                    unitEntityData.View.HandsEquipment.UpdateAll();
+                }
+                Util.ChooseSlider($"Override {animationStyle} ", weaponLookup, ref currentValue, onWeapon);
+            }
+            GUILayout.BeginHorizontal();
+            ModKit.UI.Label("Main Weapon Enchantments", GUILayout.Width(DefaultLabelWidth));
+            if (GUILayout.Button("Add Enchantment", GUILayout.ExpandWidth(false))) {
+                characterSettings.overrideMainWeaponEnchantments.Add(null);
+            }
+            GUILayout.EndHorizontal();
+            void onWeaponEnchantment() {
+                unitEntityData.View.HandsEquipment.UpdateAll();
+            }
+            for (int i = 0; i < characterSettings.overrideMainWeaponEnchantments.Count; i++) {
+                Util.ChooseSliderList($"Override Main Hand", EquipmentResourcesManager.WeaponEnchantments,
+                    characterSettings.overrideMainWeaponEnchantments, i, onWeaponEnchantment);
+            }
+            GUILayout.BeginHorizontal();
+            ModKit.UI.Label("Offhand Weapon Enchantments", GUILayout.Width(DefaultLabelWidth));
+            if (GUILayout.Button("Add Enchantment", GUILayout.ExpandWidth(false))) {
+                characterSettings.overrideOffhandWeaponEnchantments.Add("");
+            }
+            GUILayout.EndHorizontal();
+            for (int i = 0; i < characterSettings.overrideOffhandWeaponEnchantments.Count; i++) {
+                Util.ChooseSliderList($"Override Off Hand", EquipmentResourcesManager.WeaponEnchantments,
+                    characterSettings.overrideOffhandWeaponEnchantments, i, onWeaponEnchantment);
+            }
+            ModKit.UI.Label("View", GUILayout.Width(DefaultLabelWidth));
+            Util.ChooseSlider("Override View", EquipmentResourcesManager.Units, ref characterSettings.overrideView, onView);
+            void onChooseScale() {
+                Traverse.Create(unitEntityData.View).Field("m_Scale").SetValue(unitEntityData.View.GetSizeScale() + 0.01f);
+            }
+            ModKit.UI.Label("Scale", GUILayout.Width(DefaultLabelWidth));
+            GUILayout.BeginHorizontal();
+            ChooseToggle("Enable Override Scale", ref characterSettings.overrideScale, onChooseScale);
+            ChooseToggle("Restrict to polymorph", ref characterSettings.overrideScaleShapeshiftOnly, onChooseScale);
+            ChooseToggle("Use Additive Factor", ref characterSettings.overrideScaleAdditive, onChooseScale);
+            ChooseToggle("Use Cheat Mode", ref characterSettings.overrideScaleCheatMode, onChooseScale);
+            ChooseToggle("Use Continuous Factor", ref characterSettings.overrideScaleFloatMode, onChooseScale);
+            GUILayout.Space(10f);
+            GUILayout.EndHorizontal();
+            if (characterSettings.overrideScale && characterSettings.overrideScaleAdditive)
+                ChooseSizeAdditive(unitEntityData, characterSettings);
+            if (characterSettings.overrideScale && !characterSettings.overrideScaleAdditive)
+                ChooseSizeOverride(unitEntityData, characterSettings);
+        }
     }
     [HarmonyPatch(typeof(BlueprintsCache), "Init")]
-static class ResourcesLibrary_InitializeLibrary_Patch {
-    static void Postfix() {
-        /*var bps = Util.GetBlueprints();
-        var portraits = bps.OfType<BlueprintPortrait>();
-        var classes = bps.OfType<BlueprintCharacterClass>();
-        Main.blueprints = portraits.Concat<SimpleBlueprint>(classes).ToArray();*/
-        Main.blueprints = Util.GetBlueprints();
+    static class ResourcesLibrary_InitializeLibrary_Patch {
+        static void Postfix() {
+            /*var bps = Util.GetBlueprints();
+            var portraits = bps.OfType<BlueprintPortrait>();
+            var classes = bps.OfType<BlueprintCharacterClass>();
+            Main.blueprints = portraits.Concat<SimpleBlueprint>(classes).ToArray();*/
+            Main.blueprints = Util.GetBlueprints();
+        }
     }
-}
 }

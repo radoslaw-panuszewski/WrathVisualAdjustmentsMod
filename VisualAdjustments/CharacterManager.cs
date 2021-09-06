@@ -25,6 +25,32 @@ using Kingmaker.UnitLogic.Class.LevelUp;
 
 namespace VisualAdjustments
 {
+   // [HarmonyPatch(typeof(Character), "RestoreSavedEquipment")]
+    /*static class bro_patch
+    {
+        static bool Prefix(Character __instance)
+        {
+            try
+            {
+                Main.logger.Log("RestoreSaved");
+                __instance.AddEquipmentEntities(from eel in __instance.m_SavedEquipmentEntities
+                    select eel, true);
+                foreach (Character.SavedSelectedRampIndices savedSelectedRampIndices in __instance.m_SavedRampIndices)
+                {
+                  //  EquipmentEntity ee = savedSelectedRampIndices.EquipmentEntityLink.Load(false);
+                //    __instance.SetRampIndices(ee, savedSelectedRampIndices.PrimaryIndex, savedSelectedRampIndices.SecondaryIndex,
+                  //      1, 1);
+                }
+
+                return false;
+            }
+            catch (Exception e)
+            {
+               Main.logger.Log(e.ToString());
+                throw;
+            }
+        }
+    }*/
     public class CharacterManager
     {
         public static bool disableEquipmentClassPatch;
@@ -38,7 +64,7 @@ namespace VisualAdjustments
             {
                 if (unitEntityData == null) return;
                 if (unitEntityData.IsPet) return;
-                Main.SetEELs(unitEntityData, DollResourcesManager.GetDoll(unitEntityData), false);
+                //Main.SetEELs(unitEntityData, DollResourcesManager.GetDoll(unitEntityData), false);
                 var Settings = Main.settings.GetCharacterSettings(unitEntityData);
                 DollData doll = null;
                 if (DollResourcesManager.GetDoll(unitEntityData) != null) doll = DollResourcesManager.GetDoll(unitEntityData).CreateData();
@@ -56,6 +82,7 @@ namespace VisualAdjustments
                 }
                 if (doll != null)
                 {
+                  ///  Main.logger.Log("dollnotnull " + unitEntityData.CharacterName);
                     unitEntityData.Descriptor.ForcceUseClassEquipment = true;
                     Traverse.Create(unitEntityData.Descriptor).Field("UseClassEquipment").SetValue(true);
                     var savedEquipment = true;
@@ -79,10 +106,10 @@ namespace VisualAdjustments
                         EquipmentEntity ee = ResourcesLibrary.TryGetResource<EquipmentEntity>(assetID);
                         character.AddEquipmentEntity(ee, savedEquipment);
                     }
-                    doll.ApplyRampIndices(character);
-                    // Main.SetEELs(unitEntityData, DollResourcesManager.GetDoll(unitEntityData), false);
+                    doll.ApplyRampIndices(character); 
+                   // Main.SetEELs(unitEntityData, DollResourcesManager.GetDoll(unitEntityData), false);
                     Traverse.Create(unitEntityData.View).Field("m_EquipmentClass").SetValue(null); //UpdateClassEquipment won't update if the class doesn't change
-                                                                                                   //Adds Armor
+                    unitEntityData.View.HandsEquipment.UpdateAll();                                                                                                   //Adds Armor
                     unitEntityData.View.UpdateBodyEquipmentModel();
                     unitEntityData.View.UpdateClassEquipment();
                     if (Settings.customSkinColor)
@@ -93,28 +120,30 @@ namespace VisualAdjustments
                     {
                         Main.GenerateHairColor(unitEntityData);
                     }
+                    if (Settings.customHornColor)
+                    {
+                        Main.GenerateHornColor(unitEntityData);
+                    }
+                    if (Settings.customWarpaintColor)
+                    {
+                        Main.GenerateWarpaintColor(unitEntityData);
+                    }
                 }
                 else
                 {
+                 //   Main.logger.Log("dollnull " + unitEntityData.CharacterName);
                     character.RemoveAllEquipmentEntities();
                     character.RestoreSavedEquipment();
                     IEnumerable<EquipmentEntity> bodyEquipment = unitEntityData.Body.AllSlots.SelectMany(
                         new Func<ItemSlot, IEnumerable<EquipmentEntity>>(unitEntityData.View.ExtractEquipmentEntities));
                     character.AddEquipmentEntities(bodyEquipment, false);
-                    unitEntityData.View.UpdateClassEquipment();
+                                        unitEntityData.View.HandsEquipment.UpdateAll();                                                                                                   //Adds Armor
+                                        unitEntityData.View.UpdateClassEquipment();
                 }
-                Main.SetEELs(unitEntityData, DollResourcesManager.GetDoll(unitEntityData), false);
-                if (Settings.customSkinColor)
-                {
-                    Main.GenerateSkinColor(unitEntityData);
-                }
-                if (Settings.customHairColor)
-                {
-                    Main.GenerateHairColor(unitEntityData);
-                }
-                //  DollResourcesManager.GetDoll(unitEntityData).SetHairColor(Settings.HairColor);
+                //Main.SetEELs(unitEntityData, DollResourcesManager.GetDoll(unitEntityData), false);
+               //  DollResourcesManager.GetDoll(unitEntityData).SetHairColor(Settings.HairColor);
                 //Add Kineticist Tattoos
-                Main.SetEELs(unitEntityData, DollResourcesManager.GetDoll(unitEntityData), false);
+               //Main.SetEELs(unitEntityData, DollResourcesManager.GetDoll(unitEntityData), false);
                 EventBus.RaiseEvent<IUnitViewAttachedHandler>(unitEntityData, delegate (IUnitViewAttachedHandler h)
                 {
                     h.HandleUnitViewAttached();
@@ -126,7 +155,7 @@ namespace VisualAdjustments
                 Main.logger.Log(e.ToString() + " " + unitEntityData.CharacterName);
             }
         }
-        public static void RebuildCharacterNew(UnitEntityData unitEntityData)
+       /* public static void RebuildCharacterNew(UnitEntityData unitEntityData)
         {
             try
             {
@@ -201,12 +230,12 @@ namespace VisualAdjustments
                 {
                     h.HandleUnitViewAttached();
                 });
-            */}
+            *//*}
             catch (Exception e)
             {
                 Main.logger.Log(e.ToString());
             }
-        }
+        }*/
         static void ChangeCompanionOutfit(UnitEntityView __instance, CharacterSettings characterSettings)
         {
             /*
@@ -356,7 +385,16 @@ namespace VisualAdjustments
             var kee = ResourcesLibrary.TryGetBlueprint<KingmakerEquipmentEntity>(assetId);
             if (kee == null) return false;
             var doll = DollResourcesManager.GetDoll(__instance.EntityData);
-            var ee = kee.Load(__instance.EntityData.Descriptor.Gender, doll.Race.RaceId);
+            Race raceid;
+            if (doll == null)
+            {
+                raceid = __instance.Data.Progression.Race.RaceId;
+            }
+            else
+            {
+                raceid = doll.Race.RaceId;
+            }
+            var ee = kee.Load(__instance.EntityData.Descriptor.Gender, raceid);
             if (ee == null) return false; 
             HideSlot(__instance, slot, ref dirty);
             __instance.CharacterAvatar.AddEquipmentEntities(ee);
@@ -395,7 +433,6 @@ namespace VisualAdjustments
                 Settings.CharacterSettings characterSettings = Main.settings.GetCharacterSettings(view.EntityData);
                 if (view.Data.IsPet)
                 {
-
                     return;
                 }
 
@@ -507,22 +544,26 @@ namespace VisualAdjustments
                 {
                     HideSlot(view, view.EntityData.Body.Armor, ref dirty);
                 }
-
+                if (characterSettings.hideGlasses)
+                {
+                    HideSlot(view, view.EntityData.Body.Glasses, ref dirty);
+                }
                 if (characterSettings.hideGloves )
                 {
                     HideSlot(view, view.EntityData.Body.Gloves, ref dirty);
                 }
-
                 if (characterSettings.hideBracers )
                 {
                     HideSlot(view, view.EntityData.Body.Wrist, ref dirty);
                 }
-
                 if (characterSettings.hideBoots )
                 {
                     HideSlot(view, view.EntityData.Body.Feet, ref dirty);
                 }
-
+                if (characterSettings.hideShirt)
+                {
+                    HideSlot(view, view.EntityData.Body.Shirt, ref dirty);
+                }
                 if (characterSettings.hideHorns)
                 {
                     foreach (var ee in view.CharacterAvatar.EquipmentEntities.ToArray())
@@ -668,7 +709,7 @@ namespace VisualAdjustments
                     view.CharacterAvatar.IsDirty = dirty;
                 }
 
-                Main.SetEELs(view.EntityData, DollResourcesManager.GetDoll(view.EntityData), false);
+               // Main.SetEELs(view.EntityData, DollResourcesManager.GetDoll(view.EntityData), false);
             }
             catch (Exception e)
             {
@@ -716,7 +757,7 @@ namespace VisualAdjustments
                     var b = ResourcesLibrary.TryGetBlueprint<KingmakerEquipmentEntity>(characterSettings.overrideArmor.assetId).Load(__instance.Data.Gender, __instance.Data.Progression.Race.RaceId);
                     var c = __instance.EntityData.View.CharacterAvatar.m_EquipmentEntities.Intersect(b);/// != characterSettings.overrideArmor.assetId;*/
                     if (!Main.enabled) return;
-                    if (__instance.EntityData != null)
+                    if (__instance.EntityData != null && __instance.EntityData.IsPlayerFaction)
                     {
                         if (__instance.EntityData.Body.CurrentEquipmentSlots.Contains(slot))
                         {
@@ -899,17 +940,8 @@ namespace VisualAdjustments
             var characterSettings = Main.settings.GetCharacterSettings(unit);
             if (characterSettings == null) return;
             var races = BlueprintRoot.Instance.Progression.CharacterRaces.ToArray<BlueprintRace>();
-            BlueprintRace blueprintRace;
-            if (characterSettings.RaceIndex != -1)
-            {
-                blueprintRace = races[characterSettings.RaceIndex];
-            }
-            else
-            {
-                blueprintRace = unit.Progression.Race;
-                characterSettings.RaceIndex = Array.IndexOf(races, blueprintRace);
-            }
-            var race = blueprintRace.RaceId;
+            var blueprintRace = unit.Descriptor.Progression.Race;
+            var race = blueprintRace?.RaceId ?? Race.Human;
             var gender = unit.Gender;
             if(characterSettings.overrideHelm != null)TryPreloadKEE(characterSettings.overrideHelm, gender, race);
             if (characterSettings.overrideShirt != null)TryPreloadKEE(characterSettings.overrideShirt, gender, race);
@@ -1021,7 +1053,7 @@ namespace VisualAdjustments
                         ///Main.SetEELs(character,doll);
                         ///character.View.UpdateClassEquipment();
                         //  Main.GenerateHairColor(character);
-                        Main.SetEELs(character, doll, true);
+                        //Main.SetEELs(character, doll, true);
                         RebuildCharacter(character);
                         UpdateModel(character.View);
                         RebuildCharacter(character);
@@ -1054,7 +1086,7 @@ namespace VisualAdjustments
                         ///Main.SetEELs(character,doll);
                         ///character.View.UpdateClassEquipment();
                       //  Main.GenerateHairColor(character);
-                        Main.SetEELs(character,doll,true);
+                      //  Main.SetEELs(character,doll,true);
                         RebuildCharacter(character);
                         UpdateModel(character.View);
                         RebuildCharacter(character);

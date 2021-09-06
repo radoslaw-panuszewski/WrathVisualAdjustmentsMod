@@ -20,11 +20,11 @@ namespace VisualAdjustments
             GUILayout.BeginHorizontal();
             ModKit.UI.Label(name + " ", GUILayout.Width(DefaultLabelWidth));
             var newIndex = (int)Math.Round(GUILayout.HorizontalSlider(currentIndex, -1, items.Count - 1, GUILayout.Width(DefaultSliderWidth)), 0);
-            if (GUILayout.Button("Prev", GUILayout.Width(55)) && currentIndex >= 0)
+            if (GUILayout.Button("<", GUILayout.Width(55)) && currentIndex >= 0)
             {
                 newIndex = currentIndex - 1;
             }
-            if (GUILayout.Button("Next", GUILayout.Width(55)) && currentIndex < items.Count - 1)
+            if (GUILayout.Button(">", GUILayout.Width(55)) && currentIndex < items.Count - 1)
             {
                 newIndex = currentIndex + 1;
             }

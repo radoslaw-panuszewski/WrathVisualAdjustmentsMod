@@ -161,7 +161,7 @@ namespace VisualAdjustments
               //  floatsetting = new float[] { col.r, col.g, col.b };
                 func(data);
                 CharacterManager.RebuildCharacter(data);
-                Main.SetEELs(data,DollResourcesManager.GetDoll(data));
+                //Main.SetEELs(data,DollResourcesManager.GetDoll(data));
                 func(data);
             }
 

@@ -15,11 +15,17 @@ namespace VisualAdjustments
         // Token: 0x02000013 RID: 19
         internal static class LibraryThing
         {
+            public static Dictionary<string, string> resourceguidmap = new Dictionary<string,string>{};
             // Token: 0x06000054 RID: 84 RVA: 0x000039D8 File Offset: 0x00001BD8
             public static Dictionary<string, string> GetResourceGuidMap()
             {
-                LocationList locationList = (LocationList)HarmonyLib.AccessTools.Field(typeof(BundlesLoadService), "m_LocationList").GetValue(BundlesLoadService.Instance);
-                return locationList.GuidToBundle;
+                LocationList locationList = BundlesLoadService.Instance.m_LocationList;
+                //LocationList locationList = (LocationList)HarmonyLib.AccessTools.Field(typeof(BundlesLoadService), "m_LocationList").GetValue(BundlesLoadService.Instance);
+                if (resourceguidmap.Count == 0)
+                {
+                    resourceguidmap = locationList.GuidToBundle;
+                }
+                return resourceguidmap;
             }
         }
     internal static class BluePrintThing

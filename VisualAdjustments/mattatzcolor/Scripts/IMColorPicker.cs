@@ -242,7 +242,7 @@ namespace imColorPicker
                 this.HexCol = ColorUtility.ToHtmlStringRGB(_color);
             }
             var currentHexCol = this.HexCol;
-            this.HexCol = GUILayout.TextField(this.HexCol, 6, GUILayout.Width(100f));
+            this.HexCol = GUILayout.TextField(this.HexCol, 6, GUILayout.Width(150f));
             if (this.HexCol != ColorUtility.ToHtmlStringRGB(_color) && currentHexCol != this.HexCol)
             {
                 if (ColorUtility.TryParseHtmlString("#" + this.HexCol, out _color))
@@ -286,6 +286,7 @@ namespace imColorPicker
             }
             GUILayout.EndHorizontal();
         }
+
         public void DrawSVHandler(Rect rect, ref Color c)
         {
             const float size = 10f;
