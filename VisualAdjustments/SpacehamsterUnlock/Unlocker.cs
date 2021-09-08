@@ -107,6 +107,7 @@ namespace VisualAdjustments
                             HairUnlocker.originalOptions[race.name + Gender.Male] = race.MaleOptions;
                             HairUnlocker.originalOptions[race.name + Gender.Female] = race.FemaleOptions;
                         }
+                        //Main.logger.Log("unlockerInit");
                         // loaded = true;
                         // if (!enabled) return;
                         HairUnlocker.UnlockHair();

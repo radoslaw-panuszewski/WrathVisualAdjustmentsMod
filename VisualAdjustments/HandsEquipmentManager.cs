@@ -174,7 +174,7 @@ namespace VisualAdjustments
          * Override Weapon Model
          * 
          */
-      //  [HarmonyPatch(typeof(UnitViewHandSlotData), "VisibleItemBlueprint", MethodType.Getter)]
+        [HarmonyPatch(typeof(UnitViewHandSlotData), "VisibleItemBlueprint", MethodType.Getter)]
         static class UnitViewHandsSlotData_VisibleItemBlueprint_Patch
         {
             static void Postfix(UnitViewHandSlotData __instance, ref BlueprintItemEquipmentHand __result)

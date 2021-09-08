@@ -85,7 +85,7 @@ namespace VisualAdjustments {
             "Rogue",
             "Slayer",
             "Sorcerer",
-            "Wizard",
+            "Wizard",g
             "None"
         };*/
         static bool Load(UnityModManager.ModEntry modEntry) {
@@ -105,6 +105,10 @@ namespace VisualAdjustments {
 #endif
                 if (Main.blueprints == null) {
                     Main.blueprints = Util.GetBlueprints();
+                }
+                if (!classesloaded)
+                {
+                    Main.GetClasses();
                 }
             }
             catch (Exception e) {
@@ -236,8 +240,8 @@ namespace VisualAdjustments {
         public static void GenerateWarpaintColor(UnitEntityData data) {
             try {
                 var doll = DollResourcesManager.GetDoll(data);
-                if (doll == null)
-                    return;
+                if (doll == null) return;
+                if (doll.Warpaint.m_Entity == null) return;
                 var settings = Main.settings.GetCharacterSettings(data);
                 var colornum = settings.warpaintColor;
                 var settingcol = new Color(colornum[0], colornum[1], colornum[2]);
@@ -324,12 +328,22 @@ namespace VisualAdjustments {
                                 }
                             }
                             var index = a.PrimaryColorsProfile.Ramps.Where(b => b.isReadable).First(w => w.GetPixel(1, 1).ToString() == settingcol.ToString());
-                            doll.SetPrimaryEquipColor(a.PrimaryColorsProfile.Ramps.IndexOf(index));
-                            settings.companionPrimary = a.PrimaryColorsProfile.Ramps.IndexOf(index);
+                            var primindx = a.PrimaryColorsProfile.Ramps.IndexOf(index);
+                            doll.SetPrimaryEquipColor(primindx);
+                            settings.companionPrimary = primindx;
                             var indexsec = a.PrimaryColorsProfile.Ramps.Where(b => b.isReadable).First(w => w.GetPixel(1, 1).ToString() == settingcolsecondary.ToString());
-                            settings.companionSecondary = a.PrimaryColorsProfile.Ramps.IndexOf(index);
-                            doll.SetSecondaryEquipColor(a.PrimaryColorsProfile.Ramps.IndexOf(indexsec));
-
+                            var secondindx = a.PrimaryColorsProfile.Ramps.IndexOf(indexsec);
+                            settings.companionSecondary = secondindx;
+                            doll.SetSecondaryEquipColor(secondindx);
+                            doll.SetEquipColors(primindx, secondindx);
+                            foreach (var ee in dat.View.CharacterAvatar.EquipmentEntities.Where(x => x.NameSafe().Contains("Cloak") || x.NameSafe().Contains("Cape")))
+                            {
+                                ee.RepaintTextures(primindx,secondindx);
+                            }
+                            if (dat.Parts.Get<UnitPartDollData>())
+                            {
+                                dat.Parts.Get<UnitPartDollData>().Default = doll.CreateData();
+                            }
                             // doll.SetSkinColor(settings.SkinColor);
                             /*if (a.PrimaryColorsProfile.Ramps.Where(b => b.isReadable).Any(c => c.GetPixel(1, 1).ToString() == settingcol.ToString()))
                             {
@@ -494,7 +508,13 @@ namespace VisualAdjustments {
             if (classes.Count == 0) {
                 ///Main.logger.Log("bru");
                 foreach (BlueprintCharacterClass c in Main.blueprints.OfType<BlueprintCharacterClass>()) {
-                    if (!c.PrestigeClass && !c.IsMythic && !c.ToString().Contains("Mythic") && !c.ToString().Contains("Animal") && !c.ToString().Contains("Scion")) {
+                   /* if (c.StartingItems.Any() && !c.PrestigeClass && !c.ToString().Contains("Scion"))
+                    {
+                        Main.logger.Log(c.ToString());
+                    }*/
+                    // if (!c.PrestigeClass && !c.IsMythic && !c.ToString().Contains("Mythic") && !c.ToString().Contains("Animal") && !c.ToString().Contains("Scion") && c.StartingItems.Any()) {
+                       if (c.StartingItems.Any() && !c.PrestigeClass && !c.ToString().Contains("Scion"))
+                       {
                         try {
                             var charinfo = new CharInfo();
                             charinfo.Name = c.Name;
@@ -507,7 +527,7 @@ namespace VisualAdjustments {
                                 classes.Add(charinf);
                                 classes.Add(charinf2);
                             }
-                            else {
+                            {
                                 if (!classes.Any(asd => asd.Name == charinfo.Name)) {
                                     classes.Add(charinfo);
                                 }
@@ -533,20 +553,30 @@ namespace VisualAdjustments {
                         CharacterManager.RebuildCharacter(ch);
                     }
                 }
-                UI.Label("Settings");
-                using (UI.HorizontalScope()) {
-                    GUILayout.Space(20f);
-                    using (UI.VerticalScope()) {
-                        ModKit.UI.Toggle("Unlock all Portraits", ref settings.AllPortraits);
-                        ModKit.UI.Toggle("Unlock Hair", ref settings.UnlockHair, HairUnlocker.RestoreOptions, HairUnlocker.UnlockHair);
-                        ModKit.UI.Label("Warning: Unlock hair might have some hairstyles that clip or are otherwise malformed");
-                        /*ModKit.UI.Toggle("Unlock Hair Options",ref HairUnlocker.Main.settings.UnlockHair);
-                        if (HairUnlocker.Main.settings.UnlockHair) ModKit.UI.Toggle("Unlock All Hair Options (Includes incompatible options)",ref HairUnlocker.Main.settings.UnlockAllHair);
-                        ModKit.UI.Toggle("Unlock Horns",ref HairUnlocker.Main.settings.UnlockHorns);
-                        ModKit.UI.Toggle("Unlock Tails",ref HairUnlocker.Main.settings.UnlockTail);
-                        ModKit.UI.Toggle("Unlock Female Dwarf Beards (Includes incompatible options",ref HairUnlocker.Main.settings.UnlockFemaleDwarfBeards);*/
+
+                UI.DisclosureToggle("Settings", ref showsettings, 175f);
+                if (showsettings)
+                {
+                    UI.Label("Settings");
+                    using (UI.HorizontalScope())
+                    {
+                        GUILayout.Space(20f);
+                        using (UI.VerticalScope())
+                        {
+                            ModKit.UI.Toggle("Unlock all Portraits", ref settings.AllPortraits);
+                            ModKit.UI.Toggle("Unlock Hair", ref settings.UnlockHair, HairUnlocker.RestoreOptions,
+                                HairUnlocker.UnlockHair);
+                            ModKit.UI.Label(
+                                "Warning: Unlock hair might have some hairstyles that clip or are otherwise malformed");
+                            /*ModKit.UI.Toggle("Unlock Hair Options",ref HairUnlocker.Main.settings.UnlockHair);
+                            if (HairUnlocker.Main.settings.UnlockHair) ModKit.UI.Toggle("Unlock All Hair Options (Includes incompatible options)",ref HairUnlocker.Main.settings.UnlockAllHair);
+                            ModKit.UI.Toggle("Unlock Horns",ref HairUnlocker.Main.settings.UnlockHorns);
+                            ModKit.UI.Toggle("Unlock Tails",ref HairUnlocker.Main.settings.UnlockTail);
+                            ModKit.UI.Toggle("Unlock Female Dwarf Beards (Includes incompatible options",ref HairUnlocker.Main.settings.UnlockFemaleDwarfBeards);*/
+                        }
                     }
                 }
+
                 ///Asd();
                 ///Main.logger.Log(classes.Count.ToString());
                 /*foreach(CharInfo s in classes)
@@ -752,7 +782,12 @@ namespace VisualAdjustments {
             focusedStyle.focused.textColor = Color.yellow;
             GUILayout.BeginHorizontal();
             foreach (var _class in classes) {
-                if (_class.Name == "Magus") {
+                if (_class.Name == "Druid") {
+                    GUILayout.EndHorizontal();
+                    GUILayout.BeginHorizontal();
+                }
+                if (_class.Name == "Ranger")
+                {
                     GUILayout.EndHorizontal();
                     GUILayout.BeginHorizontal();
                 }
@@ -1401,9 +1436,9 @@ namespace VisualAdjustments {
                     }),
                     () => ChooseRamp(unitEntityData, doll, "Skin Color", doll.GetSkinRamps(), doll.SkinRampIndex, (int index) => doll.SetSkinColor(index)),
                     () => ChooseRamp(unitEntityData, doll, "Horn Color", doll.GetHornsRamps(), doll.HornsRampIndex, (int index) => doll.SetHornsColor(index)),
-                    () => ChooseRamp(unitEntityData, doll, "Primary Outfit Color", doll.GetOutfitRampsPrimary(), doll.EquipmentRampIndex, (int index) => doll.SetPrimaryEquipColor(index)),
-                    () => ChooseRamp(unitEntityData, doll, "Secondary Outfit Color", doll.GetOutfitRampsSecondary(), doll.EquipmentRampIndexSecondary, (int index) => doll.SetSecondaryEquipColor(index)),
-                /* if(Settings.PrimaryColor != doll.EquipmentRampIndex || Settings.SecondaryColor != doll.EquipmentRampIndexSecondary)
+                    () => ChooseRamp(unitEntityData, doll, "Primary Outfit Color", doll.GetOutfitRampsPrimary(), doll.EquipmentRampIndex, (int index) => doll.SetEquipColors(index,doll.EquipmentRampIndexSecondary)),
+                    () => ChooseRamp(unitEntityData, doll, "Secondary Outfit Color", doll.GetOutfitRampsSecondary(), doll.EquipmentRampIndexSecondary, (int index) => doll.SetEquipColors(doll.EquipmentRampIndex, index)),
+               /*  if(Settings.PrimaryColor != doll.EquipmentRampIndex || Settings.SecondaryColor != doll.EquipmentRampIndexSecondary)
                  {
                      doll.SetEquipColors(Settings.PrimaryColor,Settings.SecondaryColor);
                  }*/
@@ -1436,26 +1471,38 @@ namespace VisualAdjustments {
                             using (UI.HorizontalScope(UI.Width(800))) {
                                 using (UI.VerticalScope()) {
                                     UI.Toggle("Hair Color", ref Settings.customHairColor);
-                                    if (Settings.customHairColor) {
-                                        HairColorPicker.OnGUI(
-                                            Settings,
-                                            unitEntityData,
-                                            new Color(Settings.hairColor[0], Settings.hairColor[1], Settings.hairColor[2]),
-                                            ref Settings.hairColor,
-                                            Main.GenerateHairColor
+                                    if (Settings.customHairColor)
+                                    {
+                                        UI.Toggle("Show Hair Color Picker", ref Settings.showHair);
+                                        if (Settings.showHair)
+                                        {
+                                            HairColorPicker.OnGUI(
+                                                Settings,
+                                                unitEntityData,
+                                                new Color(Settings.hairColor[0], Settings.hairColor[1],
+                                                    Settings.hairColor[2]),
+                                                ref Settings.hairColor,
+                                                Main.GenerateHairColor
                                             );
+                                        }
                                     }
                                 }
                                 using (UI.VerticalScope()) {
                                     UI.Toggle("Skin Color", ref Settings.customSkinColor);
-                                    if (Settings.customSkinColor) {
-                                        SkinColorPicker.OnGUI(
-                                            Settings,
-                                            unitEntityData,
-                                            new Color(Settings.skinColor[0], Settings.skinColor[1], Settings.skinColor[2]),
-                                            ref Settings.skinColor,
-                                            Main.GenerateSkinColor
+                                    if (Settings.customSkinColor)
+                                    {
+                                        UI.Toggle("Show Skin Color Picker", ref Settings.showSkin);
+                                        if (Settings.showSkin)
+                                        {
+                                            SkinColorPicker.OnGUI(
+                                                Settings,
+                                                unitEntityData,
+                                                new Color(Settings.skinColor[0], Settings.skinColor[1],
+                                                    Settings.skinColor[2]),
+                                                ref Settings.skinColor,
+                                                Main.GenerateSkinColor
                                             );
+                                        }
                                     }
                                 }
                             }
@@ -1466,31 +1513,41 @@ namespace VisualAdjustments {
                 () => {
                     UI.Label("Custom", UI.AutoWidth());
                     using (UI.VerticalScope()) {
-                        UI.Toggle("Outfit Color", ref Settings.customOutfitColors);
+                        UI.Toggle("Outfit Colors", ref Settings.customOutfitColors);
                         using (UI.HorizontalScope(UI.Width(800))) {
-                            using (UI.VerticalScope()) {
-                                UI.Label("Primary");
-                                if (Settings.customOutfitColors) {
+                            using (UI.VerticalScope())
+                            {
+                                if (Settings.customOutfitColors)
+                                {
+                                    UI.Toggle("Show Primary Outfit Color Picker", ref Settings.showPrimColor);
+                                if (Settings.showPrimColor)
+                                {
                                     PrimaryColorPicker.OnGUI(
                                         Settings,
                                         unitEntityData,
                                         new Color(Settings.primColor[0], Settings.primColor[1], Settings.primColor[2]),
                                         ref Settings.primColor,
                                         Main.GenerateOutfitcolor
-                                        );
+                                    );
+                                }
                                 }
                             }
                             using (UI.VerticalScope()) {
-                                UI.Label("Secondary");
-                                if (Settings.customOutfitColors) {
-                                    SecondaryColorPicker.OnGUI(
-                                        Settings,
-                                        unitEntityData,
-                                        new Color(Settings.secondColor[0], Settings.secondColor[1], Settings.secondColor[2]),
-                                        ref Settings.secondColor,
-                                        Main.GenerateOutfitcolor
+                                if (Settings.customOutfitColors)
+                                {
+                                    UI.Toggle("Show Secondary Outfit Color Picker", ref Settings.showSecondColor);
+                                    if (Settings.showSecondColor)
+                                    {
+                                        SecondaryColorPicker.OnGUI(
+                                            Settings,
+                                            unitEntityData,
+                                            new Color(Settings.secondColor[0], Settings.secondColor[1],
+                                                Settings.secondColor[2]),
+                                            ref Settings.secondColor,
+                                            Main.GenerateOutfitcolor
                                         );
-                                }                        SecondaryColorPicker.OnGUI(Settings, unitEntityData, new Color(Settings.secondColor[0], Settings.secondColor[1], Settings.secondColor[2]), ref Settings.secondColor, Main.GenerateOutfitcolor);
+                                    }
+                                } // SecondaryColorPicker.OnGUI(Settings, unitEntityData, new Color(Settings.secondColor[0], Settings.secondColor[1], Settings.secondColor[2]), ref Settings.secondColor, Main.GenerateOutfitcolor);
 
                             }
                         }
@@ -1504,24 +1561,39 @@ namespace VisualAdjustments {
                             using (UI.HorizontalScope(UI.Width(800))) {
                                 using (UI.VerticalScope()) {
                                     UI.Toggle("Horn Color", ref Settings.customHornColor);
-                                    if (Settings.customHornColor) {
-                                        HornColorPicker.OnGUI(
-                                            Settings, unitEntityData,
-                                            new Color(Settings.hornColor[0], Settings.hornColor[1], Settings.hornColor[2]),
-                                            ref Settings.hornColor,
-                                            Main.GenerateHornColor
+                                    if (Settings.customHornColor)
+                                    {
+                                        UI.Toggle("Show Horn Color Picker", ref Settings.showHornColor);
+                                        if (Settings.showHornColor)
+                                        {
+                                            HornColorPicker.OnGUI(
+                                                Settings, unitEntityData,
+                                                new Color(Settings.hornColor[0], Settings.hornColor[1],
+                                                    Settings.hornColor[2]),
+                                                ref Settings.hornColor,
+                                                Main.GenerateHornColor
                                             );
+                                        }
                                     }
                                 }
-                                using (UI.VerticalScope()) {
+
+                                using (UI.VerticalScope())
+                                {
                                     UI.Toggle("Warpaint Color", ref Settings.customWarpaintColor);
-                                    if (Settings.customWarpaintColor) {
+                                    if (Settings.customWarpaintColor)
+                                    {
+                                        UI.Toggle("Show Warpaint Color Picker", ref Settings.showWarpaintColor);
+                                    if (Settings.showWarpaintColor)
+                                    {
                                         WarpaintColorPicker.OnGUI(
                                             Settings,
-                                            unitEntityData, new Color(Settings.warpaintColor[0], Settings.warpaintColor[1], Settings.warpaintColor[2]),
+                                            unitEntityData,
+                                            new Color(Settings.warpaintColor[0], Settings.warpaintColor[1],
+                                                Settings.warpaintColor[2]),
                                             ref Settings.warpaintColor,
                                             Main.GenerateWarpaintColor
-                                            );
+                                        );
+                                    }
                                     }
                                 }
                             }

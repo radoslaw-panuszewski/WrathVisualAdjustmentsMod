@@ -128,6 +128,15 @@ namespace VisualAdjustments
                     {
                         Main.GenerateWarpaintColor(unitEntityData);
                     }
+                    if (Settings.customOutfitColors)
+                    {
+                        Main.GenerateOutfitcolor(unitEntityData);
+                    }
+                    else
+                    {
+                        doll.ApplyRampIndices(character);
+                        //doll.SetEquipColors()
+                    }
                 }
                 else
                 {
@@ -139,9 +148,17 @@ namespace VisualAdjustments
                     character.AddEquipmentEntities(bodyEquipment, false);
                                         unitEntityData.View.HandsEquipment.UpdateAll();                                                                                                   //Adds Armor
                                         unitEntityData.View.UpdateClassEquipment();
+                                        if (Settings.customOutfitColors)
+                                        {
+                                            Main.GenerateOutfitcolor(unitEntityData);
+                                        }
                 }
                 //Main.SetEELs(unitEntityData, DollResourcesManager.GetDoll(unitEntityData), false);
                //  DollResourcesManager.GetDoll(unitEntityData).SetHairColor(Settings.HairColor);
+               if (unitEntityData.Parts.Get<UnitPartDollData>())
+               {
+                   unitEntityData.Parts.Get<UnitPartDollData>().Default = doll;
+               }
                 //Add Kineticist Tattoos
                //Main.SetEELs(unitEntityData, DollResourcesManager.GetDoll(unitEntityData), false);
                 EventBus.RaiseEvent<IUnitViewAttachedHandler>(unitEntityData, delegate (IUnitViewAttachedHandler h)
