@@ -18,10 +18,15 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Kingmaker.Designers.EventConditionActionSystem.Actions;
+using Kingmaker.Items;
 using Kingmaker.UI.MVVM._VM.Common;
 using UnityEngine;
 using static VisualAdjustments.Settings;
 using Kingmaker.UnitLogic.Class.LevelUp;
+using Kingmaker.Utility;
+using Kingmaker.Visual;
+using Kingmaker.Visual.Particles;
 
 namespace VisualAdjustments
 {
@@ -53,6 +58,7 @@ namespace VisualAdjustments
     }*/
     public class CharacterManager
     {
+        private static Dictionary<UnitEntityView, GameObject> wingsFxVisibilityManagers = new Dictionary<UnitEntityView, GameObject>();
         public static bool disableEquipmentClassPatch;
         /*
          * Based on DollData.CreateUnitView, DollRoom.CreateAvatar and 
@@ -498,9 +504,9 @@ namespace VisualAdjustments
                         equipmentClass.NameForAcronym.Contains("Inquisitor"))
                     {
                         var asd = view.CharacterAvatar.EquipmentEntities
-                            .Where(a => a.OutfitParts.Any(c =>
+                            .Where(a => Enumerable.Any(a.OutfitParts, c =>
                                 c.ToString().Contains("Cape") || c.ToString().Contains("Cloak"))).Where(a =>
-                                new[] { "Inquisitor", "Rogue", "Ranger" }.Any(c => a.name.Contains(c)));
+                                Enumerable.Any(new[] { "Inquisitor", "Rogue", "Ranger" }, c => a.name.Contains(c)));
                         if (asd.ToArray().Length > 0)
                         {
                             foreach (var a in asd)
@@ -530,9 +536,9 @@ namespace VisualAdjustments
                         equipmentClass.NameForAcronym.Contains("Rogue") ||
                         equipmentClass.NameForAcronym.Contains("Inquisitor"))
                     {
-                        if (!view.CharacterAvatar.EquipmentEntities.Any(a =>
-                            a.OutfitParts.Any(b => b.ToString().Contains("Cape") || b.ToString().Contains("Cape"))))
-                            if (view.CharacterAvatar.EquipmentEntities.Any(a =>
+                        if (!Enumerable.Any(view.CharacterAvatar.EquipmentEntities, a =>
+                            Enumerable.Any(a.OutfitParts, b => b.ToString().Contains("Cape") || b.ToString().Contains("Cape"))))
+                            if (Enumerable.Any(view.CharacterAvatar.EquipmentEntities, a =>
                                 Main.CapeOutfitParts.Keys.Contains(a.name)))
                             {
                                 var ad = view.CharacterAvatar.EquipmentEntities.Where(c =>
@@ -592,19 +598,17 @@ namespace VisualAdjustments
                         }
                     }
                 }
-
                 if (characterSettings.hideTail)
                 {
                     foreach (var ee in view.CharacterAvatar.EquipmentEntities.ToArray())
                     {
-                        if (ee.name.StartsWith("Tail"))
+                        if (ee.name.Contains("Tail"))
                         {
                             view.CharacterAvatar.EquipmentEntities.Remove(ee);
                             dirty = true;
                         }
                     }
                 }
-
                 if (characterSettings.hideClassCloak)
                 {
                     foreach (var ee in view.CharacterAvatar.EquipmentEntities.ToArray())
@@ -633,7 +637,44 @@ namespace VisualAdjustments
                         }
                     }
                 }
-
+                if (!characterSettings.overrideWingsEE.Empty() && !characterSettings.hideWings)
+                {
+                    foreach (var eetoremove in EquipmentResourcesManager.WingsEE.OfType<EquipmentEntity>())
+                    {
+                       if(view.CharacterAvatar.EquipmentEntities.Contains(eetoremove))  view.CharacterAvatar.RemoveEquipmentEntity(eetoremove,false);
+                    }
+                    view.CharacterAvatar.AddEquipmentEntity(EquipmentResourcesManager.WingsEE[characterSettings.overrideWingsEE]);
+                }
+                if (!characterSettings.overrideTail.Empty() && !characterSettings.hideTail)
+                {
+                    foreach (var eetoremove in EquipmentResourcesManager.TailsEE.OfType<EquipmentEntity>())
+                    {
+                        if (view.CharacterAvatar.EquipmentEntities.Contains(eetoremove)) view.CharacterAvatar.RemoveEquipmentEntity(eetoremove, false);
+                    }
+                    view.CharacterAvatar.AddEquipmentEntity(EquipmentResourcesManager.TailsEE[characterSettings.overrideTail]);
+                }
+                if (!characterSettings.overrideHorns.Empty() && !characterSettings.hideHorns)
+                {
+                    foreach (var eetoremove in EquipmentResourcesManager.HornsEE.OfType<EquipmentEntity>())
+                    {
+                        if (view.CharacterAvatar.EquipmentEntities.Contains(eetoremove)) view.CharacterAvatar.RemoveEquipmentEntity(eetoremove, false);
+                    }
+                    view.CharacterAvatar.AddEquipmentEntity(EquipmentResourcesManager.HornsEE[characterSettings.overrideHorns]);
+                }
+                if (!characterSettings.overrideWingsFX.Empty() && !characterSettings.hideWings)
+                {
+                    /*foreach (var eetoremove in EquipmentResourcesManager.WingsFX.OfType<GameObject>())
+                    {
+                        FxHelper.DestroyAll();
+                        if (view.CharacterAvatar.EquipmentEntities.Contains(eetoremove)) view.CharacterAvatar.RemoveEquipmentEntity(eetoremove, false);
+                    }*/
+                    if (wingsFxVisibilityManagers.ContainsKey(view) && wingsFxVisibilityManagers[view] != null) GameObject.Destroy(wingsFxVisibilityManagers[view]);
+                    if (!characterSettings.overrideWingsFX.Empty())
+                    {
+                        wingsFxVisibilityManagers[view] = FxHelper.SpawnFxOnUnit(EquipmentResourcesManager.WingsFX[characterSettings.overrideWingsFX], view);
+                    }
+                    // if (characterSettings.overrideWingsEE != null) view.CharacterAvatar.AddEquipmentEntity(EquipmentResourcesManager.WingsEE[characterSettings.overrideWingsEE]);
+                }
                 if (characterSettings.overrideHelm != null && !characterSettings.hideHelmet)
                 {
                     if (!OverrideEquipment(view, view.EntityData.Body.Head, characterSettings.overrideHelm, ref dirty))
@@ -720,7 +761,21 @@ namespace VisualAdjustments
                 {
                     FixRangerCloak(view);
                 }
-
+                if (!characterSettings.overrideMythic.Empty() && !characterSettings.hideMythic)
+                {
+                    //view.Data.Progression.AdditionalVisualSettings = Utilities.GetBlueprint<BlueprintClassAdditionalVisualSettings>(characterSettings.overrideMythic);
+                    view.CharacterAvatar.SetAdditionalVisualSettings(Utilities.GetBlueprint<BlueprintClassAdditionalVisualSettings>(characterSettings.overrideMythic));
+                }
+                else if (characterSettings.hideMythic)
+                {
+                    //view.Data.Progression.AdditionalVisualSettings = null;
+                    view.CharacterAvatar.SetAdditionalVisualSettings(null);
+                }
+                else
+                {
+                    //view.Data.Progression.AdditionalVisualSettings = view.Data.Progression.GetCurrentMythicClass().GetAdditionalVisualSettings();
+                    view.CharacterAvatar.SetAdditionalVisualSettings(view.Data.Progression.AdditionalVisualSettings);
+                }
                 if (view.CharacterAvatar.IsDirty != dirty)
                 {
                     view.CharacterAvatar.IsDirty = dirty;
@@ -780,7 +835,7 @@ namespace VisualAdjustments
                         {
                             ///DollResourcesManager.GetDoll(__instance.EntityData).Updated();
                             UpdateModel(__instance);
-                            RebuildCharacter(__instance.Data);
+                           /// RebuildCharacter(__instance.Data);
                         }
                     }
                   /*  if(slot.ToString().Contains("HandSlot") || slot.ToString().Contains("UsableSlot") || )

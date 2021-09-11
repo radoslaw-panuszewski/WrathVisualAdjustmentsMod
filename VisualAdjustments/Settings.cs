@@ -21,6 +21,7 @@ namespace VisualAdjustments
             public string characterName = "";
             public string uniqueid = "";
             public bool showClassSelection = false;
+            public bool showEELsSelection = false;
             public bool showDollSelection = false;
             public bool showEquipmentSelection = false;
             public bool showOverrideSelection = false;
@@ -58,6 +59,7 @@ namespace VisualAdjustments
             public int Warpaint = -1;
             public int WarpaintCol = -1;*/
 
+            public string overrideMythic = "";
             public BlueprintRef overrideHelm = null;
             public BlueprintRef overrideCloak = null;
             public BlueprintRef overrideShirt = null;
@@ -69,6 +71,10 @@ namespace VisualAdjustments
             public ResourceRef overrideTattoo = null;
             public ResourceRef overrideOther = null;
             public ResourceRef overrideView = null;
+            public string overrideWingsEE = "";
+            public string overrideHorns = "";
+            public string overrideTail = "";
+            public string overrideWingsFX = "";
             public List<BlueprintRef> overrideMainWeaponEnchantments = new List<BlueprintRef>();
             public List<BlueprintRef> overrideOffhandWeaponEnchantments = new List<BlueprintRef>();
             public bool overrideScale = false;
@@ -105,6 +111,7 @@ namespace VisualAdjustments
             public bool showWarpaintColor;
             public bool showHornColor;
             public bool hideSheaths;
+            public bool hideMythic;
         }
         [JsonProperty]
         public Dictionary<string, CharacterSettings> characterSettings = new Dictionary<string, CharacterSettings>();

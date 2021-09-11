@@ -37,12 +37,59 @@ namespace VisualAdjustments
                 onChoose();
             }
         }
+        public static void ChooseSlider<T>(string name, Dictionary<string, T> items, ref string currentItem, Action onChoose)
+        {
+            var currentIndex = currentItem == null ? -1 : Array.IndexOf(items.Keys.ToArray(), currentItem);
+            GUILayout.BeginHorizontal();
+            ModKit.UI.Label(name + " ", GUILayout.Width(DefaultLabelWidth));
+            var newIndex = (int)Math.Round(GUILayout.HorizontalSlider(currentIndex, -1, items.Count - 1, GUILayout.Width(DefaultSliderWidth)), 0);
+            if (GUILayout.Button("<", GUILayout.Width(55)) && currentIndex >= 0)
+            {
+                newIndex = currentIndex - 1;
+            }
+            if (GUILayout.Button(">", GUILayout.Width(55)) && currentIndex < items.Count - 1)
+            {
+                newIndex = currentIndex + 1;
+            }
+            var displayText = newIndex == -1 ? "None" : items.Keys.ElementAt(newIndex);
+            ModKit.UI.Label(" " + displayText, GUILayout.ExpandWidth(true));
+            GUILayout.EndHorizontal();
+            if (currentIndex != newIndex)
+            {
+                currentItem = newIndex == -1 ? default(string) : items.Keys.ElementAt(newIndex);
+                onChoose();
+            }
+        }
+        public static void ChooseSliderM<T>(string name, Dictionary<T, string> items, ref string currentItem, Action onChoose)
+        {
+            var currentIndex = currentItem == null ? -1 : Array.IndexOf(items.Values.ToArray(), currentItem);
+            GUILayout.BeginHorizontal();
+            ModKit.UI.Label(name + " ", GUILayout.Width(DefaultLabelWidth));
+            var newIndex = (int)Math.Round(GUILayout.HorizontalSlider(currentIndex, -1, items.Count - 1, GUILayout.Width(DefaultSliderWidth)), 0);
+            if (GUILayout.Button("<", GUILayout.Width(55)) && currentIndex >= 0)
+            {
+                newIndex = currentIndex - 1;
+            }
+            if (GUILayout.Button(">", GUILayout.Width(55)) && currentIndex < items.Count - 1)
+            {
+                newIndex = currentIndex + 1;
+            }
+            var displayText = newIndex == -1 ? "None" : items.Values.ElementAt(newIndex);
+            ModKit.UI.Label(" " + displayText, GUILayout.ExpandWidth(true));
+            GUILayout.EndHorizontal();
+            if (currentIndex != newIndex)
+            {
+                currentItem = newIndex == -1 ? default(string) : items.Values.ElementAt(newIndex);
+                //Main.logger.Log(currentItem);
+                onChoose();
+            }
+        }
         public static void ChooseSliderList<T>(string name, Dictionary<T, string> items, List<T> saved, int savedIndex, Action onChoose)
         {
             var currentItem = saved[savedIndex];
             var currentIndex = currentItem == null ? -1 : Array.IndexOf(items.Keys.ToArray(), currentItem);
             GUILayout.BeginHorizontal();
-            ModKit.UI.Label(name + " ", GUILayout.Width(DefaultLabelWidth));
+            ModKit.UI.Label(name + " ", GUILayout.ExpandWidth(false));
             var newIndex = (int)Math.Round(GUILayout.HorizontalSlider(currentIndex, -1, items.Count - 1, GUILayout.Width(DefaultSliderWidth)), 0);
             if (GUILayout.Button("Prev", GUILayout.Width(45)) && currentIndex >= 0)
             {

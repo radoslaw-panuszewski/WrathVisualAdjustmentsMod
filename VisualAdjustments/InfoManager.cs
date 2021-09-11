@@ -377,7 +377,7 @@ namespace VisualAdjustments
             }
             var equipmentList = unitEntityData.Gender == Gender.Male ? m_OrphanedMaleEquipment : m_OrphanedFemaleEquipment;
             Util.ChooseSlider($"OrphanedKingmakerEquipment", m_OrphanedKingmakerEquipment, ref selectedKingmakerOrphanedEquipment, onEquipment);
-            Util.ChooseSlider($"OrphanedEquipment", equipmentList, ref selectedOrphanedEquipment, onEquipment);
+            Util.ChooseSlider<string>($"OrphanedEquipment", equipmentList, ref selectedOrphanedEquipment, onEquipment);
 
             ModKit.UI.Label("Equipment", GUILayout.Width(200f));
             foreach (var ee in character.EquipmentEntities.ToArray())

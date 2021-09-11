@@ -54,6 +54,10 @@ namespace VisualAdjustments
         [HarmonyPatch(typeof(UnitViewHandsEquipment), "UpdateBeltPrefabs")]
         static class UnitViewHandsEquipment_UpdateBeltPrefabs_Patch
         {
+            static bool Prefix()
+            {
+                return false;
+            }
             static void Postfix(UnitViewHandsEquipment __instance, GameObject[] ___m_ConsumableSlots)
             {
                 try
@@ -85,7 +89,7 @@ namespace VisualAdjustments
         /*
          * Hide Quiver
          */
-       // [HarmonyPatch(typeof(UnitViewHandSlotData), "ReattachSheath")]
+        [HarmonyPatch(typeof(UnitViewHandSlotData), "ReattachSheath")]
         static class UnitViewHandsSlotData_ReattachSheath_Patch
         {
             static bool HasQuiver(UnitViewHandSlotData slotData)
@@ -103,18 +107,40 @@ namespace VisualAdjustments
                     if (!__instance.Owner.IsPlayerFaction) return true;
                     var characterSettings = Main.settings.GetCharacterSettings(__instance.Owner);
                     if (characterSettings == null) return true;
-                    if (!HasQuiver(__instance)) return true;
+                    //if (!HasQuiver(__instance)) return true;
                    // updateSheaths(__instance.Owner.View);
-                    if (characterSettings.hidequiver)
+                    bool skip = false;
+                    if (characterSettings.hidequiver && HasQuiver(__instance))
                     {
                         UnitViewHandSlotData unitViewHandSlotData = ___m_Equipment.QuiverHandSlot;
-                        if (unitViewHandSlotData == null) return true;
-                        if (unitViewHandSlotData == __instance) return false;
-                        if (unitViewHandSlotData.IsActiveSet || unitViewHandSlotData.SheathVisualModel == null || !HasQuiver(unitViewHandSlotData))
+                        if (unitViewHandSlotData != null)
                         {
-                            unitViewHandSlotData.DestroySheathModel();
-                            unitViewHandSlotData = null;
+                            //if (unitViewHandSlotData == __instance) return false;
+                            if (unitViewHandSlotData.IsActiveSet || unitViewHandSlotData.SheathVisualModel == null ||
+                                !HasQuiver(unitViewHandSlotData))
+                            {
+                                unitViewHandSlotData.DestroySheathModel();
+                                //unitViewHandSlotData = null;
+                            }
                         }
+
+                        skip = true;
+                    }
+                    if (characterSettings.hideSheaths)
+                    {
+                        //UnitViewHandSlotData unitViewHandSlotData = __instance;
+                       // if (unitViewHandSlotData == null) return true;
+                        //if (unitViewHandSlotData == __instance) return false;
+                      //  if (unitViewHandSlotData.SheathVisualModel != null)
+                        {
+                            __instance.DestroySheathModel();
+                        }
+
+                        skip = true;
+                    }
+
+                    if(skip)
+                    {
                         return false;
                     }
                 }

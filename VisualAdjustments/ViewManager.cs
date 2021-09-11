@@ -86,7 +86,7 @@ namespace VisualAdjustments
                         }
                     }
 
-                        UnitEntityView template = GetView(characterSettings.overrideView);
+                    UnitEntityView template = GetView(characterSettings.overrideView);
                     if (template == null)
                     {
                         Main.Log("Overriding invalid view " + characterSettings.overrideView);
