@@ -561,11 +561,6 @@ namespace VisualAdjustments {
                     }
                 }
 
-                if (GUILayout.Button("bruhh"))
-                {
-                    texture = Object.FindObjectOfType<InGamePCView>().m_StaticPartPCView.m_ServiceWindowsPCView.m_InventoryPCView.m_DollView.GetComponentInChildren<RawImage>().texture;
-                }
-                GUILayout.Box(texture);
                 /*foreach (var VARIABLE in Game.Instance.Player.Party)
                 {
                     //Game.Instance.RootUiContext.InGameVM.StaticPartVM.;
@@ -1462,205 +1457,201 @@ namespace VisualAdjustments {
                 ReferenceArrayProxy<BlueprintRaceVisualPreset, BlueprintRaceVisualPresetReference> presets = doll.Race.Presets;
                 BlueprintRaceVisualPreset racePreset = doll.RacePreset;
                 UI.Div(154, 30, 1200);
-                UI.HStack("Doll", 1,
-                    () => {
-                        ChooseRace(unitEntityData, doll);
-                    },
-                    () => ChooseVisualPreset(unitEntityData, doll, "Body Type", doll.Race.m_Presets.Select(a => (BlueprintRaceVisualPreset)a.GetBlueprint()).ToArray(), doll.RacePreset),
-                    () => ChooseEEL(unitEntityData, doll, "Face", customizationOptions.Heads, doll.Head.m_Link, (EquipmentEntityLink ee) => doll.SetHead(ee)),
-                    () => {
-                        if (doll.Scars.Count > 0)
-                            ChooseEEL(unitEntityData, doll, "Scar", doll.Scars.ToArray(), doll.Scar.m_Link, (EquipmentEntityLink ee) => doll.SetScar(ee));
-                    },
-                    () => ChooseEEL(unitEntityData, doll, "Warpaint", doll.Warpaints.ToArray(), doll.Warpaint.m_Link, (EquipmentEntityLink ee) => doll.SetWarpaint(ee)),
-                    () => {
-                        if (customizationOptions.Hair.Any())
-                            ChooseEEL(unitEntityData, doll, "Hair", customizationOptions.Hair, doll.Hair.m_Link, (EquipmentEntityLink ee) => doll.SetHair(ee));
-                    },
-                    () => {
-                        if (customizationOptions.Beards.Any())
-                            ChooseEEL(unitEntityData, doll, "Beards", customizationOptions.Beards, doll.Beard.m_Link, (EquipmentEntityLink ee) => doll.SetBeard(ee));
-                    },
-                    () => {
-                        if (customizationOptions.Horns.Any())
-                            ChooseEEL(unitEntityData, doll, "Horns", customizationOptions.Horns, doll.Horn.m_Link, (EquipmentEntityLink ee) => doll.SetHorn(ee));
-                    },
-                    () => {
-                        if (doll.Warpaints.Count > 0)
-                            ChooseRamp(unitEntityData, doll, "Warpaint Color", doll.GetWarpaintRamps(), doll.WarpaintRampIndex, (int index) => doll.SetWarpaintColor(index));
-                    },
-                    () => ChooseRamp(unitEntityData, doll, "Hair Color", doll.GetHairRamps(), doll.HairRampIndex, (int index) => {
-                        doll.SetHairColor(index);
-                    }),
-                    () => ChooseRamp(unitEntityData, doll, "Skin Color", doll.GetSkinRamps(), doll.SkinRampIndex, (int index) => doll.SetSkinColor(index)),
-                    () => ChooseRamp(unitEntityData, doll, "Horn Color", doll.GetHornsRamps(), doll.HornsRampIndex, (int index) => doll.SetHornsColor(index)),
-                    () => ChooseRamp(unitEntityData, doll, "Primary Outfit Color", doll.GetOutfitRampsPrimary(), doll.EquipmentRampIndex, (int index) => doll.SetEquipColors(index,doll.EquipmentRampIndexSecondary)),
-                    () => ChooseRamp(unitEntityData, doll, "Secondary Outfit Color", doll.GetOutfitRampsSecondary(), doll.EquipmentRampIndexSecondary, (int index) => doll.SetEquipColors(doll.EquipmentRampIndex, index)),
-
-
-
-                    /*  if(Settings.PrimaryColor != doll.EquipmentRampIndex || Settings.SecondaryColor != doll.EquipmentRampIndexSecondary)
-                      {
-                          doll.SetEquipColors(Settings.PrimaryColor,Settings.SecondaryColor);
-                      }*/
-                //  ReferenceArrayProxy<BlueprintRaceVisualPreset, BlueprintRaceVisualPresetReference> presets = doll.Race.Presets;
-                // BlueprintRaceVisualPreset racePreset = doll.RacePreset;
-                /*if (unitEntityData.Descriptor.LeftHandedOverride == true && GUILayout.Button("Set Right Handed", GUILayout.Width(DefaultLabelWidth)))
-                  {
-                      unitEntityData.Descriptor.LeftHandedOverride = false;
-                      unitEntityData.Parts.Get<UnitPartDollData>().Default = doll.CreateData();
-                      unitEntityData.Descriptor.m_LoadedDollData = doll.CreateData();
-                      ViewManager.ReplaceView(unitEntityData, null);
-                      unitEntityData.View.HandsEquipment.HandleEquipmentSetChanged();
-                  }
-                  else if (unitEntityData.Descriptor.LeftHandedOverride == false && GUILayout.Button("Set Left Handed", GUILayout.Width(DefaultLabelWidth)))
-                  {
-                      unitEntityData.Descriptor.LeftHandedOverride = true;
-                      unitEntityData.Parts.Get<UnitPartDollData>().Default = doll.CreateData();
-                      unitEntityData.Descriptor.m_LoadedDollData = doll.CreateData();
-                      ViewManager.ReplaceView(unitEntityData, null);
-                      unitEntityData.View.HandsEquipment.HandleEquipmentSetChanged();
-                  }*/
-                () => ChoosePortrait(unitEntityData),
-                () => ChooseAsks(unitEntityData),
-                () => UI.Space(),
-                () => UI.Div(0, 30, 1200),
-                () => {
-                    using (UI.HorizontalScope()) {
-                        UI.Label("Custom", UI.AutoWidth());
-                        using (UI.VerticalScope()) {
-                            using (UI.HorizontalScope(UI.Width(800))) {
-                                using (UI.VerticalScope()) {
-                                    UI.Toggle("Hair Color", ref Settings.customHairColor);
-                                    if (Settings.customHairColor)
-                                    {
-                                        UI.Toggle("Show Hair Color Picker", ref Settings.showHair);
-                                        if (Settings.showHair)
-                                        {
-                                            HairColorPicker.OnGUI(
-                                                Settings,
-                                                unitEntityData,
-                                                new Color(Settings.hairColor[0], Settings.hairColor[1],
-                                                    Settings.hairColor[2]),
-                                                ref Settings.hairColor,
-                                                Main.GenerateHairColor
-                                            );
-                                        }
-                                    }
-                                }
-                                using (UI.VerticalScope()) {
-                                    UI.Toggle("Skin Color", ref Settings.customSkinColor);
-                                    if (Settings.customSkinColor)
-                                    {
-                                        UI.Toggle("Show Skin Color Picker", ref Settings.showSkin);
-                                        if (Settings.showSkin)
-                                        {
-                                            SkinColorPicker.OnGUI(
-                                                Settings,
-                                                unitEntityData,
-                                                new Color(Settings.skinColor[0], Settings.skinColor[1],
-                                                    Settings.skinColor[2]),
-                                                ref Settings.skinColor,
-                                                Main.GenerateSkinColor
-                                            );
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
-                },
-                () => UI.Div(0, 30, 1200),
-                () => {
-                    UI.Label("Custom", UI.AutoWidth());
+                using (UI.HorizontalScope()) {
                     using (UI.VerticalScope()) {
-                        UI.Toggle("Outfit Colors", ref Settings.customOutfitColors);
-                        using (UI.HorizontalScope(UI.Width(800))) {
-                            using (UI.VerticalScope())
-                            {
-                                if (Settings.customOutfitColors)
-                                {
-                                    UI.Toggle("Show Primary Outfit Color Picker", ref Settings.showPrimColor);
-                                if (Settings.showPrimColor)
-                                {
-                                    PrimaryColorPicker.OnGUI(
-                                        Settings,
-                                        unitEntityData,
-                                        new Color(Settings.primColor[0], Settings.primColor[1], Settings.primColor[2]),
-                                        ref Settings.primColor,
-                                        Main.GenerateOutfitcolor
-                                    );
-                                }
-                                }
-                            }
-                            using (UI.VerticalScope()) {
-                                if (Settings.customOutfitColors)
-                                {
-                                    UI.Toggle("Show Secondary Outfit Color Picker", ref Settings.showSecondColor);
-                                    if (Settings.showSecondColor)
-                                    {
-                                        SecondaryColorPicker.OnGUI(
-                                            Settings,
-                                            unitEntityData,
-                                            new Color(Settings.secondColor[0], Settings.secondColor[1],
-                                                Settings.secondColor[2]),
-                                            ref Settings.secondColor,
-                                            Main.GenerateOutfitcolor
-                                        );
-                                    }
-                                } // SecondaryColorPicker.OnGUI(Settings, unitEntityData, new Color(Settings.secondColor[0], Settings.secondColor[1], Settings.secondColor[2]), ref Settings.secondColor, Main.GenerateOutfitcolor);
+                        UI.HStack("Doll", 1,
+                            () => {
+                                ChooseRace(unitEntityData, doll);
+                            },
+                            () => ChooseVisualPreset(unitEntityData, doll, "Body Type", doll.Race.m_Presets.Select(a => (BlueprintRaceVisualPreset)a.GetBlueprint()).ToArray(), doll.RacePreset),
+                            () => ChooseEEL(unitEntityData, doll, "Face", customizationOptions.Heads, doll.Head.m_Link, (EquipmentEntityLink ee) => doll.SetHead(ee)),
+                            () => {
+                                if (doll.Scars.Count > 0)
+                                    ChooseEEL(unitEntityData, doll, "Scar", doll.Scars.ToArray(), doll.Scar.m_Link, (EquipmentEntityLink ee) => doll.SetScar(ee));
+                            },
+                            () => ChooseEEL(unitEntityData, doll, "Warpaint", doll.Warpaints.ToArray(), doll.Warpaint.m_Link, (EquipmentEntityLink ee) => doll.SetWarpaint(ee)),
+                            () => {
+                                if (customizationOptions.Hair.Any())
+                                    ChooseEEL(unitEntityData, doll, "Hair", customizationOptions.Hair, doll.Hair.m_Link, (EquipmentEntityLink ee) => doll.SetHair(ee));
+                            },
+                            () => {
+                                if (customizationOptions.Beards.Any())
+                                    ChooseEEL(unitEntityData, doll, "Beards", customizationOptions.Beards, doll.Beard.m_Link, (EquipmentEntityLink ee) => doll.SetBeard(ee));
+                            },
+                            () => {
+                                if (customizationOptions.Horns.Any())
+                                    ChooseEEL(unitEntityData, doll, "Horns", customizationOptions.Horns, doll.Horn.m_Link, (EquipmentEntityLink ee) => doll.SetHorn(ee));
+                            },
+                            () => {
+                                if (doll.Warpaints.Count > 0)
+                                    ChooseRamp(unitEntityData, doll, "Warpaint Color", doll.GetWarpaintRamps(), doll.WarpaintRampIndex, (int index) => doll.SetWarpaintColor(index));
+                            },
+                            () => ChooseRamp(unitEntityData, doll, "Hair Color", doll.GetHairRamps(), doll.HairRampIndex, (int index) => {
+                                doll.SetHairColor(index);
+                            }),
+                            () => ChooseRamp(unitEntityData, doll, "Skin Color", doll.GetSkinRamps(), doll.SkinRampIndex, (int index) => doll.SetSkinColor(index)),
+                            () => ChooseRamp(unitEntityData, doll, "Horn Color", doll.GetHornsRamps(), doll.HornsRampIndex, (int index) => doll.SetHornsColor(index)),
+                            () => ChooseRamp(unitEntityData, doll, "Primary Outfit Color", doll.GetOutfitRampsPrimary(), doll.EquipmentRampIndex, (int index) => doll.SetEquipColors(index, doll.EquipmentRampIndexSecondary)),
+                            () => ChooseRamp(unitEntityData, doll, "Secondary Outfit Color", doll.GetOutfitRampsSecondary(), doll.EquipmentRampIndexSecondary, (int index) => doll.SetEquipColors(doll.EquipmentRampIndex, index)),
 
-                            }
-                        }
-                    }
-                },
-                () => UI.Div(0, 30, 1200),
-                () => {
-                    using (UI.HorizontalScope()) {
-                        UI.Label("Custom", UI.AutoWidth());
-                        using (UI.VerticalScope()) {
-                            using (UI.HorizontalScope(UI.Width(800))) {
+
+
+                        /*  if(Settings.PrimaryColor != doll.EquipmentRampIndex || Settings.SecondaryColor != doll.EquipmentRampIndexSecondary)
+                          {
+                              doll.SetEquipColors(Settings.PrimaryColor,Settings.SecondaryColor);
+                          }*/
+                        //  ReferenceArrayProxy<BlueprintRaceVisualPreset, BlueprintRaceVisualPresetReference> presets = doll.Race.Presets;
+                        // BlueprintRaceVisualPreset racePreset = doll.RacePreset;
+                        /*if (unitEntityData.Descriptor.LeftHandedOverride == true && GUILayout.Button("Set Right Handed", GUILayout.Width(DefaultLabelWidth)))
+                          {
+                              unitEntityData.Descriptor.LeftHandedOverride = false;
+                              unitEntityData.Parts.Get<UnitPartDollData>().Default = doll.CreateData();
+                              unitEntityData.Descriptor.m_LoadedDollData = doll.CreateData();
+                              ViewManager.ReplaceView(unitEntityData, null);
+                              unitEntityData.View.HandsEquipment.HandleEquipmentSetChanged();
+                          }
+                          else if (unitEntityData.Descriptor.LeftHandedOverride == false && GUILayout.Button("Set Left Handed", GUILayout.Width(DefaultLabelWidth)))
+                          {
+                              unitEntityData.Descriptor.LeftHandedOverride = true;
+                              unitEntityData.Parts.Get<UnitPartDollData>().Default = doll.CreateData();
+                              unitEntityData.Descriptor.m_LoadedDollData = doll.CreateData();
+                              ViewManager.ReplaceView(unitEntityData, null);
+                              unitEntityData.View.HandsEquipment.HandleEquipmentSetChanged();
+                          }*/
+                        () => ChoosePortrait(unitEntityData),
+                        () => ChooseAsks(unitEntityData),
+                        () => UI.Space(),
+                        () => UI.Div(0, 30, 1200),
+                        () => {
+                            using (UI.HorizontalScope()) {
+                                UI.Label("Custom", UI.AutoWidth());
                                 using (UI.VerticalScope()) {
-                                    UI.Toggle("Horn Color", ref Settings.customHornColor);
-                                    if (Settings.customHornColor)
-                                    {
-                                        UI.Toggle("Show Horn Color Picker", ref Settings.showHornColor);
-                                        if (Settings.showHornColor)
-                                        {
-                                            HornColorPicker.OnGUI(
-                                                Settings, unitEntityData,
-                                                new Color(Settings.hornColor[0], Settings.hornColor[1],
-                                                    Settings.hornColor[2]),
-                                                ref Settings.hornColor,
-                                                Main.GenerateHornColor
-                                            );
+                                    using (UI.HorizontalScope(UI.Width(800))) {
+                                        using (UI.VerticalScope()) {
+                                            UI.Toggle("Hair Color", ref Settings.customHairColor);
+                                            if (Settings.customHairColor) {
+                                                UI.Toggle("Show Hair Color Picker", ref Settings.showHair);
+                                                if (Settings.showHair) {
+                                                    HairColorPicker.OnGUI(
+                                                        Settings,
+                                                        unitEntityData,
+                                                        new Color(Settings.hairColor[0], Settings.hairColor[1],
+                                                            Settings.hairColor[2]),
+                                                        ref Settings.hairColor,
+                                                        Main.GenerateHairColor
+                                                    );
+                                                }
+                                            }
+                                        }
+                                        using (UI.VerticalScope()) {
+                                            UI.Toggle("Skin Color", ref Settings.customSkinColor);
+                                            if (Settings.customSkinColor) {
+                                                UI.Toggle("Show Skin Color Picker", ref Settings.showSkin);
+                                                if (Settings.showSkin) {
+                                                    SkinColorPicker.OnGUI(
+                                                        Settings,
+                                                        unitEntityData,
+                                                        new Color(Settings.skinColor[0], Settings.skinColor[1],
+                                                            Settings.skinColor[2]),
+                                                        ref Settings.skinColor,
+                                                        Main.GenerateSkinColor
+                                                    );
+                                                }
+                                            }
                                         }
                                     }
                                 }
-
-                                using (UI.VerticalScope())
-                                {
-                                    UI.Toggle("Warpaint Color", ref Settings.customWarpaintColor);
-                                    if (Settings.customWarpaintColor)
-                                    {
-                                        UI.Toggle("Show Warpaint Color Picker", ref Settings.showWarpaintColor);
-                                    if (Settings.showWarpaintColor)
-                                    {
-                                        WarpaintColorPicker.OnGUI(
-                                            Settings,
-                                            unitEntityData,
-                                            new Color(Settings.warpaintColor[0], Settings.warpaintColor[1],
-                                                Settings.warpaintColor[2]),
-                                            ref Settings.warpaintColor,
-                                            Main.GenerateWarpaintColor
-                                        );
+                            }
+                        },
+                        () => UI.Div(0, 30, 1200),
+                        () => {
+                            UI.Label("Custom", UI.AutoWidth());
+                            using (UI.VerticalScope()) {
+                                UI.Toggle("Outfit Colors", ref Settings.customOutfitColors);
+                                using (UI.HorizontalScope(UI.Width(800))) {
+                                    using (UI.VerticalScope()) {
+                                        if (Settings.customOutfitColors) {
+                                            UI.Toggle("Show Primary Outfit Color Picker", ref Settings.showPrimColor);
+                                            if (Settings.showPrimColor) {
+                                                PrimaryColorPicker.OnGUI(
+                                                Settings,
+                                                unitEntityData,
+                                                new Color(Settings.primColor[0], Settings.primColor[1], Settings.primColor[2]),
+                                                ref Settings.primColor,
+                                                Main.GenerateOutfitcolor
+                                            );
+                                            }
+                                        }
                                     }
+                                    using (UI.VerticalScope()) {
+                                        if (Settings.customOutfitColors) {
+                                            UI.Toggle("Show Secondary Outfit Color Picker", ref Settings.showSecondColor);
+                                            if (Settings.showSecondColor) {
+                                                SecondaryColorPicker.OnGUI(
+                                                    Settings,
+                                                    unitEntityData,
+                                                    new Color(Settings.secondColor[0], Settings.secondColor[1],
+                                                        Settings.secondColor[2]),
+                                                    ref Settings.secondColor,
+                                                    Main.GenerateOutfitcolor
+                                                );
+                                            }
+                                        } // SecondaryColorPicker.OnGUI(Settings, unitEntityData, new Color(Settings.secondColor[0], Settings.secondColor[1], Settings.secondColor[2]), ref Settings.secondColor, Main.GenerateOutfitcolor);
+
                                     }
                                 }
                             }
-                        }
+                        },
+                        () => UI.Div(0, 30, 1200),
+                        () => {
+                            using (UI.HorizontalScope()) {
+                                UI.Label("Custom", UI.AutoWidth());
+                                using (UI.VerticalScope()) {
+                                    using (UI.HorizontalScope(UI.Width(800))) {
+                                        using (UI.VerticalScope()) {
+                                            UI.Toggle("Horn Color", ref Settings.customHornColor);
+                                            if (Settings.customHornColor) {
+                                                UI.Toggle("Show Horn Color Picker", ref Settings.showHornColor);
+                                                if (Settings.showHornColor) {
+                                                    HornColorPicker.OnGUI(
+                                                        Settings, unitEntityData,
+                                                        new Color(Settings.hornColor[0], Settings.hornColor[1],
+                                                            Settings.hornColor[2]),
+                                                        ref Settings.hornColor,
+                                                        Main.GenerateHornColor
+                                                    );
+                                                }
+                                            }
+                                        }
+
+                                        using (UI.VerticalScope()) {
+                                            UI.Toggle("Warpaint Color", ref Settings.customWarpaintColor);
+                                            if (Settings.customWarpaintColor) {
+                                                UI.Toggle("Show Warpaint Color Picker", ref Settings.showWarpaintColor);
+                                                if (Settings.showWarpaintColor) {
+                                                    WarpaintColorPicker.OnGUI(
+                                                    Settings,
+                                                    unitEntityData,
+                                                    new Color(Settings.warpaintColor[0], Settings.warpaintColor[1],
+                                                        Settings.warpaintColor[2]),
+                                                    ref Settings.warpaintColor,
+                                                    Main.GenerateWarpaintColor
+                                                );
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        });
                     }
-                });
+                    using (UI.VerticalScope()) {
+                        if (GUILayout.Button("bruhh")) {
+                            texture = Object.FindObjectOfType<InGamePCView>().m_StaticPartPCView.m_ServiceWindowsPCView.m_InventoryPCView.m_DollView.GetComponentInChildren<RawImage>().texture;
+                        }
+                        GUILayout.Box(texture);
+                    }
+                }
 
                 // if (unitEntityData.IsMainCharacter || unitEntityData.IsCustomCompanion()) ChooseAsks(unitEntityData);
             }

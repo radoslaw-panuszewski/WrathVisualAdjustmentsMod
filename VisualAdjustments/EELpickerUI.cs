@@ -89,7 +89,8 @@ namespace VisualAdjustments
                     list2 = data.View.CharacterAvatar.EquipmentEntities.Where(a => a.name.Contains(txt2)).Select(b => b.name).ToList();
                     filter2 = txt2;
                 }
-                foreach (var VARIABLE in list2.GetRange())
+#if false
+            foreach (var VARIABLE in list2.GetRange())
                 {
                     if (GUILayout.Button(VARIABLE, GUILayout.Width(280f)))
                     {
@@ -98,6 +99,7 @@ namespace VisualAdjustments
                                     EquipmentResourcesManager.AllEEL[VARIABLE]);
                     }
                 }
+#endif
                 GUILayout.EndScrollView();
                 //scroll2 = GUILayout.VerticalScrollbar(scroll2, 5f, 0f, 300f);
                 GUILayout.EndHorizontal();
