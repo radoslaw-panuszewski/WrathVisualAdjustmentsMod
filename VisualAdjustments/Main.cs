@@ -5,6 +5,7 @@ using System.Reflection;
 using System;
 using System.Linq;
 using System.Collections.Generic;
+using System.Runtime.InteropServices;
 using Kingmaker;
 using Kingmaker.EntitySystem.Entities;
 using Kingmaker.UnitLogic.Class.LevelUp;
@@ -93,6 +94,7 @@ namespace VisualAdjustments {
             "Wizard",g
             "None"
         };*/
+        public static float UIscale = 1;
         static bool Load(UnityModManager.ModEntry modEntry) {
             try {
                 ModEntry = modEntry;
@@ -102,6 +104,7 @@ namespace VisualAdjustments {
                 harmony.PatchAll(Assembly.GetExecutingAssembly());
                 /// colorpicker = CreateColorPicker();
                 //dot = ColorPickerLoad.GetTexture(ModEntry.Path + "\\ColorPicker\\dot.png");
+                UIscale = UnityModManager.UI.Scale(1);
                 modEntry.OnToggle = OnToggle;
                 modEntry.OnGUI = onGUI;
                 modEntry.OnSaveGUI = OnSaveGUI;
@@ -341,10 +344,10 @@ namespace VisualAdjustments {
                             settings.companionSecondary = secondindx;
                             if (doll != null) doll.SetSecondaryEquipColor(secondindx);
                             if (doll != null) doll.SetEquipColors(primindx, secondindx);
-                            foreach (var ee in dat.View.CharacterAvatar.EquipmentEntities.Where(x => x.NameSafe().Contains("Cloak") || x.NameSafe().Contains("Cape")))
+                           /* foreach (var ee in dat.View.CharacterAvatar.EquipmentEntities.Where(x => x.NameSafe().Contains("Cloak") || x.NameSafe().Contains("Cape")))
                             {
                                 ee.RepaintTextures(primindx,secondindx);
-                            }
+                            }*/
                             /*if (dat.Parts.Get<UnitPartDollData>())
                             {
                                 dat.Parts.Get<UnitPartDollData>().Default = doll.CreateData();
@@ -550,7 +553,7 @@ namespace VisualAdjustments {
             }
         }
 
-        private static Texture texture = new Texture2D(800,800);
+        private static Texture texture;
         public static void onGUI(UnityModManager.ModEntry modEntry) {
             try {
                 if (!enabled)
@@ -561,6 +564,11 @@ namespace VisualAdjustments {
                     }
                 }
 
+                if (UnityModManager.UI.Scale(1) != UIscale)
+                {
+                    UIscale = UnityModManager.UI.Scale(1);
+                }
+
                 /*foreach (var VARIABLE in Game.Instance.Player.Party)
                 {
                     //Game.Instance.RootUiContext.InGameVM.StaticPartVM.;
@@ -569,7 +577,7 @@ namespace VisualAdjustments {
                     //Game.Instance.UI.ServiceWindow
                     //GUILayout.Box();
                 }*/
-                 if(GUILayout.Button("joe"))
+                /* if(GUILayout.Button("joe"))
                 {
                     EquipmentResourcesManager.BuildEELookup();
                     foreach (var VARIABLE in EquipmentResourcesManager.WingsEE)
@@ -956,6 +964,26 @@ namespace VisualAdjustments {
                 onChoose();
             }
         }
+        public static void ChooseFromListforee<T>(string label, IReadOnlyList<T> list, ref int currentIndex, Action onChoose)
+        {
+            if (list.Count == 0)
+                return;
+            GUILayout.BeginHorizontal(GUILayout.ExpandWidth(false));
+            UI.Label(label + "", GUILayout.Width(120f * Main.UIscale));
+            var newIndex = (int)Math.Round(GUILayout.HorizontalSlider(currentIndex, 0, list.Count - 1, GUILayout.Width(175f * Main.UIscale)), 0);
+            UI.Label($"  {newIndex}".orange() + $" ({list.Count})".cyan(), UI.Width(50f * Main.UIscale));
+            ;
+            if (GUILayout.Button("<", GUILayout.Width(35f * Main.UIscale)) && newIndex > 0)
+                newIndex--;
+            if (GUILayout.Button(">", GUILayout.Width(35f * Main.UIscale)) && newIndex < list.Count - 1)
+                newIndex++;
+            GUILayout.EndHorizontal();
+            if (newIndex != currentIndex && newIndex < list.Count)
+            {
+                currentIndex = newIndex;
+                onChoose();
+            }
+        }
         static void ChooseFromList2<T>(string label, IReadOnlyList<T> list, ref int currentIndex, Action onChoose) {
             if (list.Count == 0)
                 return;
@@ -1007,7 +1035,8 @@ namespace VisualAdjustments {
                 setter(links[index]);
 
             });
-            if (setting != index) {
+            if (setting != index) 
+            {
                 setting = index;
                 // unitEntityData.Parts.Get<UnitPartDollData>().Default = doll.CreateData();
                 // CharacterManager.RebuildCharacter(unitEntityData);
@@ -1597,7 +1626,6 @@ namespace VisualAdjustments {
                                                 );
                                             }
                                         } // SecondaryColorPicker.OnGUI(Settings, unitEntityData, new Color(Settings.secondColor[0], Settings.secondColor[1], Settings.secondColor[2]), ref Settings.secondColor, Main.GenerateOutfitcolor);
-
                                     }
                                 }
                             }
@@ -1646,10 +1674,14 @@ namespace VisualAdjustments {
                         });
                     }
                     using (UI.VerticalScope()) {
-                        if (GUILayout.Button("bruhh")) {
+                        if (texture == null)
+                        {
+                            //texture = PreviewSystem.texture;
                             texture = Object.FindObjectOfType<InGamePCView>().m_StaticPartPCView.m_ServiceWindowsPCView.m_InventoryPCView.m_DollView.GetComponentInChildren<RawImage>().texture;
                         }
                         GUILayout.Box(texture);
+                        // GUILayout.HorizontalSlider();
+                        // GUILayout.HorizontalSlider();
                     }
                 }
 

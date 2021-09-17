@@ -54,10 +54,6 @@ namespace VisualAdjustments
         [HarmonyPatch(typeof(UnitViewHandsEquipment), "UpdateBeltPrefabs")]
         static class UnitViewHandsEquipment_UpdateBeltPrefabs_Patch
         {
-            static bool Prefix()
-            {
-                return false;
-            }
             static void Postfix(UnitViewHandsEquipment __instance, GameObject[] ___m_ConsumableSlots)
             {
                 try

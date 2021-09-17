@@ -30,7 +30,7 @@ using Kingmaker.Visual.Particles;
 
 namespace VisualAdjustments
 {
-   // [HarmonyPatch(typeof(Character), "RestoreSavedEquipment")]
+    // [HarmonyPatch(typeof(Character), "RestoreSavedEquipment")]
     /*static class bro_patch
     {
         static bool Prefix(Character __instance)
@@ -56,6 +56,7 @@ namespace VisualAdjustments
             }
         }
     }*/
+
     public class CharacterManager
     {
         private static Dictionary<UnitEntityView, GameObject> wingsFxVisibilityManagers = new Dictionary<UnitEntityView, GameObject>();
@@ -91,7 +92,7 @@ namespace VisualAdjustments
                   ///  Main.logger.Log("dollnotnull " + unitEntityData.CharacterName);
                     unitEntityData.Descriptor.ForcceUseClassEquipment = true;
                     Traverse.Create(unitEntityData.Descriptor).Field("UseClassEquipment").SetValue(true);
-                    var savedEquipment = true;
+                    var savedEquipment = false;
                     character.RemoveAllEquipmentEntities(savedEquipment);
                     if (doll.RacePreset != null)
                     {
@@ -102,7 +103,7 @@ namespace VisualAdjustments
                           {
                           }*/
                         character.Skeleton = (doll.Gender != Gender.Male) ? doll.RacePreset.FemaleSkeleton : doll.RacePreset.MaleSkeleton;
-                        character.AddEquipmentEntities(doll.RacePreset.Skin.Load(doll.Gender, doll.RacePreset.RaceId), savedEquipment);
+                        character.AddEquipmentEntities(doll.RacePreset.Skin.Load(doll.Gender, doll.RacePreset.RaceId), true);
                         /// Main.logger.Log(character.name);
                         ///Main.logger.Log(unitEntityData.CharacterName);
                     }
@@ -110,9 +111,9 @@ namespace VisualAdjustments
                     foreach (string assetID in doll.EquipmentEntityIds)
                     {
                         EquipmentEntity ee = ResourcesLibrary.TryGetResource<EquipmentEntity>(assetID);
-                        character.AddEquipmentEntity(ee, savedEquipment);
+                        character.AddEquipmentEntity(ee, true);
                     }
-                    doll.ApplyRampIndices(character); 
+                    doll.ApplyRampIndices(character,true); 
                    // Main.SetEELs(unitEntityData, DollResourcesManager.GetDoll(unitEntityData), false);
                     Traverse.Create(unitEntityData.View).Field("m_EquipmentClass").SetValue(null); //UpdateClassEquipment won't update if the class doesn't change
                     unitEntityData.View.HandsEquipment.UpdateAll();                                                                                                   //Adds Armor
@@ -140,18 +141,18 @@ namespace VisualAdjustments
                     }
                     else
                     {
-                        doll.ApplyRampIndices(character);
+                       // doll.ApplyRampIndices(character);
                         //doll.SetEquipColors()
                     }
                 }
                 else
                 {
                  //   Main.logger.Log("dollnull " + unitEntityData.CharacterName);
-                    character.RemoveAllEquipmentEntities();
+                    character.RemoveAllEquipmentEntities(false);
                     character.RestoreSavedEquipment();
                     IEnumerable<EquipmentEntity> bodyEquipment = unitEntityData.Body.AllSlots.SelectMany(
                         new Func<ItemSlot, IEnumerable<EquipmentEntity>>(unitEntityData.View.ExtractEquipmentEntities));
-                    character.AddEquipmentEntities(bodyEquipment, false);
+                    character.AddEquipmentEntities(bodyEquipment, true);
                                         unitEntityData.View.HandsEquipment.UpdateAll();                                                                                                   //Adds Armor
                                         unitEntityData.View.UpdateClassEquipment();
                                         if (Settings.customOutfitColors)
@@ -166,7 +167,28 @@ namespace VisualAdjustments
                    unitEntityData.Parts.Get<UnitPartDollData>().Default = doll;
                }
                 //Add Kineticist Tattoos
-               //Main.SetEELs(unitEntityData, DollResourcesManager.GetDoll(unitEntityData), false);
+                //Main.SetEELs(unitEntityData, DollResourcesManager.GetDoll(unitEntityData), false);
+                //unitEntityData.View.CharacterAvatar.OnRenderObject();
+                var component = unitEntityData.Parts.Get<UnitPartVAEELs>();
+                if (component != null)
+                {
+                    foreach (var eetoremove in component.EEToRemove)
+                    {
+                        var ee = ResourcesLibrary.TryGetResource<EquipmentEntity>(eetoremove);
+                        if (unitEntityData.View.CharacterAvatar.EquipmentEntities.Contains(ee))
+                        {
+                            unitEntityData.View.CharacterAvatar.EquipmentEntities.Remove(ee);
+                        }
+                    }
+                    foreach (var eetoadd in component.EEToAdd)
+                    {
+                        var ee = ResourcesLibrary.TryGetResource<EquipmentEntity>(eetoadd.AssetID);
+                        unitEntityData.View.CharacterAvatar.AddEquipmentEntity(ee);
+                        unitEntityData.View.CharacterAvatar.SetPrimaryRampIndex(ee, eetoadd.PrimaryIndex);
+                        unitEntityData.View.CharacterAvatar.SetSecondaryRampIndex(ee, eetoadd.SecondaryIndex);
+                    }
+
+                }
                 EventBus.RaiseEvent<IUnitViewAttachedHandler>(unitEntityData, delegate (IUnitViewAttachedHandler h)
                 {
                     h.HandleUnitViewAttached();
@@ -663,9 +685,14 @@ namespace VisualAdjustments
                 }
                 if (!characterSettings.overrideWingsFX.Empty() && !characterSettings.hideWings)
                 {
-                    /*foreach (var eetoremove in EquipmentResourcesManager.WingsFX.OfType<GameObject>())
+                    FxHelper.Destroy(wingsFxVisibilityManagers[view]);
+                   /* foreach (var fx in )
                     {
-                        FxHelper.DestroyAll();
+                        view.CharacterAvatar.m_AdditionalFXs;
+                        if (view.)
+                        {
+                            
+                        }
                         if (view.CharacterAvatar.EquipmentEntities.Contains(eetoremove)) view.CharacterAvatar.RemoveEquipmentEntity(eetoremove, false);
                     }*/
                     if (wingsFxVisibilityManagers.ContainsKey(view) && wingsFxVisibilityManagers[view] != null) GameObject.Destroy(wingsFxVisibilityManagers[view]);
@@ -781,7 +808,33 @@ namespace VisualAdjustments
                     view.CharacterAvatar.IsDirty = dirty;
                 }
 
-               // Main.SetEELs(view.EntityData, DollResourcesManager.GetDoll(view.EntityData), false);
+                var dollpart = view.Data.Parts.Get<UnitPartDollData>();
+                if (dollpart != null)
+                {
+                    dollpart.SetDefault(doll.CreateData());
+                }
+
+                var component = view.Data.Parts.Get<UnitPartVAEELs>();
+                if (component != null)
+                {
+                    foreach (var eetoremove in component.EEToRemove)
+                    {
+                        var ee = ResourcesLibrary.TryGetResource<EquipmentEntity>(eetoremove);
+                        if (view.CharacterAvatar.EquipmentEntities.Contains(ee))
+                        {
+                            view.CharacterAvatar.EquipmentEntities.Remove(ee);
+                        }
+                    }
+                    foreach (var eetoadd in component.EEToAdd)
+                    {
+                        var ee = ResourcesLibrary.TryGetResource<EquipmentEntity>(eetoadd.AssetID);
+                        view.CharacterAvatar.AddEquipmentEntity(ee);
+                        view.CharacterAvatar.SetPrimaryRampIndex(ee,eetoadd.PrimaryIndex);
+                        view.CharacterAvatar.SetSecondaryRampIndex(ee, eetoadd.SecondaryIndex);
+                    }
+
+                }
+                // Main.SetEELs(view.EntityData, DollResourcesManager.GetDoll(view.EntityData), false);
             }
             catch (Exception e)
             {
@@ -1022,6 +1075,7 @@ namespace VisualAdjustments
             if (characterSettings.overrideGloves != null)TryPreloadKEE(characterSettings.overrideGloves, gender, race);
             if (characterSettings.overrideBoots != null)TryPreloadKEE(characterSettings.overrideBoots, gender, race);
             if (characterSettings.overrideTattoo != null)TryPreloadEE(characterSettings.overrideTattoo, gender, race);
+            if (characterSettings.overrideTail != null) TryPreloadEE(characterSettings.overrideTattoo, gender, race);
             foreach (var kv in characterSettings.overrideWeapons)
             {
                 TryPreloadWeapon(kv.Value, gender, race);
@@ -1121,6 +1175,10 @@ namespace VisualAdjustments
                     }
                     foreach (var character in Game.Instance.Player.AllCharacters)
                     {
+                        foreach (var ee in character.View.CharacterAvatar.SavedEquipmentEntities)
+                        {
+                            Main.logger.Log(ee.Load(true) + character.CharacterName);
+                        }
                         var doll = DollResourcesManager.GetDoll(character);
                         ///Main.SetEELs(character,doll);
                         ///character.View.UpdateClassEquipment();
@@ -1128,7 +1186,6 @@ namespace VisualAdjustments
                         //Main.SetEELs(character, doll, true);
                         RebuildCharacter(character);
                         UpdateModel(character.View);
-                        RebuildCharacter(character);
                         /// character.View.HandsEquipment.UpdateAll();
                     }
                 }
@@ -1161,7 +1218,6 @@ namespace VisualAdjustments
                       //  Main.SetEELs(character,doll,true);
                         RebuildCharacter(character);
                         UpdateModel(character.View);
-                        RebuildCharacter(character);
                         /// character.View.HandsEquipment.UpdateAll();
                     }
                 }
