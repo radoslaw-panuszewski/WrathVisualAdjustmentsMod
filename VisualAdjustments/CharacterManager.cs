@@ -74,7 +74,7 @@ namespace VisualAdjustments
                 //Main.SetEELs(unitEntityData, DollResourcesManager.GetDoll(unitEntityData), false);
                 var Settings = Main.settings.GetCharacterSettings(unitEntityData);
                 DollData doll = null;
-                if (DollResourcesManager.GetDoll(unitEntityData) != null) doll = DollResourcesManager.GetDoll(unitEntityData).CreateData();
+                if (DollResourcesManager.GetDoll(unitEntityData) != null) doll = ModifiedCreateDollData.CreateDataModified(DollResourcesManager.GetDoll(unitEntityData));
                 if (doll == null && Settings.classOutfit.Name == "Default")
                 {
                     unitEntityData.Descriptor.ForcceUseClassEquipment = false;
@@ -83,10 +83,6 @@ namespace VisualAdjustments
                 var character = unitEntityData.View.CharacterAvatar;
                 //Traverse.Create(unitEntityData.Descriptor).Field("UseClassEquipment").SetValue(true);
                 if (character == null) return; // Happens when overriding view
-                if (Settings.customOutfitColors)
-                {
-                    Main.GenerateOutfitcolor(unitEntityData);
-                }
                 if (doll != null)
                 {
                   ///  Main.logger.Log("dollnotnull " + unitEntityData.CharacterName);
@@ -144,6 +140,14 @@ namespace VisualAdjustments
                        // doll.ApplyRampIndices(character);
                         //doll.SetEquipColors()
                     }
+                    if (unitEntityData.Parts.Get<UnitPartDollData>())
+                    {
+                        unitEntityData.Parts.Get<UnitPartDollData>().SetDefault(doll);
+                    }
+                    else
+                    {
+                        unitEntityData.Parts.Add<UnitPartDollData>().SetDefault(doll);
+                    }
                 }
                 else
                 {
@@ -162,11 +166,7 @@ namespace VisualAdjustments
                 }
                 //Main.SetEELs(unitEntityData, DollResourcesManager.GetDoll(unitEntityData), false);
                //  DollResourcesManager.GetDoll(unitEntityData).SetHairColor(Settings.HairColor);
-               if (unitEntityData.Parts.Get<UnitPartDollData>())
-               {
-                   unitEntityData.Parts.Get<UnitPartDollData>().Default = doll;
-               }
-                //Add Kineticist Tattoos
+               //Add Kineticist Tattoos
                 //Main.SetEELs(unitEntityData, DollResourcesManager.GetDoll(unitEntityData), false);
                 //unitEntityData.View.CharacterAvatar.OnRenderObject();
                 var component = unitEntityData.Parts.Get<UnitPartVAEELs>();
@@ -188,6 +188,10 @@ namespace VisualAdjustments
                         unitEntityData.View.CharacterAvatar.SetSecondaryRampIndex(ee, eetoadd.SecondaryIndex);
                     }
 
+                }
+                if (Settings.customOutfitColors)
+                {
+                    Main.GenerateOutfitcolor(unitEntityData);
                 }
                 EventBus.RaiseEvent<IUnitViewAttachedHandler>(unitEntityData, delegate (IUnitViewAttachedHandler h)
                 {
@@ -811,7 +815,7 @@ namespace VisualAdjustments
                 var dollpart = view.Data.Parts.Get<UnitPartDollData>();
                 if (dollpart != null)
                 {
-                    dollpart.SetDefault(doll.CreateData());
+                    dollpart.SetDefault(ModifiedCreateDollData.CreateDataModified(doll));
                 }
 
                 var component = view.Data.Parts.Get<UnitPartVAEELs>();
@@ -833,6 +837,18 @@ namespace VisualAdjustments
                         view.CharacterAvatar.SetSecondaryRampIndex(ee, eetoadd.SecondaryIndex);
                     }
 
+                }
+                if (characterSettings.customOutfitColors)
+                {
+                    Main.GenerateOutfitcolor(view.Data);
+                }
+                if (view.Data.Parts.Get<UnitPartDollData>())
+                {
+                    view.Data.Parts.Get<UnitPartDollData>().SetDefault(ModifiedCreateDollData.CreateDataModified(doll));
+                }
+                else if(doll != null)
+                {
+                    view.Data.Parts.Add<UnitPartDollData>().SetDefault(ModifiedCreateDollData.CreateDataModified(doll));
                 }
                 // Main.SetEELs(view.EntityData, DollResourcesManager.GetDoll(view.EntityData), false);
             }
@@ -1175,16 +1191,17 @@ namespace VisualAdjustments
                     }
                     foreach (var character in Game.Instance.Player.AllCharacters)
                     {
-                        foreach (var ee in character.View.CharacterAvatar.SavedEquipmentEntities)
+                       /* foreach (var ee in character.View.CharacterAvatar.SavedEquipmentEntities)
                         {
                             Main.logger.Log(ee.Load(true) + character.CharacterName);
-                        }
-                        var doll = DollResourcesManager.GetDoll(character);
+                        }*/
+                        //var doll = DollResourcesManager.GetDoll(character);
                         ///Main.SetEELs(character,doll);
                         ///character.View.UpdateClassEquipment();
                         //  Main.GenerateHairColor(character);
                         //Main.SetEELs(character, doll, true);
                         RebuildCharacter(character);
+                        Thread.Sleep(250);
                         UpdateModel(character.View);
                         /// character.View.HandsEquipment.UpdateAll();
                     }
@@ -1195,7 +1212,7 @@ namespace VisualAdjustments
                 }
             }
         }
-        [HarmonyPatch(typeof(Game), "OnAreaLoaded")]
+       // [HarmonyPatch(typeof(Game), "OnAreaLoaded")]
         static class Game_OnAreaLoaded_Patch
         {
             static void Postfix()
@@ -1211,12 +1228,13 @@ namespace VisualAdjustments
                     }
                     foreach (var character in Game.Instance.Player.AllCharacters)
                     {
-                        var doll = DollResourcesManager.GetDoll(character);
+                        //var doll = DollResourcesManager.GetDoll(character);
                         ///Main.SetEELs(character,doll);
                         ///character.View.UpdateClassEquipment();
                       //  Main.GenerateHairColor(character);
                       //  Main.SetEELs(character,doll,true);
                         RebuildCharacter(character);
+                        Thread.Sleep(250);
                         UpdateModel(character.View);
                         /// character.View.HandsEquipment.UpdateAll();
                     }

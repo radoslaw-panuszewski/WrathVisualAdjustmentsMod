@@ -160,6 +160,8 @@ namespace VisualAdjustments
             {
               //  floatsetting = new float[] { col.r, col.g, col.b };
                 func(data);
+                //Greytest
+                CharacterManager.UpdateModel(data.View);
                 CharacterManager.RebuildCharacter(data);
                 //Main.SetEELs(data,DollResourcesManager.GetDoll(data));
                 func(data);

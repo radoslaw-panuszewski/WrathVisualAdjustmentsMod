@@ -31,7 +31,7 @@ namespace VisualAdjustments
     }
     public class EELpickerUI
     {
-        private static EquipmentEntity selectedEntity = null;
+        public static EquipmentEntity selectedEntity = null;
         private static string filter = "";
         private static string filter2 = "";
         public static Vector2 scroll1 = new Vector2(0, 0);
@@ -62,7 +62,6 @@ namespace VisualAdjustments
             if (ee.name.Contains("_DH")) return "Dhampir";
             if (ee.name.Contains("_HO")) return "Half-Orc";
             return "N/A";
-
         }
         static void ChooseRamp(UnitEntityData unitEntityData, string label, List<Texture2D> textures, int currentRamp, Action<int> setter)
         {
@@ -140,7 +139,7 @@ namespace VisualAdjustments
                     {
                         component.EEToAdd.Add(new EEStorage(EquipmentResourcesManager.AllEEL[ee.name], primary,
                             secondary));
-                        Main.logger.Log("add" + ee.name + EquipmentResourcesManager.AllEEL[ee.name]);
+                        //Main.logger.Log("add" + ee.name + EquipmentResourcesManager.AllEEL[ee.name]);
                     }
                 }
                 void removeFromAddEEpart(EquipmentEntity ee)
@@ -172,7 +171,7 @@ namespace VisualAdjustments
                     }
                     else
                     {
-                        Main.logger.Log("coloradd" + ee.name + EquipmentResourcesManager.AllEEL[ee.name]);
+                       // Main.logger.Log("coloradd" + ee.name + EquipmentResourcesManager.AllEEL[ee.name]);
                         component.EEToAdd.Add(new EEStorage(EquipmentResourcesManager.AllEEL[ee.name], primaryIndex, primaryIndex));
                     }
                     
@@ -369,6 +368,8 @@ namespace VisualAdjustments
                 part.EEToAdd.Clear();
                 part.EEToRemove.Clear();
                 CharacterManager.RebuildCharacter(data);
+                //greytest
+                CharacterManager.UpdateModel(data.View);
                 }
             GUILayout.EndVertical();
             if (list2 == null || txt2 != filter2)

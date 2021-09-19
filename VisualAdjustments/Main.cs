@@ -29,6 +29,7 @@ using Kingmaker.Visual.CharacterSystem;
 using Kingmaker.Visual.Particles;
 using ModKit;
 using Kingmaker.UI.MVVM._PCView.ServiceWindows.Inventory;
+//using TutorialCanvas.UI;
 using UnityEngine.UI;
 using Object = UnityEngine.Object;
 
@@ -98,16 +99,19 @@ namespace VisualAdjustments {
         static bool Load(UnityModManager.ModEntry modEntry) {
             try {
                 ModEntry = modEntry;
+
                 logger = modEntry.Logger;
                 settings = Settings.Load(modEntry);
                 var harmony = new Harmony(modEntry.Info.Id);
                 harmony.PatchAll(Assembly.GetExecutingAssembly());
+                //TutorialCanvas.Main.Load(modEntry);
                 /// colorpicker = CreateColorPicker();
                 //dot = ColorPickerLoad.GetTexture(ModEntry.Path + "\\ColorPicker\\dot.png");
-                UIscale = UnityModManager.UI.Scale(1);
+                UIscale = 1; // fix this
                 modEntry.OnToggle = OnToggle;
                 modEntry.OnGUI = onGUI;
                 modEntry.OnSaveGUI = OnSaveGUI;
+                modEntry.OnUpdate = OnUpdate;
 #if DEBUG
                 modEntry.OnUnload = Unload;
 #endif
@@ -118,12 +122,30 @@ namespace VisualAdjustments {
                 {
                     Main.GetClasses();
                 }
+
+                
             }
             catch (Exception e) {
                 Log(e.ToString() + "\n" + e.StackTrace);
                 throw e;
             }
             return true;
+        }
+
+        public static void OnUpdate(UnityModManager.ModEntry modEntry,float a)
+        {
+           // Main.logger.Log("updat");
+           if (settings.enableHotKey)
+           {
+               if (UnityEngine.Input.GetKey("left alt") && UnityEngine.Input.GetKeyDown("x"))
+               {
+                   Main.logger.Log("Hotkey");
+                   foreach (var unit in Game.Instance.Player.PartyAndPets.Concat(Game.Instance.Player.PartyAndPetsDetached))
+                   {
+                       CharacterManager.RebuildCharacter(unit);
+                   }
+               }
+           }
         }
 
         public static void GenerateHairColor(UnitEntityData data) {
@@ -502,6 +524,7 @@ namespace VisualAdjustments {
         // Called when the mod is turned to on/off.
         static bool OnToggle(UnityModManager.ModEntry modEntry, bool value /* active or inactive */) {
             enabled = value;
+            //TutorialCanvas.Main.OnToggle(ModEntry,value);
             return true; // Permit or not.
         }
         /* public static ColorPicker CreateColorPicker()
@@ -563,11 +586,11 @@ namespace VisualAdjustments {
                         CharacterManager.RebuildCharacter(ch);
                     }
                 }
-
-                if (UnityModManager.UI.Scale(1) != UIscale)
-                {
-                    UIscale = UnityModManager.UI.Scale(1);
-                }
+                //fix this
+                //if (UnityModManager.UI.Scale(1) != UIscale)
+               // {
+                   // UIscale = UnityModManager.UI.Scale(1);
+               // }
 
                 /*foreach (var VARIABLE in Game.Instance.Player.Party)
                 {
@@ -610,6 +633,7 @@ namespace VisualAdjustments {
                                 HairUnlocker.UnlockHair);
                             ModKit.UI.Label(
                                 "Warning: Unlock hair might have some hairstyles that clip or are otherwise malformed");
+                            ModKit.UI.Toggle("Enable Rebuild All Hotkey (Alt + X)", ref settings.enableHotKey);
                             /*ModKit.UI.Toggle("Unlock Hair Options",ref HairUnlocker.Main.settings.UnlockHair);
                             if (HairUnlocker.Main.settings.UnlockHair) ModKit.UI.Toggle("Unlock All Hair Options (Includes incompatible options)",ref HairUnlocker.Main.settings.UnlockAllHair);
                             ModKit.UI.Toggle("Unlock Horns",ref HairUnlocker.Main.settings.UnlockHorns);
@@ -1004,7 +1028,7 @@ namespace VisualAdjustments {
             var index = links.ToList().FindIndex((eel) => eel != null && eel.AssetId == link?.AssetId);
             ChooseFromList(label, links, ref index, () => {
                 setter(links[index]);
-                unitEntityData.Descriptor.Doll = doll.CreateData();
+                unitEntityData.Parts.Get<UnitPartDollData>().Default = ModifiedCreateDollData.CreateDataModified(doll);
                 CharacterManager.RebuildCharacter(unitEntityData);
             });
         }
@@ -1049,7 +1073,7 @@ namespace VisualAdjustments {
             }
             var index = links.ToList().FindIndex((eel) => eel != null && eel.AssetId == link?.AssetId); ///var index = setting;
             ChooseFromList(label, links, ref index, () => {
-                unitEntityData.Descriptor.Doll = doll.CreateData();
+                unitEntityData.Descriptor.Doll = ModifiedCreateDollData.CreateDataModified(doll);
             });
             if (setting != index) {
                 setting = index;
@@ -1062,8 +1086,7 @@ namespace VisualAdjustments {
                 GUILayout.BeginHorizontal();
                 ChooseFromList(label, textures, ref currentRamp, () => {
                     setter(currentRamp);
-                    //   var DollPart = unitEntityData.Parts.Get<UnitPartDollData>();
-                    //    DollPart.Default = doll.CreateData();
+                    var DollPart = unitEntityData.Parts.Get<UnitPartDollData>().Default = ModifiedCreateDollData.CreateDataModified(doll);
                     ////   Traverse.Create(DollPart).Field("ActiveDoll").SetValue(doll.CreateData());
                     /// unitEntityData.Parts.Get<UnitPartDollData>().ActiveDoll = doll.CreateData();
                 });
@@ -1081,7 +1104,7 @@ namespace VisualAdjustments {
         static void ChooseRamp(UnitEntityData unitEntityData, DollState doll, string label, List<Texture2D> textures, int currentRamp, Action<int> setter) {
             ChooseFromList(label, textures, ref currentRamp, () => {
                 setter(currentRamp);
-                unitEntityData.Descriptor.Doll = doll.CreateData();
+                unitEntityData.Parts.Get<UnitPartDollData>().Default = ModifiedCreateDollData.CreateDataModified(doll);
                 CharacterManager.RebuildCharacter(unitEntityData);
             });
         }
@@ -1210,8 +1233,8 @@ namespace VisualAdjustments {
             GUILayout.EndHorizontal();
             if (index != races.IndexOf(currentRace) && index < races.Count()) {
                 doll.SetRace(races[index]);
-                unitEntityData.Descriptor.Doll = doll.CreateData();
-                unitEntityData.Parts.Get<UnitPartDollData>().Default = doll.CreateData();
+               // unitEntityData.Descriptor.Doll = ModifiedCreateDollData.CreateDataModified(doll);
+                unitEntityData.Parts.Get<UnitPartDollData>().Default = ModifiedCreateDollData.CreateDataModified(doll);
                 CharacterManager.RebuildCharacter(unitEntityData);
             }
         }
@@ -1221,8 +1244,8 @@ namespace VisualAdjustments {
             var index = Array.FindIndex(presets, (vp) => vp == currentPreset);
             ChooseFromList(label, presets, ref index, () => {
                 doll.SetRacePreset(presets[index]);
-                unitEntityData.Parts.Get<UnitPartDollData>().Default = doll.CreateData();
-                unitEntityData.Descriptor.Doll = doll.CreateData();
+                unitEntityData.Parts.Get<UnitPartDollData>().Default = ModifiedCreateDollData.CreateDataModified(doll);
+                //unitEntityData.Descriptor.Doll = doll.CreateData();
 
                 CharacterManager.RebuildCharacter(unitEntityData);
             });
@@ -1723,7 +1746,7 @@ namespace VisualAdjustments {
                     //SetEELs(unitEntityData, dollState);
                     // unitEntityData.Descriptor.Doll = dollState.CreateData();
                     unitEntityData.Parts.Add<UnitPartDollData>();
-                    unitEntityData.Parts.Get<UnitPartDollData>().Default = dollState.CreateData();
+                    unitEntityData.Parts.Get<UnitPartDollData>().Default = ModifiedCreateDollData.CreateDataModified(dollState);
                     unitEntityData.Parts.Get<UnitPartDollData>().OnDidAttachToEntity();
                     unitEntityData.Parts.Get<UnitPartDollData>().OnViewDidAttach();
                     unitEntityData.View.HandsEquipment.UpdateLocatorTrackers();
