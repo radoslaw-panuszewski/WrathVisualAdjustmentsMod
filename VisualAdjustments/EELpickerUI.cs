@@ -167,12 +167,12 @@ namespace VisualAdjustments
                     {
                         var eewithcolor = component.EEToAdd.First(a => a.AssetID == EquipmentResourcesManager.AllEEL[ee.name]);
                         eewithcolor.PrimaryIndex = primaryIndex;
-                        eewithcolor.SecondaryIndex = primaryIndex;
+                        eewithcolor.SecondaryIndex = secondaryIndex;
                     }
                     else
                     {
                        // Main.logger.Log("coloradd" + ee.name + EquipmentResourcesManager.AllEEL[ee.name]);
-                        component.EEToAdd.Add(new EEStorage(EquipmentResourcesManager.AllEEL[ee.name], primaryIndex, primaryIndex));
+                        component.EEToAdd.Add(new EEStorage(EquipmentResourcesManager.AllEEL[ee.name], primaryIndex, secondaryIndex));
                     }
                     
                 }

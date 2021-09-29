@@ -589,7 +589,7 @@ namespace VisualAdjustments
         static void ShowDollInfo(UnitEntityData unitEntityData)
         {
             ///var doll = unitEntityData.Descriptor.m_LoadedDollData;
-            var doll = unitEntityData.Parts.Get<UnitPartDollData>().ActiveDoll;
+            var doll = unitEntityData.Parts.Get<UnitPartDollData>().Default;
             if (doll == null)
             {
                 ModKit.UI.Label("No Doll", GUILayout.Width(200f));

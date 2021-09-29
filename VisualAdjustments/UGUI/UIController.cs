@@ -1,4 +1,4 @@
-﻿/*using Kingmaker;
+﻿using Kingmaker;
 using Kingmaker.PubSubSystem;
 using ModMaker;
 using ModMaker.Utility;
@@ -69,4 +69,4 @@ namespace TutorialCanvas.UI
             Attach();
         }
     }
-}*/
+}

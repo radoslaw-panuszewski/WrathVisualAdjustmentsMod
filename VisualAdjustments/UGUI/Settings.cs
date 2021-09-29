@@ -1,14 +1,14 @@
-﻿/*using UnityModManagerNet;
+﻿using UnityModManagerNet;
 
 namespace TutorialCanvas
 {
     public class Settings : UnityModManager.ModSettings
     {
-        //settings go here
+     /*   //settings go here
         public string lastModVersion;
 
         public string localizationFileName;
         public string modPath;
-        public bool reuse;
+        public bool reuse;*/
     }
-}*/
+}

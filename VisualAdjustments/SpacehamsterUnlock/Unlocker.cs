@@ -15,7 +15,7 @@ namespace VisualAdjustments
     {
         static Dictionary<string, CustomizationOptions> originalOptions = new Dictionary<string, CustomizationOptions>();
        public static void UnlockHair()
-        {
+       {
             if (!Main.settings.UnlockHair) return;
             BlueprintRace[][] groups;
             if (Main.settings.UnlockHair)
@@ -87,6 +87,14 @@ namespace VisualAdjustments
         }
         public static void RestoreOptions()
         {
+            if (originalOptions.Count == 0)
+            {
+                foreach (var race in Game.Instance.BlueprintRoot.Progression.CharacterRaces.ToArray<BlueprintRace>())
+                {
+                    HairUnlocker.originalOptions[race.name + Gender.Male] = race.MaleOptions;
+                    HairUnlocker.originalOptions[race.name + Gender.Female] = race.FemaleOptions;
+                }
+            }
             foreach (var race in Game.Instance.BlueprintRoot.Progression.CharacterRaces.ToArray<BlueprintRace>())
             {
                 race.MaleOptions = GetOriginalOptions(race, Gender.Male);

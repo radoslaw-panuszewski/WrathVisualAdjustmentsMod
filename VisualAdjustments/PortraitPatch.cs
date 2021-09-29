@@ -40,7 +40,7 @@ namespace VisualAdjustments
 						if (!bp.InitiativePortrait && bp.Data.SmallPortrait != null && bp.Data.HalfLengthPortrait != null && bp.Data.FullLengthPortrait != null)
 						{
 							if (bp.AssetGuid.ToString() == null) return;
-							if(bp.AssetGuid.ToString() != "9412ffb857efa074eb8e4945c8b94de4" && bp.AssetGuid.ToString() != "621ada02d0b4bf64387babad3a53067b" && bp.AssetGuid.ToString() != "9fe4f89ecf15b874db9d1d2bf3ef33d2")
+							//if(bp.AssetGuid.ToString() != "9412ffb857efa074eb8e4945c8b94de4" && bp.AssetGuid.ToString() != "621ada02d0b4bf64387babad3a53067b" && bp.AssetGuid.ToString() != "9fe4f89ecf15b874db9d1d2bf3ef33d2")
 							{
 								CharGenPortraitSelectorItemVM charGenPortraitSelectorItemVM = new CharGenPortraitSelectorItemVM(bp, false);
 								///__instance.m_AllPortraitsCollection.Add(charGenPortraitSelectorItemVM);

@@ -2628,35 +2628,35 @@ namespace VisualAdjustments
                 return m_Tattoo;
             }
         }
-        public static Dictionary<string, EquipmentEntity> WingsEE
+        public static Dictionary<string, string> WingsEE
         {
             get
             {
                 if (m_WingsEE.Count == 0)
                 {
-                    m_WingsEE["EE_Wings_M_SU"] = ResourcesLibrary.TryGetResource<EquipmentEntity>("89343a8dc170abb46ae15c11775e867a");
-                    m_WingsEE["EE_Wings_F_SU"] = ResourcesLibrary.TryGetResource<EquipmentEntity>("96122c0bb0c483e46a53b8c9d05a1c39");
-                    m_WingsEE["EE_WingsAngelic_M"] = ResourcesLibrary.TryGetResource<EquipmentEntity>("632dbfaaf86513645a465598fa536892");
-                    m_WingsEE["EE_WingsAngelic_F"] = ResourcesLibrary.TryGetResource<EquipmentEntity>("419520afa5191ee4bb8d33fc75d2fd29");
-                    m_WingsEE["EE_WingsAzata_F"] = ResourcesLibrary.TryGetResource<EquipmentEntity>("225e273480af01348b7aaacf4d2f0c54");
-                    m_WingsEE["EE_WingsDemonic_M"] = ResourcesLibrary.TryGetResource<EquipmentEntity>("23b3eed8f78e69c40a2c6d416cac2f9e");
-                    m_WingsEE["EE_WingsAngelic_Black_F"] = ResourcesLibrary.TryGetResource<EquipmentEntity>("da9f766f4de989f4e865a2d019b55098");
-                    m_WingsEE["EE_WingsColoxus_F"] = ResourcesLibrary.TryGetResource<EquipmentEntity>("faf4e32b97ebb614fbb321e36d207c8a");
-                    m_WingsEE["EE_WingsDemonic_F"] = ResourcesLibrary.TryGetResource<EquipmentEntity>("317c89eb4850e0a45a5eb3e4ae0124a9");
-                    m_WingsEE["EE_WingsAngelicMythic_M"] = ResourcesLibrary.TryGetResource<EquipmentEntity>("e810ab7d95644cf41979f83c06576eb4");
-                    m_WingsEE["EE_WingsAngelicMythic_F"] = ResourcesLibrary.TryGetResource<EquipmentEntity>("f3e3e309560d1f94a8f3c7b29016ef69");
-                    m_WingsEE["EE_WingsAzataMythic_M"] = ResourcesLibrary.TryGetResource<EquipmentEntity>("c6d020c1203745041b449706dcacee2d");
-                    m_WingsEE["EE_WingsAzataMythic_F"] = ResourcesLibrary.TryGetResource<EquipmentEntity>("c6366318b30792944b31b5fccc1db3c8");
-                    m_WingsEE["EE_WingsMythicDevil_M"] = ResourcesLibrary.TryGetResource<EquipmentEntity>("85e618f6c710a44498148cf99ca20c83");
-                    m_WingsEE["EE_WingsMythicDevil_F"] = ResourcesLibrary.TryGetResource<EquipmentEntity>("214b59c14bada944c83041f18dcec3d2");
-                    m_WingsEE["EE_WingsMythicDragon_M"] = ResourcesLibrary.TryGetResource<EquipmentEntity>("eafa30048103d204eb5178405fa2a369");
-                    m_WingsEE["EE_WingsMythicDragon_F"] = ResourcesLibrary.TryGetResource<EquipmentEntity>("2a8485b6546982b449cac01acb0c9c0d");
-                    m_WingsEE["EE_WingsAngelic_Black_M"] = ResourcesLibrary.TryGetResource<EquipmentEntity>("876fbc0d239695a4790358a3be5d7c53");
-                    m_WingsEE["EE_WingsDiabolic_M"] = ResourcesLibrary.TryGetResource<EquipmentEntity>("f845b1c66b2f7804cb53d17654ad7424");
-                    m_WingsEE["EE_WingsAzata_M"] = ResourcesLibrary.TryGetResource<EquipmentEntity>("8c1a370599cf04343a490f71322bf167");
-                    m_WingsEE["EE_WingsHeraldCorrupted"] = ResourcesLibrary.TryGetResource<EquipmentEntity>("b4b185de320eca0429c60716f6501ec9");
-                    m_WingsEE["EE_WingsDraconic_M"] = ResourcesLibrary.TryGetResource<EquipmentEntity>("c466520b1c587c94dbefcc7e9fcf22ca");
-                    m_WingsEE["EE_FireWings_F"] = ResourcesLibrary.TryGetResource<EquipmentEntity>("8604b675977361043978ecf56122f389");
+                    m_WingsEE["EE_Wings_M_SU"] = "89343a8dc170abb46ae15c11775e867a";
+                    m_WingsEE["EE_Wings_F_SU"] ="96122c0bb0c483e46a53b8c9d05a1c39";
+                    m_WingsEE["EE_WingsAngelic_M"] ="632dbfaaf86513645a465598fa536892";
+                    m_WingsEE["EE_WingsAngelic_F"] ="419520afa5191ee4bb8d33fc75d2fd29";
+                    m_WingsEE["EE_WingsAzata_F"] ="225e273480af01348b7aaacf4d2f0c54";
+                    m_WingsEE["EE_WingsDemonic_M"] ="23b3eed8f78e69c40a2c6d416cac2f9e";
+                    m_WingsEE["EE_WingsAngelic_Black_F"] ="da9f766f4de989f4e865a2d019b55098";
+                    m_WingsEE["EE_WingsColoxus_F"] ="faf4e32b97ebb614fbb321e36d207c8a";
+                    m_WingsEE["EE_WingsDemonic_F"] ="317c89eb4850e0a45a5eb3e4ae0124a9";
+                    m_WingsEE["EE_WingsAngelicMythic_M"] ="e810ab7d95644cf41979f83c06576eb4";
+                    m_WingsEE["EE_WingsAngelicMythic_F"] ="f3e3e309560d1f94a8f3c7b29016ef69";
+                    m_WingsEE["EE_WingsAzataMythic_M"] ="c6d020c1203745041b449706dcacee2d";
+                    m_WingsEE["EE_WingsAzataMythic_F"] ="c6366318b30792944b31b5fccc1db3c8";
+                    m_WingsEE["EE_WingsMythicDevil_M"] ="85e618f6c710a44498148cf99ca20c83";
+                    m_WingsEE["EE_WingsMythicDevil_F"] ="214b59c14bada944c83041f18dcec3d2";
+                    m_WingsEE["EE_WingsMythicDragon_M"] ="eafa30048103d204eb5178405fa2a369";
+                    m_WingsEE["EE_WingsMythicDragon_F"] ="2a8485b6546982b449cac01acb0c9c0d";
+                    m_WingsEE["EE_WingsAngelic_Black_M"] ="876fbc0d239695a4790358a3be5d7c53";
+                    m_WingsEE["EE_WingsDiabolic_M"] ="f845b1c66b2f7804cb53d17654ad7424";
+                    m_WingsEE["EE_WingsAzata_M"] ="8c1a370599cf04343a490f71322bf167";
+                    m_WingsEE["EE_WingsHeraldCorrupted"] ="b4b185de320eca0429c60716f6501ec9";
+                    m_WingsEE["EE_WingsDraconic_M"] ="c466520b1c587c94dbefcc7e9fcf22ca";
+                    m_WingsEE["EE_FireWings_F"] ="8604b675977361043978ecf56122f389";
                     //BuildEELookup();
                 }
                 return m_WingsEE;
@@ -2823,7 +2823,7 @@ namespace VisualAdjustments
         private static Dictionary<ResourceRef, string> m_Units = new Dictionary<ResourceRef, string>();
         private static Dictionary<BlueprintRef, string> m_WeaponEnchantments = new Dictionary<BlueprintRef, string>();
         private static Dictionary<BlueprintRef, string> m_MythicOptions = new Dictionary<BlueprintRef, string>();
-        private static Dictionary<string, EquipmentEntity> m_WingsEE = new Dictionary<string, EquipmentEntity>();
+        private static Dictionary<string, string> m_WingsEE = new Dictionary<string, string>();
         private static Dictionary<string, EquipmentEntity> m_HornsEE = new Dictionary<string, EquipmentEntity>();
         private static Dictionary<string, EquipmentEntity> m_TailEE = new Dictionary<string, EquipmentEntity>();
         private static Dictionary<string, GameObject> m_WingsFX = new Dictionary<string, GameObject>();

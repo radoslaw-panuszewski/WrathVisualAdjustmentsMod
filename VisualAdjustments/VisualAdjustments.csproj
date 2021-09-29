@@ -120,7 +120,8 @@
       <HintPath>$(WrathPath)\Wrath_Data\Managed\Assembly-CSharp-firstpass.dll</HintPath>
       <Private>False</Private>
     </Reference>
-    <Reference Include="Assembly-CSharp_public">
+    <Reference Include="Assembly-CSharp_public, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
       <HintPath>..\lib\Assembly-CSharp_public.dll</HintPath>
     </Reference>
     <Reference Include="Newtonsoft.Json">
@@ -134,10 +135,6 @@
     </Reference>
     <Reference Include="Owlcat.Runtime.UI">
       <HintPath>$(WrathPath)\Wrath_Data\Managed\Owlcat.Runtime.UI.dll</HintPath>
-    </Reference>
-    <Reference Include="Owlcat.Runtime.UI_public">
-      <HintPath>..\..\ToyBox\lib\Owlcat.Runtime.UI_public.dll</HintPath>
-      <Private>False</Private>
     </Reference>
     <Reference Include="System, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL" />
     <Reference Include="System.Xml" />
@@ -189,6 +186,7 @@
       <HintPath>$(WrathPath)\Wrath_Data\Managed\UnityModManager\UnityModManager.dll</HintPath>
     </Reference>
   </ItemGroup>
+  <Import Project="..\..\WrathModMaker\ModMaker\ModMaker.projitems" Label="Shared" />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
     <PropertyGroup>

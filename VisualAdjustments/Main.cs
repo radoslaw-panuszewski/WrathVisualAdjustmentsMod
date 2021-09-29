@@ -29,6 +29,7 @@ using Kingmaker.Visual.CharacterSystem;
 using Kingmaker.Visual.Particles;
 using ModKit;
 using Kingmaker.UI.MVVM._PCView.ServiceWindows.Inventory;
+using ModMaker.Utility;
 //using TutorialCanvas.UI;
 using UnityEngine.UI;
 using Object = UnityEngine.Object;
@@ -37,11 +38,13 @@ namespace VisualAdjustments {
 #if DEBUG
     [EnableReloading]
 #endif
-    public class CharInfo {
+    public class CharInfo 
+    {
         public string GUID;
         public string Name;
     }
-    public class Main {
+    public class Main 
+    {
         public static SimpleBlueprint[] blueprints;
         const float DefaultLabelWidth = 200f;
         const float DefaultSliderWidth = 300f;
@@ -96,6 +99,7 @@ namespace VisualAdjustments {
             "None"
         };*/
         public static float UIscale = 1;
+        private static bool haspatched = false;
         static bool Load(UnityModManager.ModEntry modEntry) {
             try {
                 ModEntry = modEntry;
@@ -103,10 +107,15 @@ namespace VisualAdjustments {
                 logger = modEntry.Logger;
                 settings = Settings.Load(modEntry);
                 var harmony = new Harmony(modEntry.Info.Id);
-                harmony.PatchAll(Assembly.GetExecutingAssembly());
-                //TutorialCanvas.Main.Load(modEntry);
+                //if (haspatched)
+                //{
+                 //   haspatched = true;
+                    harmony.PatchAll(Assembly.GetExecutingAssembly());
+                //}
+                TutorialCanvas.Main.Load(modEntry);
                 /// colorpicker = CreateColorPicker();
                 //dot = ColorPickerLoad.GetTexture(ModEntry.Path + "\\ColorPicker\\dot.png");
+                TutorialCanvas.Utilities.BundleManger.AddBundle("tutorialcanvas");
                 UIscale = 1; // fix this
                 modEntry.OnToggle = OnToggle;
                 modEntry.OnGUI = onGUI;
@@ -516,6 +525,8 @@ namespace VisualAdjustments {
            }*/
         static bool Unload(UnityModManager.ModEntry modEntry) {
             new Harmony(modEntry.Info.Id).UnpatchAll(modEntry.Info.Id);
+            //TutorialCanvas.Main.Unload(modEntry);
+           //ReflectionCache.Clear();
             return true;
         }
         static void OnSaveGUI(UnityModManager.ModEntry modEntry) {
@@ -524,7 +535,7 @@ namespace VisualAdjustments {
         // Called when the mod is turned to on/off.
         static bool OnToggle(UnityModManager.ModEntry modEntry, bool value /* active or inactive */) {
             enabled = value;
-            //TutorialCanvas.Main.OnToggle(ModEntry,value);
+            TutorialCanvas.Main.OnToggle(modEntry,value);
             return true; // Permit or not.
         }
         /* public static ColorPicker CreateColorPicker()
@@ -535,7 +546,9 @@ namespace VisualAdjustments {
              };
              return asd;
          }*/
-        public static void GetClasses() {
+        public static void GetClasses()
+        {
+            if (Main.blueprints.Length == 0) Main.blueprints = Util.GetBlueprints();
             if (classes.Count == 0) {
                 ///Main.logger.Log("bru");
                 foreach (BlueprintCharacterClass c in Main.blueprints.OfType<BlueprintCharacterClass>()) {
@@ -709,7 +722,7 @@ namespace VisualAdjustments {
                             using (UI.HorizontalScope()) {
                                 UI.Label(string.Format("{0}", unitEntityData.CharacterName), GUILayout.Width(DefaultLabelWidth));
                                 UI.Space(25);
-                                UI.DisclosureToggle("Select EELs", ref characterSettings.showEELsSelection);
+                                UI.DisclosureToggle("Select EEs", ref characterSettings.showEELsSelection);
                                 UI.Space(25);
                                 UI.DisclosureToggle("Select Outfit", ref characterSettings.showClassSelection);
                                 UI.Space(25);
@@ -1087,7 +1100,7 @@ namespace VisualAdjustments {
                 ChooseFromList(label, textures, ref currentRamp, () => {
                     setter(currentRamp);
                     var DollPart = unitEntityData.Parts.Get<UnitPartDollData>().Default = ModifiedCreateDollData.CreateDataModified(doll);
-                    ////   Traverse.Create(DollPart).Field("ActiveDoll").SetValue(doll.CreateData());
+                    //   Traverse.Create(DollPart).Field("ActiveDoll").SetValue(doll.CreateData());
                     /// unitEntityData.Parts.Get<UnitPartDollData>().ActiveDoll = doll.CreateData();
                 });
                 if (setting != currentRamp) {

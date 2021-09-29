@@ -42,6 +42,8 @@ namespace VisualAdjustments
             state.Race = Kingmaker.Game.Instance.BlueprintRoot.Progression.CharacterRaces.First(a => a.Presets.Contains(dollData2.RacePreset));
             state.SetRacePreset(dollData2.RacePreset);
             state.SetRace(state.Race);
+            state.SetRacePreset(dollData2.RacePreset);
+            state.Scars = DollState.GetScarsList(state.Race.RaceId);
             //state.RacePreset = dollData2.RacePreset;
             ClassData classData = unit.Progression.Classes.FirstOrDefault<ClassData>();
             state.CharacterClass = ((classData != null) ? classData.CharacterClass : null);
@@ -68,6 +70,7 @@ namespace VisualAdjustments
                         state.Eyebrows = new DollState.EEAdapter(ee);
                     }
                     if (customizationOptions.Hair.Contains((EquipmentEntityLink link) => link.Load(false) == ee))
+                    //if (ee.name.Contains("Hair") || ee.name.Contains("hair"))
                     {
                         state.Hair = new DollState.EEAdapter(ee);
                     }
@@ -81,11 +84,16 @@ namespace VisualAdjustments
                     }
                     if (state.Scars.Contains((EquipmentEntityLink link) => link.Load(false) == ee))
                     {
-                        state.Scar = new DollState.EEAdapter(ee);
+                        var NewEEAdapter = new DollState.EEAdapter(ee);
+                        NewEEAdapter.m_Link = DollState.GetScarsList(state.Race.RaceId).FirstOrDefault((EquipmentEntityLink link2) => link2.Load(false) == ee);
+                        state.Scar = NewEEAdapter;
                     }
                     if (state.Warpaints.Contains((EquipmentEntityLink link) => link.Load(false) == ee))
                     {
-                        state.Warpaint = new DollState.EEAdapter(ee);
+                        var NewEEAdapter = new DollState.EEAdapter(ee);
+                        NewEEAdapter.m_Link = state.Warpaints.FirstOrDefault((EquipmentEntityLink link2) => link2.Load(false) == ee);
+                        state.Warpaint = NewEEAdapter;
+                       // state.Warpaint = new DollState.EEAdapter(ee);
                     }
                 }
             }
@@ -132,7 +140,7 @@ namespace VisualAdjustments
     class DollResourcesManager
     {
         static private SortedList<string, EquipmentEntityLink> head = new SortedList<string, EquipmentEntityLink>();
-        static private SortedList<string, EquipmentEntityLink> hair = new SortedList<string, EquipmentEntityLink>();
+        static public SortedList<string, EquipmentEntityLink> hair = new SortedList<string, EquipmentEntityLink>();
         static private SortedList<string, EquipmentEntityLink> beard = new SortedList<string, EquipmentEntityLink>();
         static private SortedList<string, EquipmentEntityLink> eyebrows = new SortedList<string, EquipmentEntityLink>();
         static private SortedList<string, EquipmentEntityLink> skin = new SortedList<string, EquipmentEntityLink>();
@@ -297,12 +305,13 @@ namespace VisualAdjustments
                         dollState.SetSkinColor(dollData.EntityRampIdices[assetID]);
                     }
                 }
-                if (hair.ContainsKey(assetID))
+                if (hair.ContainsKey(assetID) && !hair[assetID].Load().name.Contains("EMPTY"))
                 {
+                   // Main.logger.Log(hair[assetID].Load().name);
                     dollState.SetHair(hair[assetID]);
                     if (dollData.EntityRampIdices.ContainsKey(assetID))
                     {
-                        dollState.SetHairColor(dollData.EntityRampIdices[assetID]);
+                       dollState.SetHairColor(dollData.EntityRampIdices[assetID]);
                     }
                 }
                 if (beard.ContainsKey(assetID))

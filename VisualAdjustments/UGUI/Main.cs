@@ -1,4 +1,4 @@
-﻿/*using ModMaker;
+﻿using ModMaker;
 using ModMaker.Utility;
 using System;
 using System.Reflection;
@@ -11,27 +11,27 @@ namespace TutorialCanvas
 #endif
     internal static class Main
     {
-        public static LocalizationManager<DefaultLanguage> Local;
+       // public static LocalizationManager<DefaultLanguage> Local;
         public static ModManager<Core, Settings> Mod;
         public static MenuManager Menu;
 
         public static bool Load(UnityModManager.ModEntry modEntry)
         {
-            Local = new LocalizationManager<DefaultLanguage>();
+            //Local = new LocalizationManager<DefaultLanguage>();
             Mod = new ModManager<Core, Settings>();
             Menu = new MenuManager();
-            modEntry.OnToggle = OnToggle;
+            //modEntry.OnToggle = OnToggle;
 #if (DEBUG)
-            modEntry.OnUnload = Unload;
+            //modEntry.OnUnload = Unload;
             return true;
         }
 
-        private static bool Unload(UnityModManager.ModEntry modEntry)
+        public static bool Unload(UnityModManager.ModEntry modEntry)
         {
-            Mod.Disable(modEntry, true);
+            Mod.Disable(modEntry, false);
             Menu = null;
             Mod = null;
-            Local = null;
+           // Local = null;
             return true;
         }
 
@@ -45,7 +45,7 @@ namespace TutorialCanvas
             if (value)
             {
                 Assembly assembly = Assembly.GetExecutingAssembly();
-                Local.Enable(modEntry);
+                //Local.Enable(modEntry);
                 Mod.Enable(modEntry, assembly);
                 Menu.Enable(modEntry, assembly);
                 //VisualAdjustments.Main.ModEntry.Path = modEntry.Path;
@@ -54,7 +54,7 @@ namespace TutorialCanvas
             {
                 Menu.Disable(modEntry);
                 Mod.Disable(modEntry, false);
-                Local.Disable(modEntry);
+                //Local.Disable(modEntry);
                 ReflectionCache.Clear();
             }
             return true;
@@ -66,4 +66,4 @@ namespace TutorialCanvas
             return new InvalidOperationException(message);
         }
     }
-}*/
+}

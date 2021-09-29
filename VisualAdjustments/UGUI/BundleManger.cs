@@ -1,4 +1,4 @@
-﻿/*using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -88,4 +88,4 @@ namespace TutorialCanvas.Utilities
         public static Dictionary<string, GameObject> LoadedPrefabs { get { return _objects; } }
         public static Dictionary<string, Sprite> LoadedSprites { get { return _sprites; } }
     }
-}*/
+}

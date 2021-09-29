@@ -140,14 +140,14 @@ namespace VisualAdjustments
                        // doll.ApplyRampIndices(character);
                         //doll.SetEquipColors()
                     }
-                    if (unitEntityData.Parts.Get<UnitPartDollData>())
+                   /* if (unitEntityData.Parts.Get<UnitPartDollData>())
                     {
                         unitEntityData.Parts.Get<UnitPartDollData>().SetDefault(doll);
                     }
                     else
                     {
                         unitEntityData.Parts.Add<UnitPartDollData>().SetDefault(doll);
-                    }
+                    }*/
                 }
                 else
                 {
@@ -183,9 +183,10 @@ namespace VisualAdjustments
                     foreach (var eetoadd in component.EEToAdd)
                     {
                         var ee = ResourcesLibrary.TryGetResource<EquipmentEntity>(eetoadd.AssetID);
-                        unitEntityData.View.CharacterAvatar.AddEquipmentEntity(ee);
-                        unitEntityData.View.CharacterAvatar.SetPrimaryRampIndex(ee, eetoadd.PrimaryIndex);
-                        unitEntityData.View.CharacterAvatar.SetSecondaryRampIndex(ee, eetoadd.SecondaryIndex);
+                        unitEntityData.View.CharacterAvatar.AddEquipmentEntity(ee,primaryRamp: eetoadd.PrimaryIndex,secondaryRamp:eetoadd.SecondaryIndex);
+                       // unitEntityData.View.CharacterAvatar.SetPrimaryRampIndex(ee, eetoadd.PrimaryIndex);
+                       // unitEntityData.View.CharacterAvatar.SetSecondaryRampIndex(ee, eetoadd.SecondaryIndex);
+                       // unitEntityData.View.CharacterAvatar.SetRampIndices(ee,eetoadd.PrimaryIndex,eetoadd.SecondaryIndex);
                     }
 
                 }
@@ -665,11 +666,12 @@ namespace VisualAdjustments
                 }
                 if (!characterSettings.overrideWingsEE.Empty() && !characterSettings.hideWings)
                 {
-                    foreach (var eetoremove in EquipmentResourcesManager.WingsEE.OfType<EquipmentEntity>())
+                    foreach (var eetoremove in EquipmentResourcesManager.WingsEE.Values)
                     {
-                       if(view.CharacterAvatar.EquipmentEntities.Contains(eetoremove))  view.CharacterAvatar.RemoveEquipmentEntity(eetoremove,false);
+                        var ee = ResourcesLibrary.TryGetResource<EquipmentEntity>(eetoremove);
+                       if(view.CharacterAvatar.EquipmentEntities.Contains(ee))  view.CharacterAvatar.RemoveEquipmentEntity(ee,false);
                     }
-                    view.CharacterAvatar.AddEquipmentEntity(EquipmentResourcesManager.WingsEE[characterSettings.overrideWingsEE]);
+                    view.CharacterAvatar.AddEquipmentEntity(ResourcesLibrary.TryGetResource<EquipmentEntity>(characterSettings.overrideWingsEE));
                 }
                 if (!characterSettings.overrideTail.Empty() && !characterSettings.hideTail)
                 {
@@ -812,11 +814,11 @@ namespace VisualAdjustments
                     view.CharacterAvatar.IsDirty = dirty;
                 }
 
-                var dollpart = view.Data.Parts.Get<UnitPartDollData>();
+                /*var dollpart = view.Data.Parts.Get<UnitPartDollData>();
                 if (dollpart != null)
                 {
                     dollpart.SetDefault(ModifiedCreateDollData.CreateDataModified(doll));
-                }
+                }*/
 
                 var component = view.Data.Parts.Get<UnitPartVAEELs>();
                 if (component != null)
@@ -842,14 +844,14 @@ namespace VisualAdjustments
                 {
                     Main.GenerateOutfitcolor(view.Data);
                 }
-                if (view.Data.Parts.Get<UnitPartDollData>())
+               /* if (view.Data.Parts.Get<UnitPartDollData>())
                 {
                     view.Data.Parts.Get<UnitPartDollData>().SetDefault(ModifiedCreateDollData.CreateDataModified(doll));
                 }
                 else if(doll != null)
                 {
                     view.Data.Parts.Add<UnitPartDollData>().SetDefault(ModifiedCreateDollData.CreateDataModified(doll));
-                }
+                }*/
                 // Main.SetEELs(view.EntityData, DollResourcesManager.GetDoll(view.EntityData), false);
             }
             catch (Exception e)
@@ -1201,7 +1203,7 @@ namespace VisualAdjustments
                         //  Main.GenerateHairColor(character);
                         //Main.SetEELs(character, doll, true);
                         RebuildCharacter(character);
-                        Thread.Sleep(250);
+                        //Thread.Sleep(250);
                         UpdateModel(character.View);
                         /// character.View.HandsEquipment.UpdateAll();
                     }
@@ -1233,9 +1235,9 @@ namespace VisualAdjustments
                         ///character.View.UpdateClassEquipment();
                       //  Main.GenerateHairColor(character);
                       //  Main.SetEELs(character,doll,true);
-                        RebuildCharacter(character);
-                        Thread.Sleep(250);
-                        UpdateModel(character.View);
+                        //RebuildCharacter(character);
+                        //Thread.Sleep(250);
+                        //UpdateModel(character.View);
                         /// character.View.HandsEquipment.UpdateAll();
                     }
                 }

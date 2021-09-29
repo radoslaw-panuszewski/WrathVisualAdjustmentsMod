@@ -5,6 +5,9 @@ using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using Kingmaker.Items.Slots;
+using Kingmaker.UI.GenericSlot;
+using ModMaker.Utility;
 using UnityEngine;
 using UnityModManagerNet;
 using static UnityModManagerNet.UnityModManager;
@@ -60,6 +63,7 @@ namespace VisualAdjustments
             public int Warpaint = -1;
             public int WarpaintCol = -1;*/
 
+            public Dictionary<string,string> overridesLookup = new SerializableDictionary<string, string>(){};
             public string overrideMythic = "";
             public BlueprintRef overrideHelm = null;
             public BlueprintRef overrideCloak = null;
@@ -149,26 +153,35 @@ namespace VisualAdjustments
         }
         public static Settings Load(ModEntry modEntry)
         {
-            var filepath = Path.Combine(modEntry.Path, "Settings.json");
-            if (File.Exists(filepath))
+            try
             {
-                try
+                modEntry.Logger.Log("triedloadsettings");
+                var filepath = Path.Combine(modEntry.Path, "Settings.json");
+                if (File.Exists(filepath))
                 {
-                    JsonSerializer serializer = new JsonSerializer();
-                    using (StreamReader sr = new StreamReader(filepath))
-                    using (JsonTextReader reader = new JsonTextReader(sr))
+                    try
                     {
-                        Settings result = serializer.Deserialize<Settings>(reader);
-                        return result;
+                        JsonSerializer serializer = new JsonSerializer();
+                        using (StreamReader sr = new StreamReader(filepath))
+                        using (JsonTextReader reader = new JsonTextReader(sr))
+                        {
+                            Settings result = serializer.Deserialize<Settings>(reader);
+                            return result;
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        modEntry.Logger.Error($"Can't read {filepath}.");
+                        modEntry.Logger.Error(ex.ToString());
                     }
                 }
-                catch (Exception ex)
-                {
-                    modEntry.Logger.Error($"Can't read {filepath}.");
-                    modEntry.Logger.Error(ex.ToString());
-                }
+                return new Settings();
             }
-            return new Settings();
+            catch(Exception e)
+            {
+                Main.logger.Log("errorsettings");
+                throw;
+            }
         }
     }
 }
