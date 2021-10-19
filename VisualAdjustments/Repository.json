@@ -1,6 +1,9 @@
 {
 	"Releases":
 	[
-		{"Id": "VisualAdjustments", "Version": "1.8.4"}
+		{
+			"Id": "VisualAdjustments",
+			"Version": "1.11.0d"
+		}
 	]
 }

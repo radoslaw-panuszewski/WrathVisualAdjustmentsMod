@@ -89,9 +89,9 @@ namespace VisualAdjustments
             /*var races = BluePrintThing.GetBlueprints<BlueprintRace>();
             var racePresets = BluePrintThing.GetBlueprints<BlueprintRaceVisualPreset>();
             var classes = BluePrintThing.GetBlueprints<BlueprintCharacterClass>();*/
-            var races = Main.blueprints.OfType<BlueprintRace>();
-            var racePresets = Main.blueprints.OfType<BlueprintRaceVisualPreset>();
-            var classes = Main.blueprints.OfType<BlueprintCharacterClass>();
+            var races = Main.blueprints.Entries.Where(a => a.Type == typeof(BlueprintRace)).Select(b => ResourcesLibrary.TryGetBlueprint<BlueprintRace>(b.Guid));
+            var racePresets = Main.blueprints.Entries.Where(a => a.Type == typeof(BlueprintRaceVisualPreset)).Select(b => ResourcesLibrary.TryGetBlueprint<BlueprintRaceVisualPreset>(b.Guid));
+            var classes = Main.blueprints.Entries.Where(a => a.Type == typeof(BlueprintCharacterClass)).Select(b => ResourcesLibrary.TryGetBlueprint<BlueprintCharacterClass>(b.Guid));
 
             foreach (var race in races)
             {
@@ -124,7 +124,7 @@ namespace VisualAdjustments
                 }
             }
             ///var gear = BluePrintThing.GetBlueprints<KingmakerEquipmentEntity>();
-            var gear = Main.blueprints.OfType<KingmakerEquipmentEntity>();
+            var gear = Main.blueprints.Entries.Where(a => a.Type == typeof(KingmakerEquipmentEntity)).Select(b => ResourcesLibrary.TryGetBlueprint<KingmakerEquipmentEntity>(b.Guid));
             foreach (var race in races)
             {
                 foreach (var gender in new Gender[] { Gender.Male, Gender.Female })
@@ -136,7 +136,7 @@ namespace VisualAdjustments
                 }
             }
             ///blueprintBuffs = BluePrintThing.GetBlueprints<BlueprintBuff>().ToArray();
-            blueprintBuffs = Main.blueprints.OfType<BlueprintBuff>().ToArray();
+            blueprintBuffs = Main.blueprints.Entries.Where(a => a.Type == typeof(BlueprintBuff)).Select(b => ResourcesLibrary.TryGetBlueprint<BlueprintBuff>(b.Guid)).ToArray();
         }
             public static void ShowInfo(UnitEntityData unitEntityData)
                 {;
@@ -271,7 +271,7 @@ namespace VisualAdjustments
                     foreach (var race in BlueprintRoot.Instance.Progression.CharacterRaces)
                     {
                         ///var armorLinks = BluePrintThing.GetBlueprints<KingmakerEquipmentEntity>()
-                        var armorLinks = Main.blueprints.OfType<KingmakerEquipmentEntity>()
+                        var armorLinks = Main.blueprints.Entries.Where(a => a.Type == typeof(KingmakerEquipmentEntity)).Select(b => ResourcesLibrary.TryGetBlueprint<KingmakerEquipmentEntity>(b.Guid))
                             .SelectMany(kee => kee.GetLinks(gender, race.RaceId));
                         var options = gender == Gender.Male ? race.MaleOptions : race.FemaleOptions;
                         var links = race.Presets
@@ -334,7 +334,7 @@ namespace VisualAdjustments
                             .Distinct()
                             .ToDictionary(key => key);
             ///foreach (var kee in BluePrintThing.GetBlueprints<KingmakerEquipmentEntity>())
-            foreach(var kee in Main.blueprints.OfType<KingmakerEquipmentEntity>())
+            foreach(var kee in Main.blueprints.Entries.Where(a => a.Type == typeof(KingmakerEquipmentEntity)).Select(b => ResourcesLibrary.TryGetBlueprint<KingmakerEquipmentEntity>(b.Guid)).ToArray())
             {
                 if (!itemLinks.ContainsKey(kee.AssetGuidThreadSafe))
                 {
@@ -475,7 +475,7 @@ namespace VisualAdjustments
             ModKit.UI.Label($"Current Asks: {asks?.name}, Display: {asks?.DisplayName}", GUILayout.Width(200f));
             ModKit.UI.Label($"Current CustomAsks: {customAsks?.name}, Display: {customAsks?.DisplayName}", GUILayout.Width(200f));
             ModKit.UI.Label($"Current OverrideAsks: {overrideAsks?.name}, Display: {overrideAsks?.DisplayName}", GUILayout.Width(200f));
-            foreach (var blueprint in Main.blueprints.OfType<BlueprintUnitAsksList>())
+            foreach (var blueprint in Main.blueprints.Entries.Where(a => a.Type == typeof(BlueprintUnitAsksList)).Select(b => ResourcesLibrary.TryGetBlueprint<BlueprintUnitAsksList>(b.Guid)))
             {
                 ModKit.UI.Label($"Asks: {blueprint}, Display: {blueprint.DisplayName}", GUILayout.Width(200f));
             }

@@ -42,28 +42,171 @@ using Kingmaker.Utility;
 using Kingmaker.Visual.CharacterSystem;
 using ModKit.Utility;
 using ModMaker.Utility;
-using Steamworks;
 using UniRx;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityModManagerNet;
+using Kingmaker.View.Animation;
+using Kingmaker.Blueprints.Classes;
+using Kingmaker.View;
+using Kingmaker.Visual.Animation;
 
+namespace TutorialCanvas.Enums
+{
+
+}
 namespace TutorialCanvas.UI
 {
     /// <summary>
     ///  MAKE THE EES MORE READABLE
     /// </summary>
-    public class overrideUI
+    /// 
+    public class EEButtonCategories
     {
-        public Dictionary<BlueprintRef, string> EELs;
-        public BlueprintRef current;
+        public string gender = "N/A";
+        public string race = "N/A";
     }
-    internal class UIManager : MonoBehaviour
+    public class UIManager : MonoBehaviour
     {
-        public void handleOverrideSelected(string Key,ref BlueprintRef bpref)
+
+        public static string GetTextAndSetupCategory(string ee)
         {
-            settings = VisualAdjustments.Main.settings.GetCharacterSettings(data);
+            try
+            {
+                /*var str = ee;
+                if(ee.Contains("_M_"))
+                {
+                    VisualAdjustments.Main.logger.Log("Male");
+                    str = str.Replace("_M", " Male ");
+                }
+                else if (ee.Contains("_F_"))
+                {
+                    VisualAdjustments.Main.logger.Log("Female");
+                    str = str.Replace("_F", " Female ");
+                }
+                if (raceidentifiers.Keys.Any(a => str.Contains(a)))
+                {
+                    var race = raceidentifiers.Keys.First(a => str.Contains(a));
+                    str = str.Replace(race, " " + raceidentifiers[race] + " ");
+                    VisualAdjustments.Main.logger.Log(raceidentifiers[race]);
+                }
+                str = str.Replace("EE_","");
+                str = str.Replace("EE", "");
+                str = str.Replace("_Any", "");
+                str = str.Replace("Any", "");
+                str = str.Replace("_U", "");
+                var tempstring = str;
+                var b = 0;
+                str = Regex.Replace(str, @"(?<!^)(\B|b)(?!$)", " ");
+                for (int i = 0; i < tempstring.Length-1; i++)
+                {
+                    if((char.IsUpper(tempstring,i) && (i < tempstring.Length-1 && !char.IsUpper(tempstring,i+1)) && (i == 0  || !char.IsUpper(tempstring, i - 1))) || char.IsNumber(tempstring,i))
+                    {
+                        if (i + b <= tempstring.Length-1)
+                        {
+                            tempstring = tempstring.Insert(i + b, " ");
+                           // b++;
+                        }
+                    }
+                }
+                str = tempstring;
+                VisualAdjustments.Main.logger.Log(str);
+                return str;*/
+                if(UnfilteredAndFilteredEEName.TryGetValue(ee,out string outval))
+                {
+                    return outval;
+                }
+                var stringarray = ee.Split('_');
+                bool hassetrace = false;
+                var newarray = new List<string>();
+                foreach (var s in stringarray)
+                {
+                    if (!hassetrace && raceidentifiers.Keys.TryFind(a => s == a, out string raceout))
+                    {
+                        newarray.Add(raceidentifiers[raceout]);
+                        hassetrace = true;
+                    }
+                    else if (s == "M")
+                    {
+                        newarray.Add("Male");
+                    }
+                    else if (s == "F")
+                    {
+                        newarray.Add("Female");
+                    }
+                    else if (s != "EE" && s != "Any" && s != "KEE" && s.Length > 1)
+                    {
+                        StringBuilder SB = new System.Text.StringBuilder(s);
+                        var b = 0;
+                        for (int c = 0; c < s.Length; c++)
+                        {
+                            if (c > 0 && ((Char.IsUpper(s[c]) && (!Char.IsUpper(s[c - 1]) || (c < s.Length ||!Char.IsUpper(s[c + 1]) )) || (Char.IsNumber(s[c]) && (!Char.IsNumber(s[c - 1]) /*|| !Char.IsNumber(s[c-1])*/)))))
+                            {
+                                SB.Insert(c + b, " ");
+                                b++;
+                                //SB.Append(s[c]);
+                            }
+                        }
+                        newarray.Add(SB.ToString());
+                    }
+                }
+                var concatstring = "";
+                foreach (var item in newarray)
+                {
+                    concatstring = concatstring + " " + item;
+                    //  VisualAdjustments.Main.logger.Log(item);
+                }
+                concatstring = concatstring.TrimStart();
+                concatstring.TrimEnd();
+                //VisualAdjustments.Main.logger.Log(concatstring);
+                if(FilteredAndUnfilteredEEName.Keys.Contains(concatstring))
+                {
+                    FilteredAndUnfilteredEEName[concatstring] = ee;
+                }
+                else
+                {
+                    FilteredAndUnfilteredEEName.Add(concatstring, ee);
+                }
+                if (UnfilteredAndFilteredEEName.Keys.Contains(ee))
+                {
+                    UnfilteredAndFilteredEEName[ee] = concatstring;
+                }
+                else
+                {
+                    UnfilteredAndFilteredEEName.Add(ee, concatstring);
+                }
+                return concatstring;
+
+            }
+            catch (Exception e)
+            {
+                VisualAdjustments.Main.logger.Log(e.ToString());
+                throw;
+            }
         }
+        public static Dictionary<string, string> FilteredAndUnfilteredEEName = new Dictionary<string, string>{};
+        public static Dictionary<string, string> UnfilteredAndFilteredEEName = new Dictionary<string, string> { };
+        public static Dictionary<string, string> raceidentifiers = new Dictionary<string, string>
+        {
+            ["HM"] = "Human",
+            ["AA"] = "Aasimar",
+            ["HE"] = "Half-Elf",
+            ["MM"] = "Mongrel",
+            ["SU"] = "Succubus",
+            ["DW"] = "Dwarf",
+            ["TL"] = "Tiefling",
+            ["EL"] = "Elf",
+            ["KT"] = "Kitsune",
+            ["GN"] = "Gnome",
+            ["OD"] = "Oread",
+            ["HL"] = "Halfling",
+            ["DH"] = "Dhampir",
+            ["HO"] = "Half-Orc",
+            ["ZB"] = "Zombie",
+            ["CB"] = "Cambion",
+            ["SN"] = "Skeleton"
+
+        };
         public static string getGender(EquipmentEntity ee)
         {
             if (ee.name.Contains("_M_")) return "Male";
@@ -113,7 +256,9 @@ namespace TutorialCanvas.UI
                 {
                     var buttontoadd = Instantiate(buttonTemplate);
                     var buttontoaddtext = buttontoadd.Find("TextB").GetComponent<TextMeshProUGUI>();
-                    buttontoaddtext.text = currentee.name;
+                    // buttontoaddtext.text = currentee.name;
+                    buttontoaddtext.text = GetTextAndSetupCategory(currentee.name);
+                   // buttontoaddtext.text = GetTextAndSetupCategory(currentee);
                     buttontoaddtext.font = font;
                     buttontoaddtext.color = Color.white;
                     buttontoadd.transform.SetParent(contentCurrentEE.transform, false);
@@ -126,6 +271,53 @@ namespace TutorialCanvas.UI
                     currentEELButtons.Add(currentee.name, buttontoaddbuttoncomponent);
                 }
             }
+        }
+        public static void setCustomColorToEEPart(Color col, bool primorsec)
+        {
+            var component = data.Parts.Ensure<UnitPartVAEELs>();
+            if (component.EEToAdd.Contains(a => a.AssetID == EquipmentResourcesManager.AllEEL[selectedEntity.name]))
+            {
+                if (primorsec)
+                {
+                    var storage = component.EEToAdd.First(a => a.AssetID == EquipmentResourcesManager.AllEEL[selectedEntity.name]);
+                    storage.CustomColorPrim = new float[] { col.r, col.g, col.b };
+                    storage.hasCustomColor = true;
+                    storage.Apply(selectedEntity,data.View.CharacterAvatar);
+                   // component.EEToAdd.Add(new EEStorage(EquipmentResourcesManager.AllEEL[selectedEntity.name], -1, -1, true, CustomColorPrimin: new float[] { col.r, col.g, col.b }));
+                }
+                else
+                {
+                    var storage = component.EEToAdd.First(a => a.AssetID == EquipmentResourcesManager.AllEEL[selectedEntity.name]);
+                    storage.CustomColorSec = new float[] { col.r, col.g, col.b };
+                    storage.hasCustomColor = true;
+                    storage.Apply(selectedEntity, data.View.CharacterAvatar);
+                }
+                //Main.logger.Log("add" + ee.name + EquipmentResourcesManager.AllEEL[ee.name]);
+            }
+            else
+            {
+                var ee = ResourcesLibrary.TryGetResource<EquipmentEntity>(EquipmentResourcesManager.AllEEL[selectedEntity.name]);
+                if (data.View.CharacterAvatar.EquipmentEntities.Contains(ee))
+                {
+                    if (primorsec)
+                    {
+                        var storage = new EEStorage(EquipmentResourcesManager.AllEEL[selectedEntity.name], -1, -1, true, CustomColorPrimin: new float[] { col.r, col.g, col.b });
+                        component.EEToAdd.Add(storage);
+                        storage.Apply(selectedEntity, data.View.CharacterAvatar);
+                    }
+                    else
+                    {
+                        var storage = new EEStorage(EquipmentResourcesManager.AllEEL[selectedEntity.name], -1, -1, true, CustomColorSecin: new float[] { col.r, col.g, col.b });
+                        component.EEToAdd.Add(storage);
+                        storage.Apply(selectedEntity, data.View.CharacterAvatar);
+                    }
+                }
+            }
+            primSlider.maxValue = selectedEntity.PrimaryRamps.Count;
+            primSlider.value = data.View.CharacterAvatar.GetPrimaryRampIndex(selectedEntity);
+            secondSlider.maxValue = selectedEntity.SecondaryRamps.Count;
+            secondSlider.value = data.View.CharacterAvatar.GetSecondaryRampIndex(selectedEntity);
+            UpdatePreview();
         }
         void removeFromRemoveEEPart(EquipmentEntity ee)
         {
@@ -194,7 +386,7 @@ namespace TutorialCanvas.UI
             {
                 var eewithcolor = component.EEToAdd.First(a => a.AssetID == EquipmentResourcesManager.AllEEL[ee.name]);
                 eewithcolor.PrimaryIndex = primaryIndex;
-                eewithcolor.SecondaryIndex = primaryIndex;
+                eewithcolor.SecondaryIndex = secondaryIndex;
             }
             else
             {
@@ -204,7 +396,7 @@ namespace TutorialCanvas.UI
 
         }
 
-        int getColorFromPart(EquipmentEntity ee,bool primorsec)
+        int getColorFromPart(EquipmentEntity ee, bool primorsec)
         {
             if (primorsec)
             {
@@ -230,18 +422,21 @@ namespace TutorialCanvas.UI
         public const string Source = "TutorialCanvas";
         public static Transform window;
         private TextMeshProUGUI _text;
-        private static bool haschanged = true;
+        public static bool haschanged = true;
         private static InventoryDollPCView dollPcView;
-
+        private static string SelectedWeaponType = "";
+        public static int slot = 0;
+        public static bool primorsec;
+        public static bool loaded = false;
         public static UnitEntityData data
         {
             get
             {
                 var newData = Kingmaker.UI.Common.UIUtility.GetCurrentCharacter();
-                if (m_Data != newData)
+                if (m_Data.UniqueId != newData.UniqueId)
                 {
                     m_Data = newData;
-                     haschanged = true;
+                    haschanged = true;
                 }
                 // m_Data = Kingmaker.UI.Common.UIUtility.GetCurrentCharacter();
                 return m_Data;
@@ -249,22 +444,79 @@ namespace TutorialCanvas.UI
             set
             {
                 m_Data = value;
+                haschanged = true;
             }
         }
 
         private static void UpdatePreview()
         {
-            if (window.parent.Find("Doll").TryGetComponent<InventoryDollPCView>(out dollPcView))
+            // if (window.parent.Find("Doll").TryGetComponent<InventoryDollPCView>(out dollPcView))
             {
                 try
                 {
                     // fix this
-                    //dollPcView = window.parent.Find("Doll").GetComponent<InventoryDollPCView>();
-                  //  dollPcView.OnHide();
-                    //dollPcView.BindViewImplementation();
-                   // dollPcView.OnShow();
-                    //dollPcView.RefreshView();
-                    data.View.CharacterAvatar.IsDirty = true;
+                    if (dollPcView == null)
+                    {
+                        dollPcView = window.parent.Find("Doll").GetComponent<InventoryDollPCView>();
+                    }
+                    else
+                    {
+
+                        //dollPcView.Initialize();
+                      // dollPcView.SwitchOffDoll();
+                       // dollPcView.SwitchOnDoll();
+                        // dollPcView.BindViewImplementation();
+                          //dollPcView.OnHide();
+                       // dollPcView.BindViewImplementation();
+                        //dollPcView.OnShow();
+                        if(UISelectGrid.activeInHierarchy)/* && dollPcView.Room && dollPcView.IsBinded)*/
+                        {
+                            VisualAdjustments.Main.logger.Log("UpdatedPreview");
+                            CharacterManager.RebuildCharacter(data);
+                            dollPcView.OnHide();
+                            dollPcView.RefreshView();
+                            dollPcView.OnShow();
+                            
+                            //  dollPcView.RefreshView();
+                        }
+                        
+                    }
+                    {
+                       /* var player = data;
+                        Character character2 = Game.Instance.UI.Common.DollRoom.CreateAvatar(Game.Instance.UI.Common.DollRoom.m_OriginalAvatar, Game.Instance.UI.Common.DollRoom.Unit.Gender, Game.Instance.UI.Common.DollRoom.Unit.Progression.Race.RaceId, Game.Instance.UI.Common.DollRoom.m_Unit.ToString());
+                        Game.Instance.UI.Common.DollRoom.SetAvatar(character2);
+                        character2.transform.localScale = player.View.transform.localScale;
+                        Vector3 localScale = new Vector3(player.View.OriginalScale.x / player.View.transform.localScale.x, player.View.OriginalScale.y / player.View.transform.localScale.y, player.View.OriginalScale.z / player.View.transform.localScale.z);
+                        character2.transform.parent.localScale = localScale;
+                        IKController component = Game.Instance.UI.Common.DollRoom.Unit.View.GetComponent<IKController>();
+                        IKController ikcontroller = Game.Instance.UI.Common.DollRoom.m_Avatar.gameObject.AddComponent<IKController>();
+                        ikcontroller.DollRoom = Game.Instance.UI.Common.DollRoom;
+                        ikcontroller.CharacterSystem = Game.Instance.UI.Common.DollRoom.m_Avatar;
+                        ikcontroller.Settings = ((component != null) ? component.Settings : null);
+                        UnitEntityView component2 = Game.Instance.UI.Common.DollRoom.m_OriginalAvatar.GetComponent<UnitEntityView>();
+                        if (component2 != null)
+                        {
+                            ikcontroller.CharacterUnitEntity = component2;
+                        }
+                        Game.Instance.UI.Common.DollRoom.Update(false);
+                        Game.Instance.UI.Common.DollRoom.SetupAnimationManager(character2.AnimationManager);
+                        character2.AnimationManager.Tick();
+                        character2.AnimationManager.LocoMotionHandle.Action.OnUpdate(character2.AnimationManager.LocoMotionHandle, 0.1f);*/
+                    }
+
+                    /*Game.Instance.UI.Common.DollRoom.UpdateCharacter();
+                    Game.Instance.UI.Common.DollRoom.UpdateCharacter();
+                    Game.Instance.UI.Common.DollRoom.UpdateAvatarRenderers();
+                    Game.Instance.UI.Common.DollRoom.OnCharacterUpdated(data.View.CharacterAvatar);
+                    //Game.Instance.UI.Common.DollRoom.DollRoomVisualSettingsOff(); (Hide mythics???)
+                    Game.Instance.UI.Common.DollRoom.GetAvatar();*/
+                    //Game.Instance.UI.Common.DollRoom.SetAvatar(data.View.CharacterAvatar);
+                    /* dollPcView.OnHide();
+                     //dollPcView.BindViewImplementation();
+                     dollPcView.OnShow();
+                     dollPcView.RefreshView();
+                     dollPcView.*/
+                    //data.View.CharacterAvatar.IsDirty = true;
                 }
                 catch (Exception e)
                 {
@@ -292,7 +544,11 @@ namespace TutorialCanvas.UI
                     //data.View.CharacterAvatar.IsAtlasesDirty = true;
                     primSlider.value = value;
                     setColorAddEEPart(selectedEntity, value, secondindex);
-                    m_Primxindex = value;
+                    if (value != m_Primxindex)
+                    {
+                        m_Primxindex = value;
+                        UpdatePreview();
+                    }
                 }
                 PrimaryIndex.text = value.ToString();
             }
@@ -318,7 +574,11 @@ namespace TutorialCanvas.UI
                     secondSlider.value = value;
                     setColorAddEEPart(selectedEntity, primindex, value);
                     
-                    m_SecondaryIndex = value;
+                    if (value != m_SecondaryIndex)
+                    {
+                        m_SecondaryIndex = value;
+                        UpdatePreview();
+                    }
                 }
                 SecondaryIndex.text = value.ToString();
             }
@@ -330,19 +590,59 @@ namespace TutorialCanvas.UI
 
         // }
         private TextMeshProUGUI Name;
+        private TextMeshProUGUI Name2;
         private TextMeshProUGUI Race;
         private TextMeshProUGUI Sex;
         private GameObject AddRemoveButton;
         private static UnitEntityData m_Data;
-        private string selectedstring = "";
         private TMP_FontAsset font;
         private Transform contentAllEE;
         private Transform contentCurrentEE;
         private static Transform buttonTemplate;
         public Dictionary<string, Button> currentEELButtons = new Dictionary<string, Button>();
         public Dictionary<string, GameObject> allEELButtons = new Dictionary<string, GameObject>();
-        public static Dictionary<Toggle,bool> hidebuttons = new Dictionary<Toggle, bool>();
-        VisualAdjustments.Settings.CharacterSettings settings = VisualAdjustments.Main.settings.GetCharacterSettings(data);
+        public Dictionary<int, string> weaponIndices = new Dictionary<int, string>();
+        public static Dictionary<Toggle, bool> hidebuttons = new Dictionary<Toggle, bool>();
+        public static VisualAdjustments.Settings.CharacterSettings settings
+        {
+            get
+            {
+                if (m_settings == null || data != m_Data || loaded)
+                {
+                    if (VisualAdjustments.Main.settings.characterSettings.TryGetValue(data.UniqueId, out VisualAdjustments.Settings.CharacterSettings setting))
+                    {
+                        m_settings = setting;
+                    }
+                    else
+                    {
+                        var charinfo = new CharInfo
+                        {
+                            GUID = data.Progression.GetEquipmentClass().AssetGuidThreadSafe,
+                            Name = data.Progression.GetEquipmentClass().Name
+                        };
+                        if (data.IsStoryCompanion())
+                        {
+                            charinfo.Name = "Default";
+                        }
+                        var fb = new VisualAdjustments.Settings.CharacterSettings
+                        {
+                            characterName = data.CharacterName,
+                            classOutfit = charinfo,
+                            uniqueid = data.UniqueId
+                        };
+                        VisualAdjustments.Main.settings.AddCharacterSettings(data, fb);
+                        m_settings = fb;
+                    }
+                    loaded = false;
+                }
+                return m_settings;
+            }
+            set
+            {
+                m_settings = value;
+            }
+        }
+        static VisualAdjustments.Settings.CharacterSettings m_settings;
         public static UIManager CreateObject()
         {
             //This is the method that get's called when it is time to create the UI.  This happens every time a scene is loaded.
@@ -351,12 +651,12 @@ namespace TutorialCanvas.UI
             {
                 VisualAdjustments.Main.logger.Log("createdobject");
                 if (!Game.Instance.UI.Canvas) return null;
-                if (!BundleManger.IsLoaded(Source)) throw new NullReferenceException();
+                if (!BundleManger.IsLoaded(Source)) throw new NullReferenceException("NotLoaded");
 
                 //
                 //Attempt to get the wrath objects needed to build the UI
                 //
-                var staticCanvas = Game.Instance.UI.Canvas.RectTransform.Find("ServiceWindowsPCView").Find("InventoryView").Find("Inventory");
+                var staticCanvas = Game.Instance.UI.Canvas.RectTransform.Find("ServiceWindowsPCView/InventoryPCView/Inventory");
                 //var background = staticCanvas.Find("HUDLayout/CombatLog_New/Background/Background_Image").GetComponent<Image>(); //Using the path we found earlier we get the sprite component 
 
 
@@ -365,18 +665,20 @@ namespace TutorialCanvas.UI
                 //
                 //Attempt to get the objects loaded from the AssetBundles and build the window.
                 //
-                 window = Instantiate(BundleManger.LoadedPrefabs[Source].transform.Find("Canvas")); //We ditch the TutorialCanvas as talked about in the Wiki, we will attach it to a different parent
-                //window.localScale = new Vector3((float)0.76, (float)0.76, (float)0.76);
-                
+                window = Instantiate(BundleManger.LoadedPrefabs[Source].transform.Find("Canvas")); //We ditch the TutorialCanvas as talked about in the Wiki, we will attach it to a different parent
+                                                                                                   //window.localScale = new Vector3((float)0.76, (float)0.76, (float)0.76);
+                VisualAdjustments.Main.logger.Log("createdobject2");
                 window.SetParent(staticCanvas, false); //Attaches our window to the static canvas
                 window.SetAsLastSibling(); //Our window will always be under other UI elements as not to interfere with the game. Top of the list has the lowest priority
-                                            // if(SettingsWrapper.Reuse) window.Find("Background").GetComponent<Image>().sprite = background.sprite; //Sets the background sprite to the one used in CombatLog_New
+                                           // if(SettingsWrapper.Reuse) window.Find("Background").GetComponent<Image>().sprite = background.sprite; //Sets the background sprite to the one used in CombatLog_New
                 window.localPosition = new Vector3(0, 27, 0);
                 window.localScale = new Vector3((float)0.76, (float)0.76, (float)0.76);
                 window.Find("Menus").gameObject.active = false;
-               // content = ;
-
-                return window.gameObject.AddComponent<UIManager>(); //This adds this class as a component so it can handle events, button clicks, awake, update, etc.
+                VisualAdjustments.Main.logger.Log("createdobject3");
+                // content = ;
+                var cmp = window.gameObject.AddComponent<UIManager>();
+               // cmp.Awake();
+                return cmp; //This adds this class as a component so it can handle events, button clicks, awake, update, etc.
             }
             catch (Exception ex)
             {
@@ -387,665 +689,1008 @@ namespace TutorialCanvas.UI
 
         private void Awake()
         {
-            //This is a unity message that runs once when the script activates (Check Unity documenation for the differences between Start() and Awake()
-
-            //
-            // Setup the listeners when the script starts
-            //
-            VisualAdjustments.Main.logger.Log("awake");
-
-
-            // Setup scrollview content
-            contentAllEE = this.transform.Find("Menus/InventoryViewWindow/AllEEs/Scroll View/Viewport/Content");
-            contentCurrentEE = this.transform.Find("Menus/InventoryViewWindow/CurrentEEs/Scroll View/Viewport/Content");
-            VisualAdjustments.Main.logger.Log("awake2");
-            buttonTemplate = this.transform.Find("NewButton");
-            font = this.transform.parent.Find("Doll/DollTitle/TitleLabel").GetComponent<TextMeshProUGUI>().font;
-            foreach (var txt in this.transform.GetComponentsInChildren<TextMeshProUGUI>(true))
+            try
             {
-                txt.font = font;
-                txt.color = Color.black;
-            }
-            foreach (var eename in VisualAdjustments.EquipmentResourcesManager.AllEEL)
-            {
-                var buttontoadd = Instantiate(buttonTemplate);
-                var buttontoaddtext = buttontoadd.Find("TextB").GetComponent<TextMeshProUGUI>();
-                buttontoaddtext.text = eename.Key;
-                buttontoaddtext.font = font;
-                buttontoaddtext.color = Color.white;
-                buttontoadd.transform.SetParent(contentAllEE.transform,false);
-                var buttontoaddbuttoncomponent = buttontoadd.GetComponent<Button>();
-                buttontoaddbuttoncomponent.onClick = new Button.ButtonClickedEvent();
-                buttontoaddbuttoncomponent.onClick.AddListener(new UnityAction(() => { HandleEEClicked(buttontoaddtext.text);
-                }));
-                allEELButtons.Add(eename.Key,buttontoadd.gameObject);
-            }
-            m_Data = Kingmaker.UI.Common.UIUtility.GetCurrentCharacter();
+                //This is a unity message that runs once when the script activates (Check Unity documenation for the differences between Start() and Awake()
 
-            //switch font
-            //var texts = ;
+                //
+                // Setup the listeners when the script starts
+                //
+                VisualAdjustments.Main.logger.Log("awake");
 
 
-            
-
-            // setup UI toggles
-            {
-                //primary toggle
-                var button = this.transform.Find("ToggleButton").GetComponent<Button>();
-                button.onClick = new Button.ButtonClickedEvent();
-                button.onClick.AddListener(new UnityAction(HandleButtonClick));
-                //Secondary toggles
+                // Setup scrollview content
+                contentAllEE = this.transform.Find("Menus/InventoryViewWindow/AllEEs/Scroll View/Viewport/Content");
+                contentCurrentEE = this.transform.Find("Menus/InventoryViewWindow/CurrentEEs/Scroll View/Viewport/Content");
+                
+                buttonTemplate = this.transform.Find("NewButton");
+                font = this.transform.parent.Find("Doll/DollTitle/TitleLabel").GetComponent<TextMeshProUGUI>().font;
+                foreach (var txt in this.transform.GetComponentsInChildren<TextMeshProUGUI>(true))
                 {
-                    var UISelectionGrid = this.transform.Find("UISelectionGrid");
-
-                    //Outfitdoll
-                    var OutfitDoll = UISelectionGrid.Find("OutfitDoll").GetComponent<Button>();
-                    OutfitDoll.onClick = new Button.ButtonClickedEvent();
-                    OutfitDoll.onClick.AddListener(new UnityAction(() =>
-                    {
-                        HandleUIToggle(UISelectionGrid.Find("OutfitDoll/Text (TMP)").GetComponent<TextMeshProUGUI>().text);
-                    }));
-
-                    //Overrides
-                    var Overrides = UISelectionGrid.Find("Overrides").GetComponent<Button>();
-                    Overrides.onClick = new Button.ButtonClickedEvent();
-                    Overrides.onClick.AddListener(new UnityAction(() =>
-                    {
-                        HandleUIToggle(UISelectionGrid.Find("Overrides/Text (TMP)").GetComponent<TextMeshProUGUI>().text);
-                    }));
-
-                    //EEPicker
-                    var EEPicker = UISelectionGrid.Find("EEPicker").GetComponent<Button>();
-                    EEPicker.onClick = new Button.ButtonClickedEvent();
-                    EEPicker.onClick.AddListener(new UnityAction(() =>
-                    {
-                        HandleUIToggle(UISelectionGrid.Find("EEPicker/Text (TMP)").GetComponent<TextMeshProUGUI>().text);
-                    }));
-
-                    //Equipment
-                    var Equipment = UISelectionGrid.Find("Equipment").GetComponent<Button>();
-                    Equipment.onClick = new Button.ButtonClickedEvent();
-                    Equipment.onClick.AddListener(new UnityAction(() =>
-                    {
-                        HandleUIToggle(UISelectionGrid.Find("Equipment/Text (TMP)").GetComponent<TextMeshProUGUI>().text);
-                    }));
-                    UISelectionGrid.gameObject.SetActive(false);
-
-
-
+                    txt.font = font;
+                    txt.color = Color.black;
                 }
-            }
-            // setup EE Picker
-            {
-                Name = this.transform.Find("Menus/InventoryViewWindow/EEInfo/TextboxesValues/Name")
-                    .GetComponent<TextMeshProUGUI>();
-                Race = this.transform.Find("Menus/InventoryViewWindow/EEInfo/TextboxesValues/Race")
-                    .GetComponent<TextMeshProUGUI>();
-                Sex = this.transform.Find("Menus/InventoryViewWindow/EEInfo/TextboxesValues/Sex")
-                    .GetComponent<TextMeshProUGUI>();
-                AddRemoveButton = this.transform.Find("Menus/InventoryViewWindow/AddRemove/Button/ButtonText").gameObject;
-
-                var AddRemoveButtonButton = this.transform.Find("Menus/InventoryViewWindow/AddRemove/Button").GetComponent<Button>();
-                AddRemoveButtonButton.onClick = new Button.ButtonClickedEvent();
-                AddRemoveButtonButton.onClick.AddListener(new UnityAction(() =>
+                foreach (var eename in VisualAdjustments.EquipmentResourcesManager.AllEEL)
                 {
-                    addRemoveButton();
-                }));
-
-
-                //Primary Color Picker
-                {
-                    PrimaryIndex = this.transform.Find("Menus/InventoryViewWindow/EEInfo/ColorSelectors/Primary/InputFieldIndex").GetComponent<TMP_InputField>();
-                    PrimaryIndex.onValueChanged = new TMP_InputField.OnChangeEvent();
-                    PrimaryIndex.onValueChanged.AddListener((string val) =>
-                    {
-                        handleSliderInputField(val, true);
-                    });
-                    PrimaryIndex.textComponent.color = Color.white;
-                    var IncreaseButton = this.transform.Find("Menus/InventoryViewWindow/EEInfo/ColorSelectors/Primary/PositiveIncrement").GetComponent<Button>();
-                    var DecreaseButton = this.transform.Find("Menus/InventoryViewWindow/EEInfo/ColorSelectors/Primary/NegativeIncrement").GetComponent<Button>();
-                    IncreaseButton.onClick = new Button.ButtonClickedEvent();
-                    IncreaseButton.onClick.AddListener(new UnityAction(() =>
-                    {
-                        increasePrimaryButton();
-                        UpdatePreview();
+                    var buttontoadd = Instantiate(buttonTemplate);
+                    var buttontoaddtext = buttontoadd.Find("TextB").GetComponent<TextMeshProUGUI>();
+                    buttontoaddtext.text = GetTextAndSetupCategory(eename.Key);
+                    // buttontoaddtext.text = eename.Key;
+                    buttontoaddtext.font = font;
+                    buttontoaddtext.color = Color.white;
+                    buttontoadd.transform.SetParent(contentAllEE.transform, false);
+                    var buttontoaddbuttoncomponent = buttontoadd.GetComponent<Button>();
+                    buttontoaddbuttoncomponent.onClick = new Button.ButtonClickedEvent();
+                    buttontoaddbuttoncomponent.onClick.AddListener(new UnityAction(() => { HandleEEClicked(buttontoaddtext.text);
                     }));
-                    DecreaseButton.onClick = new Button.ButtonClickedEvent();
-                    DecreaseButton.onClick.AddListener(new UnityAction(() =>
-                    {
-                        decreasePrimaryButton();
-                        UpdatePreview();
-                    }));
-                    primSlider = this.transform.Find("Menus/InventoryViewWindow/EEInfo/ColorSelectors/Primary/Slider").GetComponent<Slider>();
-                    primSlider.onValueChanged = new Slider.SliderEvent();
-                    primSlider.onValueChanged.AddListener(new UnityAction<float>((float value) =>
-                    {
-                        primindex = (int)value;
-                        UpdatePreview();
-                    }));
+                    allEELButtons.Add(eename.Key, buttontoadd.gameObject);
                 }
-                //Secondary Color Picker
+                m_Data = Kingmaker.UI.Common.UIUtility.GetCurrentCharacter();
+                UISelectGrid = transform.Find("UISelectionGrid").gameObject;
+                //switch font
+                //var texts = ;
+
+
+
+
+                // setup UI toggles
                 {
-                    SecondaryIndex = this.transform.Find("Menus/InventoryViewWindow/EEInfo/ColorSelectors/Secondary/InputFieldIndex").GetComponent<TMP_InputField>();
-                    SecondaryIndex.onValueChanged = new TMP_InputField.OnChangeEvent();
-                    SecondaryIndex.onValueChanged.AddListener((string val) =>
+                    //primary toggle
+                    var button = this.transform.Find("ToggleButton").GetComponent<Button>();
+                    this.transform.Find("ToggleButton/Text (TMP)").GetComponent<TextMeshProUGUI>().color = Color.white;
+                    button.onClick = new Button.ButtonClickedEvent();
+                    button.onClick.AddListener(new UnityAction(HandleButtonClick));
+                    //Secondary toggles
                     {
-                        handleSliderInputField(val,false);
-                    });
-                    SecondaryIndex.textComponent.color = Color.white;
-                    var IncreaseButton = this.transform.Find("Menus/InventoryViewWindow/EEInfo/ColorSelectors/Secondary/PositiveIncrement").GetComponent<Button>();
-                    var DecreaseButton = this.transform.Find("Menus/InventoryViewWindow/EEInfo/ColorSelectors/Secondary/NegativeIncrement").GetComponent<Button>();
-                    IncreaseButton.onClick = new Button.ButtonClickedEvent();
-                    IncreaseButton.onClick.AddListener(new UnityAction(() =>
-                    {
-                        increaseSecondaryButton();
-                        UpdatePreview();
-                    }));
-                    DecreaseButton.onClick = new Button.ButtonClickedEvent();
-                    DecreaseButton.onClick.AddListener(new UnityAction(() =>
-                    {
-                        decreaseSecondaryButton();
-                        UpdatePreview();
-                    }));
-                    secondSlider = this.transform.Find("Menus/InventoryViewWindow/EEInfo/ColorSelectors/Secondary/Slider").GetComponent<Slider>();
-                    secondSlider.onValueChanged = new Slider.SliderEvent();
-                    secondSlider.onValueChanged.AddListener(new UnityAction<float>((float value) =>
-                    {
-                        secondindex = (int)value;
-                        UpdatePreview();
-                    }));
-                }
-                // setup filter fields
-                {
-                    // All EE's
-                    var AllEETxtField = this.transform.Find("Menus/InventoryViewWindow/AllEEs/FilterArea/InputField (TMP)").GetComponent<TMP_InputField>();
-                    var placeholder = AllEETxtField.gameObject.transform.Find("Text Area/Placeholder").GetComponent<TextMeshProUGUI>();
-                    placeholder.color = new Color((float)0.05, (float)0.05, (float)0.05, (float)0.6);
-                    placeholder.fontStyle = FontStyles.Italic;
-                    AllEETxtField.onValueChanged = new TMP_InputField.OnChangeEvent();
-                    AllEETxtField.onValueChanged.AddListener(HandleFilterChangedAll);
+                        var UISelectionGrid = this.transform.Find("UISelectionGrid");
 
-                    // Current EE's
-                    var CurrentEETxtField = this.transform.Find("Menus/InventoryViewWindow/CurrentEEs/FilterArea/InputField (TMP)").GetComponent<TMP_InputField>();
-                    var placeholdercurrent = CurrentEETxtField.gameObject.transform.Find("Text Area/Placeholder").GetComponent<TextMeshProUGUI>();
-                    placeholdercurrent.color = new Color((float)0.05, (float)0.05, (float)0.05, (float)0.6);
-                    placeholdercurrent.fontStyle = FontStyles.Italic;
-                    CurrentEETxtField.onValueChanged = new TMP_InputField.OnChangeEvent();
-                    CurrentEETxtField.onValueChanged.AddListener(HandleFilterChangedCurrent);
-                }
-                // Reset Button
-                {
-                    var resetbutton = this.transform.Find("Menus/InventoryViewWindow/CurrentEEs/ResetButton");
-                    resetbutton.GetComponent<Button>().onClick = new Button.ButtonClickedEvent();
-                    resetbutton.GetComponent<Button>().onClick.AddListener(resetEEPart);
-                    var resetbuttonText = resetbutton.Find("Text (TMP)").GetComponent<TextMeshProUGUI>();
-                    resetbuttonText.color = Color.white;
-                }
-                // button.gameObject.AddComponent<DraggableWindow>(); //Add draggable windows component allowing the window to be dragged when the button is pressed down
-
-                //_text = this.transform.Find("InfoWindow").transform.Find("AddRemove").Find("AddRemoveText").GetComponent<TextMeshProUGUI>(); //Find the text component so we can update later.
-                //Mod.Log(_text.ToString());
-            }
-            // Setup Outfit/Doll
-            {
-
-            }
-            //Setup Overrides??
-            {
-
-            }
-            //Setup Equipment/Overrides
-            {
-                //hidebuttons = this.transform.Find("Menus/HideEquipment/RightSide/Toggles").Children().Select(a => a.gameObject.GetComponent<Toggle>()).ToDictionary();
-                foreach (var buttontransform in this.transform.Find("Menus/HideEquipment/RightSide/Toggles").Children().Select(a => a.gameObject.GetComponent<Toggle>()))
-                {
-                    var buttontoggle = buttontransform;
-                    buttontoggle.onValueChanged = new Toggle.ToggleEvent();
-
-                    var buttontext = buttontransform.transform.Find("Label").GetComponent<TextMeshProUGUI>();
-                    if (settings == null) settings = VisualAdjustments.Main.settings.GetCharacterSettings(data);
-                    switch (buttontext.text)
-                    {
-                        case "Hide Cap":
-                            buttontoggle.onValueChanged.AddListener((bool state) =>
-                            {
-                                handleHideEquipment(state, ref settings.hideCap);
-                            });
-                            buttontoggle.isOn = settings.hideCap;
-                            hidebuttons.Add(buttontoggle,settings.hideCap);
-                            break;
-                        case "Hide Helmet":
-                            buttontoggle.onValueChanged.AddListener((bool state) =>
-                            {
-                                handleHideEquipment(state, ref settings.hideHelmet);
-                            });
-                            buttontoggle.isOn = settings.hideHelmet;
-                            hidebuttons.Add(buttontoggle, settings.hideHelmet);
-                            break;
-                        case "Hide Glasses":
-                            buttontoggle.onValueChanged.AddListener((bool state) =>
-                            {
-                                handleHideEquipment(state, ref settings.hideGlasses);
-                            });
-                            buttontoggle.isOn = settings.hideGlasses;
-                            hidebuttons.Add(buttontoggle, settings.hideGlasses);
-                            break;
-                        case "Hide Shirt":
-                            buttontoggle.onValueChanged.AddListener((bool state) =>
-                            {
-                                handleHideEquipment(state, ref settings.hideShirt);
-                            });
-                            buttontoggle.isOn = settings.hideShirt;
-                            hidebuttons.Add(buttontoggle, settings.hideShirt);
-                            break;
-                        case "Hide Class Gear":
-                            buttontoggle.onValueChanged.AddListener((bool state) =>
-                            {
-                                handleHideEquipment(state, ref settings.hideClassCloak);
-                            });
-                            buttontoggle.isOn = settings.hideClassCloak;
-                            hidebuttons.Add(buttontoggle, settings.hideClassCloak);
-                            break;
-                        case "Hide Cloak":
-                            buttontoggle.onValueChanged.AddListener((bool state) =>
-                            {
-                                handleHideEquipment(state, ref settings.hideItemCloak);
-                            });
-                            buttontoggle.isOn = settings.hideItemCloak;
-                            hidebuttons.Add(buttontoggle, settings.hideItemCloak);
-                            break;
-                        case "Hide Armor":
-                            buttontoggle.onValueChanged.AddListener((bool state) =>
-                            {
-                                handleHideEquipment(state, ref settings.hideArmor);
-                            });
-                            buttontoggle.isOn = settings.hideArmor;
-                            hidebuttons.Add(buttontoggle, settings.hideArmor);
-                            break;
-                        case "Hide Bracers":
-                            buttontoggle.onValueChanged.AddListener((bool state) =>
-                            {
-                                handleHideEquipment(state, ref settings.hideBracers);
-                            });
-                            buttontoggle.isOn = settings.hideBracers;
-                            hidebuttons.Add(buttontoggle, settings.hideBracers);
-                            break;
-                        case "Hide Gloves":
-                            buttontoggle.onValueChanged.AddListener((bool state) =>
-                            {
-                                handleHideEquipment(state, ref settings.hideGloves);
-                            });
-                            buttontoggle.isOn = settings.hideGloves;
-                            hidebuttons.Add(buttontoggle, settings.hideGloves);
-                            break;
-                        case "Hide Boots":
-                            buttontoggle.onValueChanged.AddListener((bool state) =>
-                            {
-                                handleHideEquipment(state, ref settings.hideBoots);
-                            });
-                            buttontoggle.isOn = settings.hideBoots;
-                            hidebuttons.Add(buttontoggle, settings.hideBoots);
-                            break;
-                        case "Hide Weapons":
-                            buttontoggle.onValueChanged.AddListener((bool state) =>
-                            {
-                                handleHideEquipment(state, ref settings.hideWeapons);
-                            });
-                            buttontoggle.isOn = settings.hideWeapons;
-                            hidebuttons.Add(buttontoggle, settings.hideWeapons);
-                            break;
-                        case "Hide Sheaths":
-                            buttontoggle.onValueChanged.AddListener((bool state) =>
-                            {
-                                handleHideEquipment(state, ref settings.hideSheaths);
-                            });
-                            buttontoggle.isOn = settings.hideSheaths;
-                            hidebuttons.Add(buttontoggle, settings.hideSheaths);
-                            break;
-                        case "Hide Belt Items":
-                            buttontoggle.onValueChanged.AddListener((bool state) =>
-                            {
-                                handleHideEquipment(state, ref settings.hideBeltSlots);
-                            });
-                            buttontoggle.isOn = settings.hideBeltSlots;
-                            hidebuttons.Add(buttontoggle, settings.hideBeltSlots);
-                            break;
-                        case "Hide Quiver":
-                            buttontoggle.onValueChanged.AddListener((bool state) =>
-                            {
-                                handleHideEquipment(state, ref settings.hidequiver);
-                            });
-                            buttontoggle.isOn = settings.hidequiver;
-                            hidebuttons.Add(buttontoggle, settings.hidequiver);
-                            break;
-                        case "Hide Enchantments":
-                            buttontoggle.onValueChanged.AddListener((bool state) =>
-                            {
-                                handleHideEquipment(state, ref settings.hideWeaponEnchantments);
-                            });
-                            buttontoggle.isOn = settings.hideWeaponEnchantments;
-                            hidebuttons.Add(buttontoggle, settings.hideWeaponEnchantments);
-                            break;
-                        case "Hide Wings":
-                            buttontoggle.onValueChanged.AddListener((bool state) =>
-                            {
-                                handleHideEquipment(state, ref settings.hideWings);
-                            });
-                            buttontoggle.isOn = settings.hideWings;
-                            hidebuttons.Add(buttontoggle, settings.hideWings);
-                            break;
-                        case "Hide Horns":
-                            buttontoggle.onValueChanged.AddListener((bool state) =>
-                            {
-                                handleHideEquipment(state, ref settings.hideHorns);
-                            });
-                            buttontoggle.isOn = settings.hideHorns;
-                            hidebuttons.Add(buttontoggle, settings.hideHorns);
-                            break;
-                        case "Hide Tail":
-                            buttontoggle.onValueChanged.AddListener((bool state) =>
-                            {
-                                handleHideEquipment(state, ref settings.hideTail);
-                            });
-                            buttontoggle.isOn = settings.hideTail;
-                            hidebuttons.Add(buttontoggle, settings.hideTail);
-                            break;
-                        case "Hide Mythic":
-                            buttontoggle.onValueChanged.AddListener((bool state) =>
-                            {
-                                handleHideEquipment(state, ref settings.hideMythic);
-                            });
-                            buttontoggle.isOn = settings.hideMythic;
-                            hidebuttons.Add(buttontoggle, settings.hideMythic);
-                            break;
-                    }
-                    buttontext.color = Color.white;
-
-                }
-                //Overrides
-                {
-                    var overridesobject = this.transform.Find("Menus/HideEquipment/Overrides");
-                    //var options = new List<TMP_Dropdown.OptionData>();
-                    //options[0] = new TMP_Dropdown.OptionData().text;
-                    var overridesdropdown = overridesobject.Find("OverrideSelect").GetComponent<TMP_Dropdown>();
-                    overridesdropdown.onValueChanged = new TMP_Dropdown.DropdownEvent();
-                    var overridecontent = overridesobject.Find("Scroll View/Viewport/Content");
-                    var index2 = 0;
-                    {
-                        var optiondata = new TMP_Dropdown.OptionData("Helmet");
-                        EELDictionaries.Add(index2,EquipmentResourcesManager.Helm);
-                        index2++;
-                        overridesdropdown.options.Add(optiondata);
-                    }
-                    {
-                        var optiondata = new TMP_Dropdown.OptionData("Cloak");
-                        EELDictionaries.Add(index2, EquipmentResourcesManager.Cloak);
-                        index2++;
-                        overridesdropdown.options.Add(optiondata);
-                    }
-                    {
-                        var optiondata = new TMP_Dropdown.OptionData("Shirt");
-                        EELDictionaries.Add(index2, EquipmentResourcesManager.Shirt);
-                        index2++;
-                        overridesdropdown.options.Add(optiondata);
-                    }
-                    {
-                        var optiondata = new TMP_Dropdown.OptionData("Glasses/Mask");
-                        EELDictionaries.Add(index2, EquipmentResourcesManager.Glasses);
-                        index2++;
-                        overridesdropdown.options.Add(optiondata);
-                    }
-                    {
-                        var optiondata = new TMP_Dropdown.OptionData("Armor");
-                        EELDictionaries.Add(index2, EquipmentResourcesManager.Armor);
-                        index2++;
-                        overridesdropdown.options.Add(optiondata);
-                    }
-                    {
-                        var optiondata = new TMP_Dropdown.OptionData("Bracers");
-                        EELDictionaries.Add(index2, EquipmentResourcesManager.Bracers);
-                        index2++;
-                        overridesdropdown.options.Add(optiondata);
-                    }
-                    {
-                        var optiondata = new TMP_Dropdown.OptionData("Gloves");
-                        EELDictionaries.Add(index2, EquipmentResourcesManager.Gloves);
-                        index2++;
-                        overridesdropdown.options.Add(optiondata);
-                    }
-                    {
-                        var optiondata = new TMP_Dropdown.OptionData("Boots");
-                        EELDictionaries.Add(index2, EquipmentResourcesManager.Boots);
-                        index2++;
-                        overridesdropdown.options.Add(optiondata);
-                    }
-                    /* {
-                         var optiondata = new TMP_Dropdown.OptionData("Wings (FX)");
-                         EELDictionaries.Add(index2, EquipmentResourcesManager.WingsFX);
-                         index2++;
-                         overridesdropdown.options.Add(optiondata);
-                     }*/
-                    {
-                        var optiondata = new TMP_Dropdown.OptionData("Mythic");
-                        EELDictionaries.Add(index2, EquipmentResourcesManager.MythicOptions);
-                        index2++;
-                        overridesdropdown.options.Add(optiondata);
-                    }
-                    {
-                        var optiondata = new TMP_Dropdown.OptionData("Wings");
-                        var newwings = new Dictionary<BlueprintRef, string>();
-                        foreach (var wingpair in EquipmentResourcesManager.WingsEE)
+                        //Outfitdoll
+                        var OutfitDoll = UISelectionGrid.Find("OutfitDoll").GetComponent<Button>();
+                        OutfitDoll.onClick = new Button.ButtonClickedEvent();
+                        OutfitDoll.onClick.AddListener(new UnityAction(() =>
                         {
-                            //VisualAdjustments.Main.logger.Log(wingpair.Key + "   " + wingpair.ToString());
-                            newwings.Add(new BlueprintRef(wingpair.Value), wingpair.Key);
+                            HandleUIToggle(UISelectionGrid.Find("OutfitDoll/Text (TMP)").GetComponent<TextMeshProUGUI>().text);
+                        }));
+
+                        //Overrides
+                        var Overrides = UISelectionGrid.Find("Overrides").GetComponent<Button>();
+                        Overrides.onClick = new Button.ButtonClickedEvent();
+                        Overrides.onClick.AddListener(new UnityAction(() =>
+                        {
+                            HandleUIToggle(UISelectionGrid.Find("Overrides/Text (TMP)").GetComponent<TextMeshProUGUI>().text);
+                        }));
+
+                        //EEPicker
+                        var EEPicker = UISelectionGrid.Find("EEPicker").GetComponent<Button>();
+                        EEPicker.onClick = new Button.ButtonClickedEvent();
+                        EEPicker.onClick.AddListener(new UnityAction(() =>
+                        {
+                            HandleUIToggle(UISelectionGrid.Find("EEPicker/Text (TMP)").GetComponent<TextMeshProUGUI>().text);
+                        }));
+
+                        //Equipment
+                        var Equipment = UISelectionGrid.Find("Equipment").GetComponent<Button>();
+                        Equipment.onClick = new Button.ButtonClickedEvent();
+                        Equipment.onClick.AddListener(new UnityAction(() =>
+                        {
+                            HandleUIToggle(UISelectionGrid.Find("Equipment/Text (TMP)").GetComponent<TextMeshProUGUI>().text);
+                        }));
+                        UISelectionGrid.gameObject.SetActive(false);
+
+
+
+                    }
+                }
+                // setup EE Picker
+                {
+                    var eepicker = this.transform.Find("Menus/InventoryViewWindow/EEInfo");
+                    foreach (var text in eepicker.GetComponentsInChildren<TextMeshProUGUI>())
+                    {
+                        text.color = Color.white;
+                    }
+                    eepicker.Find("FlexibleColorPicker").gameObject.SetActive(false);
+                    Name = eepicker.Find("TextboxesValues/Name")
+                        .GetComponent<TextMeshProUGUI>();
+                    Name2 = eepicker.Find("FlexibleColorPicker/NameValue")
+                        .GetComponent<TextMeshProUGUI>();
+                    Race = eepicker.Find("TextboxesValues/Race")
+                        .GetComponent<TextMeshProUGUI>();
+                    Sex = eepicker.Find("TextboxesValues/Sex")
+                        .GetComponent<TextMeshProUGUI>();
+                    AddRemoveButton = this.transform.Find("Menus/InventoryViewWindow/AddRemove/Button/ButtonText").gameObject;
+
+                    var AddRemoveButtonButton = this.transform.Find("Menus/InventoryViewWindow/AddRemove/Button").GetComponent<Button>();
+                    AddRemoveButtonButton.onClick = new Button.ButtonClickedEvent();
+                    AddRemoveButtonButton.onClick.AddListener(new UnityAction(() =>
+                    {
+                        addRemoveButton();
+                    }));
+
+
+                    //Primary Color Picker
+                    {
+                        PrimaryIndex = eepicker.Find("ColorSelectors/Primary/InputFieldIndex").GetComponent<TMP_InputField>();
+                        PrimaryIndex.onValueChanged = new TMP_InputField.OnChangeEvent();
+                        PrimaryIndex.onValueChanged.AddListener((string val) =>
+                        {
+                            handleSliderInputField(val, true);
+                        });
+                        PrimaryIndex.textComponent.color = Color.white;
+                        var IncreaseButton = eepicker.Find("ColorSelectors/Primary/PositiveIncrement").GetComponent<Button>();
+                        var DecreaseButton = eepicker.Find("ColorSelectors/Primary/NegativeIncrement").GetComponent<Button>();
+                        IncreaseButton.onClick = new Button.ButtonClickedEvent();
+                        IncreaseButton.onClick.AddListener(new UnityAction(() =>
+                        {
+                            increasePrimaryButton();
+                        //UpdatePreview();
+                    }));
+                        DecreaseButton.onClick = new Button.ButtonClickedEvent();
+                        DecreaseButton.onClick.AddListener(new UnityAction(() =>
+                        {
+                            decreasePrimaryButton();
+                        //UpdatePreview();
+                    }));
+                        primSlider = eepicker.Find("ColorSelectors/Primary/Slider").GetComponent<Slider>();
+                        primSlider.onValueChanged = new Slider.SliderEvent();
+                        primSlider.onValueChanged.AddListener(new UnityAction<float>((float value) =>
+                        {
+                            primindex = (int)value;
+                        // UpdatePreview();
+                    }));
+                        PrimNoColor = eepicker.Find("ColorSelectors/Primary/Available").gameObject;
+                        PrimNoColor.transform.Find("Text (TMP)").GetComponent<TextMeshProUGUI>().color = Color.white;
+                    }
+                    //Secondary Color Picker
+                    {
+                        SecondaryIndex = eepicker.Find("ColorSelectors/Secondary/InputFieldIndex").GetComponent<TMP_InputField>();
+                        SecondaryIndex.onValueChanged = new TMP_InputField.OnChangeEvent();
+                        SecondaryIndex.onValueChanged.AddListener((string val) =>
+                        {
+                            handleSliderInputField(val, false);
+                        });
+                        SecondaryIndex.textComponent.color = Color.white;
+                        var IncreaseButton = eepicker.Find("ColorSelectors/Secondary/PositiveIncrement").GetComponent<Button>();
+                        var DecreaseButton = eepicker.Find("ColorSelectors/Secondary/NegativeIncrement").GetComponent<Button>();
+                        IncreaseButton.onClick = new Button.ButtonClickedEvent();
+                        IncreaseButton.onClick.AddListener(new UnityAction(() =>
+                        {
+                            increaseSecondaryButton();
+                        // UpdatePreview();
+                    }));
+                        DecreaseButton.onClick = new Button.ButtonClickedEvent();
+                        DecreaseButton.onClick.AddListener(new UnityAction(() =>
+                        {
+                            decreaseSecondaryButton();
+                        //UpdatePreview();
+                    }));
+                        secondSlider = eepicker.Find("ColorSelectors/Secondary/Slider").GetComponent<Slider>();
+                        secondSlider.onValueChanged = new Slider.SliderEvent();
+                        secondSlider.onValueChanged.AddListener(new UnityAction<float>((float value) =>
+                        {
+                            secondindex = (int)value;
+                        // UpdatePreview();
+                    }));
+                        SecNoColor = eepicker.Find("ColorSelectors/Secondary/Available").gameObject;
+                        SecNoColor.transform.Find("Text (TMP)").GetComponent<TextMeshProUGUI>().color = Color.white;
+                    }
+                    //Custom Color Picker
+                    {
+                        // var newpickersarray = new FlexibleColorPicker.Picker[]{mainpicker,rpicker};
+                    }
+                    // setup filter fields
+                    {
+                        // All EE's
+                        var AllEETxtField = this.transform.Find("Menus/InventoryViewWindow/AllEEs/FilterArea/InputField (TMP)").GetComponent<TMP_InputField>();
+                        var placeholder = AllEETxtField.gameObject.transform.Find("Text Area/Placeholder").GetComponent<TextMeshProUGUI>();
+                        placeholder.color = new Color((float)0.05, (float)0.05, (float)0.05, (float)0.6);
+                        placeholder.fontStyle = FontStyles.Italic;
+                        AllEETxtField.onValueChanged = new TMP_InputField.OnChangeEvent();
+                        AllEETxtField.onValueChanged.AddListener(HandleFilterChangedAll);
+
+                        // Current EE's
+                        var CurrentEETxtField = this.transform.Find("Menus/InventoryViewWindow/CurrentEEs/FilterArea/InputField (TMP)").GetComponent<TMP_InputField>();
+                        var placeholdercurrent = CurrentEETxtField.gameObject.transform.Find("Text Area/Placeholder").GetComponent<TextMeshProUGUI>();
+                        placeholdercurrent.color = new Color((float)0.05, (float)0.05, (float)0.05, (float)0.6);
+                        placeholdercurrent.fontStyle = FontStyles.Italic;
+                        CurrentEETxtField.onValueChanged = new TMP_InputField.OnChangeEvent();
+                        CurrentEETxtField.onValueChanged.AddListener(HandleFilterChangedCurrent);
+                    }
+                    // Reset Button
+                    {
+                        var resetbutton = this.transform.Find("Menus/InventoryViewWindow/CurrentEEs/ResetButton");
+                        resetbutton.GetComponent<Button>().onClick = new Button.ButtonClickedEvent();
+                        resetbutton.GetComponent<Button>().onClick.AddListener(resetEEPart);
+                        var resetbuttonText = resetbutton.Find("Text (TMP)").GetComponent<TextMeshProUGUI>();
+                        resetbuttonText.color = Color.white;
+                    }
+                    // button.gameObject.AddComponent<DraggableWindow>(); //Add draggable windows component allowing the window to be dragged when the button is pressed down
+
+                    //_text = this.transform.Find("InfoWindow").transform.Find("AddRemove").Find("AddRemoveText").GetComponent<TextMeshProUGUI>(); //Find the text component so we can update later.
+                    //Mod.Log(_text.ToString());
+                }
+                // Setup Outfit/Doll
+                {
+
+                }
+                //Setup Overrides??
+                {
+
+                }
+                //Setup Equipment/Overrides
+                {
+                    //hidebuttons = this.transform.Find("Menus/HideEquipment/RightSide/Toggles").Children().Select(a => a.gameObject.GetComponent<Toggle>()).ToDictionary();
+                    foreach (var buttontransform in this.transform.Find("Menus/HideEquipment/RightSide/Toggles").Children().Select(a => a.gameObject.GetComponent<Toggle>()))
+                    {
+                        var buttontoggle = buttontransform;
+                        buttontoggle.onValueChanged = new Toggle.ToggleEvent();
+
+                        var buttontext = buttontransform.transform.Find("Label").GetComponent<TextMeshProUGUI>();
+                        VisualAdjustments.Main.logger.Log(buttontext.text);
+                        VisualAdjustments.Main.logger.Log(settings.ToString());
+                        switch (buttontext.text)
+                        {
+                            case "Hide Cap":
+                                buttontoggle.onValueChanged.AddListener((bool state) =>
+                                {
+                                    handleHideEquipment(state, ref settings.hideCap);
+                                });
+                                buttontoggle.isOn = settings.hideCap;
+                                hidebuttons.Add(buttontoggle, settings.hideCap);
+                                break;
+                            case "Hide Helmet":
+                                buttontoggle.onValueChanged.AddListener((bool state) =>
+                                {
+                                    handleHideEquipment(state, ref settings.hideHelmet);
+                                });
+                                buttontoggle.isOn = settings.hideHelmet;
+                                hidebuttons.Add(buttontoggle, settings.hideHelmet);
+                                break;
+                            case "Hide Glasses":
+                                buttontoggle.onValueChanged.AddListener((bool state) =>
+                                {
+                                    handleHideEquipment(state, ref settings.hideGlasses);
+                                });
+                                buttontoggle.isOn = settings.hideGlasses;
+                                hidebuttons.Add(buttontoggle, settings.hideGlasses);
+                                break;
+                            case "Hide Shirt":
+                                buttontoggle.onValueChanged.AddListener((bool state) =>
+                                {
+                                    handleHideEquipment(state, ref settings.hideShirt);
+                                });
+                                buttontoggle.isOn = settings.hideShirt;
+                                hidebuttons.Add(buttontoggle, settings.hideShirt);
+                                break;
+                            case "Hide Class Gear":
+                                buttontoggle.onValueChanged.AddListener((bool state) =>
+                                {
+                                    handleHideEquipment(state, ref settings.hideClassCloak);
+                                });
+                                buttontoggle.isOn = settings.hideClassCloak;
+                                hidebuttons.Add(buttontoggle, settings.hideClassCloak);
+                                break;
+                            case "Hide Cloak":
+                                buttontoggle.onValueChanged.AddListener((bool state) =>
+                                {
+                                    handleHideEquipment(state, ref settings.hideItemCloak);
+                                });
+                                buttontoggle.isOn = settings.hideItemCloak;
+                                hidebuttons.Add(buttontoggle, settings.hideItemCloak);
+                                break;
+                            case "Hide Armor":
+                                buttontoggle.onValueChanged.AddListener((bool state) =>
+                                {
+                                    handleHideEquipment(state, ref settings.hideArmor);
+                                });
+                                buttontoggle.isOn = settings.hideArmor;
+                                hidebuttons.Add(buttontoggle, settings.hideArmor);
+                                break;
+                            case "Hide Bracers":
+                                buttontoggle.onValueChanged.AddListener((bool state) =>
+                                {
+                                    handleHideEquipment(state, ref settings.hideBracers);
+                                });
+                                buttontoggle.isOn = settings.hideBracers;
+                                hidebuttons.Add(buttontoggle, settings.hideBracers);
+                                break;
+                            case "Hide Gloves":
+                                buttontoggle.onValueChanged.AddListener((bool state) =>
+                                {
+                                    handleHideEquipment(state, ref settings.hideGloves);
+                                });
+                                buttontoggle.isOn = settings.hideGloves;
+                                hidebuttons.Add(buttontoggle, settings.hideGloves);
+                                break;
+                            case "Hide Boots":
+                                buttontoggle.onValueChanged.AddListener((bool state) =>
+                                {
+                                    handleHideEquipment(state, ref settings.hideBoots);
+                                });
+                                buttontoggle.isOn = settings.hideBoots;
+                                hidebuttons.Add(buttontoggle, settings.hideBoots);
+                                break;
+                            case "Hide Weapons":
+                                buttontoggle.onValueChanged.AddListener((bool state) =>
+                                {
+                                    handleHideEquipment(state, ref settings.hideWeapons);
+                                });
+                                buttontoggle.isOn = settings.hideWeapons;
+                                hidebuttons.Add(buttontoggle, settings.hideWeapons);
+                                break;
+                            case "Hide Sheaths":
+                                buttontoggle.onValueChanged.AddListener((bool state) =>
+                                {
+                                    handleHideEquipment(state, ref settings.hideSheaths);
+                                });
+                                buttontoggle.isOn = settings.hideSheaths;
+                                hidebuttons.Add(buttontoggle, settings.hideSheaths);
+                                break;
+                            case "Hide Belt Items":
+                                buttontoggle.onValueChanged.AddListener((bool state) =>
+                                {
+                                    handleHideEquipment(state, ref settings.hideBeltSlots);
+                                });
+                                buttontoggle.isOn = settings.hideBeltSlots;
+                                hidebuttons.Add(buttontoggle, settings.hideBeltSlots);
+                                break;
+                            case "Hide Quiver":
+                                buttontoggle.onValueChanged.AddListener((bool state) =>
+                                {
+                                    handleHideEquipment(state, ref settings.hidequiver);
+                                });
+                                buttontoggle.isOn = settings.hidequiver;
+                                hidebuttons.Add(buttontoggle, settings.hidequiver);
+                                break;
+                            case "Hide Enchantments":
+                                buttontoggle.onValueChanged.AddListener((bool state) =>
+                                {
+                                    handleHideEquipment(state, ref settings.hideWeaponEnchantments);
+                                });
+                                buttontoggle.isOn = settings.hideWeaponEnchantments;
+                                hidebuttons.Add(buttontoggle, settings.hideWeaponEnchantments);
+                                break;
+                            case "Hide Wings":
+                                buttontoggle.onValueChanged.AddListener((bool state) =>
+                                {
+                                    handleHideEquipment(state, ref settings.hideWings);
+                                });
+                                buttontoggle.isOn = settings.hideWings;
+                                hidebuttons.Add(buttontoggle, settings.hideWings);
+                                break;
+                            case "Hide Horns":
+                                buttontoggle.onValueChanged.AddListener((bool state) =>
+                                {
+                                    handleHideEquipment(state, ref settings.hideHorns);
+                                });
+                                buttontoggle.isOn = settings.hideHorns;
+                                hidebuttons.Add(buttontoggle, settings.hideHorns);
+                                break;
+                            case "Hide Tail":
+                                buttontoggle.onValueChanged.AddListener((bool state) =>
+                                {
+                                    handleHideEquipment(state, ref settings.hideTail);
+                                });
+                                buttontoggle.isOn = settings.hideTail;
+                                hidebuttons.Add(buttontoggle, settings.hideTail);
+                                break;
+                            case "Hide Mythic":
+                                buttontoggle.onValueChanged.AddListener((bool state) =>
+                                {
+                                    handleHideEquipment(state, ref settings.hideMythic);
+                                });
+                                buttontoggle.isOn = settings.hideMythic;
+                                hidebuttons.Add(buttontoggle, settings.hideMythic);
+                                break;
                         }
-                        EELDictionaries.Add(index2, newwings);
-                        index2++;
-                        overridesdropdown.options.Add(optiondata);
-                    }
+                        buttontext.color = Color.white;
 
-                    void handleOverrideDropdownChanged(int index)
+                    }
+                    //Overrides
                     {
-                        foreach (var thing in buttonsEELOverride)
+                        var overridesobject = this.transform.Find("Menus/HideEquipment/Overrides");
+                        //var options = new List<TMP_Dropdown.OptionData>();
+                        //options[0] = new TMP_Dropdown.OptionData().text;
+                        var overridesdropdown = overridesobject.Find("OverrideSelect").GetComponent<TMP_Dropdown>();
+                        overridesdropdown.transform.Find("Label").GetComponent<TextMeshProUGUI>().color = Color.white;
+                        overridesdropdown.onValueChanged = new TMP_Dropdown.DropdownEvent();
+                        var overridecontent = overridesobject.Find("Scroll View/Viewport/Content");
+                        var index2 = 0;
                         {
-                            if (!EELDictionaries[index].ContainsKey(thing.Key) && thing.Key != "None")
+                            var optiondata = new TMP_Dropdown.OptionData("Helmet");
+                            EELDictionaries.Add(index2, EquipmentResourcesManager.Helm);
+                            index2++;
+                            overridesdropdown.options.Add(optiondata);
+                        }
+                        {
+                            var optiondata = new TMP_Dropdown.OptionData("Cloak");
+                            EELDictionaries.Add(index2, EquipmentResourcesManager.Cloak);
+                            index2++;
+                            overridesdropdown.options.Add(optiondata);
+                        }
+                        {
+                            var optiondata = new TMP_Dropdown.OptionData("Shirt");
+                            EELDictionaries.Add(index2, EquipmentResourcesManager.Shirt);
+                            index2++;
+                            overridesdropdown.options.Add(optiondata);
+                        }
+                        {
+                            var optiondata = new TMP_Dropdown.OptionData("Glasses/Mask");
+                            EELDictionaries.Add(index2, EquipmentResourcesManager.Glasses);
+                            index2++;
+                            overridesdropdown.options.Add(optiondata);
+                        }
+                        {
+                            var optiondata = new TMP_Dropdown.OptionData("Armor");
+                            EELDictionaries.Add(index2, EquipmentResourcesManager.Armor);
+                            index2++;
+                            overridesdropdown.options.Add(optiondata);
+                        }
+                        {
+                            var optiondata = new TMP_Dropdown.OptionData("Bracers");
+                            EELDictionaries.Add(index2, EquipmentResourcesManager.Bracers);
+                            index2++;
+                            overridesdropdown.options.Add(optiondata);
+                        }
+                        {
+                            var optiondata = new TMP_Dropdown.OptionData("Gloves");
+                            EELDictionaries.Add(index2, EquipmentResourcesManager.Gloves);
+                            index2++;
+                            overridesdropdown.options.Add(optiondata);
+                        }
+                        {
+                            var optiondata = new TMP_Dropdown.OptionData("Boots");
+                            EELDictionaries.Add(index2, EquipmentResourcesManager.Boots);
+                            index2++;
+                            overridesdropdown.options.Add(optiondata);
+                        }
+                        /* {
+                             var optiondata = new TMP_Dropdown.OptionData("Wings (FX)");
+                             EELDictionaries.Add(index2, EquipmentResourcesManager.WingsFX);
+                             index2++;
+                             overridesdropdown.options.Add(optiondata);
+                         }*/
+                        {
+                            var optiondata = new TMP_Dropdown.OptionData("Mythic");
+                            EELDictionaries.Add(index2, EquipmentResourcesManager.MythicOptions);
+                            index2++;
+                            overridesdropdown.options.Add(optiondata);
+                        }
+                        {
+                            var optiondata = new TMP_Dropdown.OptionData("Wings");
+                            var newwings = new Dictionary<BlueprintRef, string>();
+                            foreach (var wingpair in EquipmentResourcesManager.WingsEE)
                             {
-                                thing.Value.gameObject.SetActive(false);
+                                //VisualAdjustments.Main.logger.Log(wingpair.Key + "   " + wingpair.ToString());
+                                newwings.Add(new BlueprintRef(wingpair.Value), wingpair.Key);
                             }
-                            else if (thing.Key == "None")
+                            EELDictionaries.Add(index2, newwings);
+                            index2++;
+                            overridesdropdown.options.Add(optiondata);
+                        }
+                        //Weapons
+                        {
+                            var optiondata = new TMP_Dropdown.OptionData("Weapons");
+                            overridesdropdown.options.Add(optiondata);
+                            index2++;
+                            VisualAdjustments.Main.logger.Log(index2.ToString());
+                            // Weaponstyles dropdown
                             {
-                                thing.Value.gameObject.SetActive(true);
+                                var weapondropdown = overridesobject.Find("WeaponStyleSelect").GetComponent<TMP_Dropdown>();
+                                weapondropdown.transform.Find("Label").GetComponent<TextMeshProUGUI>().color = Color.white;
+                                var index = 0;
+                                foreach (var a in EquipmentResourcesManager.Weapons)
+                                {
+                                    var optiondatas = new TMP_Dropdown.OptionData(a.Key);
+                                    weaponIndices.Add(index, a.Key);
+                                    //EELDictionaries.Add(index2, EquipmentResourcesManager.Weapons[((WeaponAnimationStyle)a).ToString()]);
+                                    index++;
+                                    weapondropdown.options.Add(optiondatas);
+                                }
+                            }
+                        }
+                        //Enchantments
+                        {
+                            var optiondata = new TMP_Dropdown.OptionData("Enchantments");
+                            //VisualAdjustments.Main.logger.Log("Enchantments" + index2);
+                            EELDictionaries.Add(index2, EquipmentResourcesManager.WeaponEnchantments);
+                            index2++;
+                            overridesdropdown.options.Add(optiondata);
+                        }
+                        //Views
+                        {
+                            var optiondata = new TMP_Dropdown.OptionData("View");
+                            // VisualAdjustments.Main.logger.Log("View" + index2);
+                            var newunits = new Dictionary<BlueprintRef, string>();
+                            foreach (var unit in EquipmentResourcesManager.Units)
+                            {
+                                //VisualAdjustments.Main.logger.Log(wingpair.Key + "   " + wingpair.ToString());
+                                newunits.Add(new BlueprintRef(unit.Key), unit.Value);
+                            }
+                            EELDictionaries.Add(index2, newunits);
+                            index2++;
+                            overridesdropdown.options.Add(optiondata);
+                        }
+
+                        overridesdropdown.onValueChanged.AddListener(handleOverrideDropdownChanged);
+                        handleOverrideDropdownChanged(0);
+                        void handleOverrideDropdownChanged(int index)
+                        {
+                            VisualAdjustments.Main.logger.Log(index.ToString());
+                            if (index != 10)
+                            {
+                                overridesobject.Find("WeaponStyleSelect").gameObject.SetActive(false);
+                                foreach (var thing in buttonsEELOverride)
+                                {
+                                    if (!EELDictionaries[index].ContainsKey(thing.Key) && thing.Key != "None")
+                                    {
+                                        thing.Value.gameObject.SetActive(false);
+                                    }
+                                    else if (thing.Key == "None")
+                                    {
+                                        thing.Value.gameObject.SetActive(true);
+                                    }
+                                    else
+                                    {
+                                        thing.Value.gameObject.SetActive(true);
+                                    }
+                                }
+                                if (!buttonsEELOverride.ContainsKey("None"))
+                                {
+                                    var buttontoaddD = Instantiate(buttonTemplate);
+                                    var buttontoaddtextt = buttontoaddD.Find("TextB").GetComponent<TextMeshProUGUI>();
+                                    buttontoaddtextt.text = "None";
+                                    //buttontoaddtext.font = font;
+                                    buttontoaddtextt.color = Color.white;
+                                    buttontoaddD.transform.SetParent(overridecontent.transform, false);
+                                    var buttontoaddbuttoncomponentt = buttontoaddD.GetComponent<Button>();
+                                    buttontoaddbuttoncomponentt.onClick = new Button.ButtonClickedEvent();
+                                    buttontoaddbuttoncomponentt.onClick.AddListener(new UnityAction(() =>
+                                    {
+                                        setsetting(overridesdropdown.value, "");
+                                        UpdatePreview();
+                                    }));
+                                    buttonsEELOverride.Add("None", buttontoaddD);
+                                }
+
+                                foreach (var eename in EELDictionaries[index])
+                                {
+                                    if (!buttonsEELOverride.ContainsKey(eename.Key.assetId))
+                                    {
+                                        try
+                                        {
+                                            var buttontoadd = Instantiate(buttonTemplate);
+                                            var buttontoaddtext = buttontoadd.Find("TextB").GetComponent<TextMeshProUGUI>();
+                                            // if ()
+                                            {
+                                                //buttontoaddtext.text = eename.Value;
+                                                buttontoaddtext.text = GetTextAndSetupCategory(eename.Value);
+                                                //buttontoaddtext.text = Kingmaker.Cheats.Utilities.GetBlueprint<BlueprintScriptableObject>(eename.Key.assetId).name;
+                                            }
+
+                                            //buttontoaddtext.font = font;
+                                            buttontoaddtext.color = Color.white;
+                                            buttontoadd.transform.SetParent(overridecontent.transform, false);
+                                            var buttontoaddbuttoncomponent = buttontoadd.GetComponent<Button>();
+                                            buttontoaddbuttoncomponent.onClick = new Button.ButtonClickedEvent();
+                                            buttonsEELOverride.Add(eename.Key.assetId, buttontoadd);
+                                            buttontoaddbuttoncomponent.onClick.AddListener(new UnityAction(() =>
+                                            {
+                                                setsetting(index, eename.Key.assetId);
+                                                UpdatePreview();
+                                            }));
+                                        }
+                                        catch (Exception e)
+                                        {
+                                            VisualAdjustments.Main.logger.Log(e.ToString());
+                                            throw;
+                                        }
+                                    }
+                                }
                             }
                             else
                             {
-                                thing.Value.gameObject.SetActive(true);
+                                overridesobject.Find("WeaponStyleSelect").gameObject.SetActive(true);
                             }
                         }
-                        if (!buttonsEELOverride.ContainsKey("None"))
-                        {
-                            var buttontoaddD = Instantiate(buttonTemplate);
-                            var buttontoaddtextt = buttontoaddD.Find("TextB").GetComponent<TextMeshProUGUI>();
-                            buttontoaddtextt.text = "None";
-                            //buttontoaddtext.font = font;
-                            buttontoaddtextt.color = Color.white;
-                            buttontoaddD.transform.SetParent(overridecontent.transform, false);
-                            var buttontoaddbuttoncomponentt = buttontoaddD.GetComponent<Button>();
-                            buttontoaddbuttoncomponentt.onClick = new Button.ButtonClickedEvent();
-                            buttontoaddbuttoncomponentt.onClick.AddListener(new UnityAction(() => {
-                                setsetting(overridesdropdown.value, "");
-                            }));
-                            buttonsEELOverride.Add("None", buttontoaddD);
-                        }
+                    }
 
-                        foreach (var eename in EELDictionaries[index])
+                }
+                //Weaponstyle Selector
+                {
+                    var overridesobject = this.transform.Find("Menus/HideEquipment/Overrides");
+                    void HandleWeaponSelectorSelected(int index)
+                    {
+                        if (weaponIndices.TryGetValue(index, out string weaponstyle))
                         {
-                            if (!buttonsEELOverride.ContainsKey(eename.Key.assetId))
+                            SelectedWeaponType = weaponstyle;
+                            if (EquipmentResourcesManager.Weapons.TryGetValue(weaponstyle, out Dictionary<BlueprintRef, string> Weapons))
                             {
-                                try
+                                var overridecontent = overridesobject.Find("Scroll View/Viewport/Content");
+                                foreach (var thing in buttonsEELOverride)
                                 {
-                                    var buttontoadd = Instantiate(buttonTemplate);
-                                    var buttontoaddtext = buttontoadd.Find("TextB").GetComponent<TextMeshProUGUI>();
-                                   // if ()
-                                   {
-                                       buttontoaddtext.text = eename.Value;
-                                       //buttontoaddtext.text = Kingmaker.Cheats.Utilities.GetBlueprint<BlueprintScriptableObject>(eename.Key.assetId).name;
-                                   }
-
-                                    //buttontoaddtext.font = font;
-                                    buttontoaddtext.color = Color.white;
-                                    buttontoadd.transform.SetParent(overridecontent.transform, false);
-                                    var buttontoaddbuttoncomponent = buttontoadd.GetComponent<Button>();
-                                    buttontoaddbuttoncomponent.onClick = new Button.ButtonClickedEvent();
-                                    buttonsEELOverride.Add(eename.Key.assetId,buttontoadd);
-                                     buttontoaddbuttoncomponent.onClick.AddListener(new UnityAction(() => {
-                                         setsetting(index,eename.Key.assetId);
-                                     }));
+                                    if (!Weapons.ContainsKey(thing.Key) && thing.Key != "None")
+                                    {
+                                        thing.Value.gameObject.SetActive(false);
+                                    }
+                                    else if (thing.Key == "None")
+                                    {
+                                        thing.Value.gameObject.SetActive(true);
+                                    }
+                                    else
+                                    {
+                                        thing.Value.gameObject.SetActive(true);
+                                    }
                                 }
-                                catch (Exception e)
+                                if (!buttonsEELOverride.ContainsKey("None"))
                                 {
-                                    VisualAdjustments.Main.logger.Log(e.ToString());
-                                    throw;
+                                    var buttontoaddD = Instantiate(buttonTemplate);
+                                    var buttontoaddtextt = buttontoaddD.Find("TextB").GetComponent<TextMeshProUGUI>();
+                                    buttontoaddtextt.text = "None";
+                                    //buttontoaddtext.font = font;
+                                    buttontoaddtextt.color = Color.white;
+                                    buttontoaddD.transform.SetParent(overridecontent.transform, false);
+                                    var buttontoaddbuttoncomponentt = buttontoaddD.GetComponent<Button>();
+                                    buttontoaddbuttoncomponentt.onClick = new Button.ButtonClickedEvent();
+                                    buttontoaddbuttoncomponentt.onClick.AddListener(new UnityAction(() =>
+                                    {
+                                    //settings.weaponOverrides[(new OverrideInfo(weaponstyle, slot, primorsec))] = null;
+                                    //settings.weaponOverrides[(new Tuple<string, int, bool>(weaponstyle, slot, primorsec))] = null;
+                                    settings.weaponOverrides[new Tuple<string, int, bool>(weaponstyle, slot, primorsec).ToString()] = null;
+                                        VisualAdjustments.Main.logger.Log("settonull");
+                                        UpdatePreview();
+                                    //Set appropriate assetguid to nothing
+                                    // setsetting(overridesdropdown.value, "");
+                                }));
+                                    buttonsEELOverride.Add("None", buttontoaddD);
+                                }
+                                foreach (var weapon in Weapons)
+                                {
+                                    if (!buttonsEELOverride.ContainsKey(weapon.Key.assetId))
+                                    {
+                                        try
+                                        {
+                                            var buttontoadd = Instantiate(buttonTemplate);
+                                            var buttontoaddtext = buttontoadd.Find("TextB").GetComponent<TextMeshProUGUI>();
+                                            // if ()
+                                            {
+                                                buttontoaddtext.text = weapon.Value;
+                                                //buttontoaddtext.text = Kingmaker.Cheats.Utilities.GetBlueprint<BlueprintScriptableObject>(eename.Key.assetId).name;
+                                            }
+                                            //buttontoaddtext.font = font;
+                                            buttontoaddtext.color = Color.white;
+                                            buttontoadd.transform.SetParent(overridecontent.transform, false);
+                                            var buttontoaddbuttoncomponent = buttontoadd.GetComponent<Button>();
+                                            buttontoaddbuttoncomponent.onClick = new Button.ButtonClickedEvent();
+                                            buttonsEELOverride.Add(weapon.Key.assetId, buttontoadd);
+                                            buttontoaddbuttoncomponent.onClick.AddListener(new UnityAction(() =>
+                                            {
+                                                settings.weaponOverrides[new Tuple<string, int, bool>(weaponstyle, slot, primorsec).ToString()] = weapon.Key;
+                                                UpdatePreview();
+                                            //settings.weaponOverrides[(new Tuple<string,int,bool>(weaponstyle, slot, primorsec))] = weapon.Key;
+                                            //Set appropriate weapon override
+                                            //setsetting(index, weapon.Key.assetId);
+                                        }));
+                                        }
+                                        catch (Exception e)
+                                        {
+                                            VisualAdjustments.Main.logger.Log(e.ToString());
+                                            throw;
+                                        }
+                                    }
                                 }
                             }
                         }
                     }
-                    overridesdropdown.onValueChanged.AddListener(handleOverrideDropdownChanged);
-                    handleOverrideDropdownChanged(0);
+                    var WeaponSelector = overridesobject.Find("WeaponStyleSelect").GetComponent<TMP_Dropdown>();
+                    WeaponSelector.onValueChanged = new TMP_Dropdown.DropdownEvent();
+                    WeaponSelector.onValueChanged.AddListener(new UnityAction<int>((int index) =>
+                    {
+                        HandleWeaponSelectorSelected(index);
+                        VisualAdjustments.Main.logger.Log(index.ToString());
+                    }));
+                    //handleOverrideDropdownChanged(0);
+                    //Weapon Slot Selector
+                    {
+                        /* var SetSelectors = overridesobject.Find("WeaponSetSelectors");
+                         //1
+                         {
+                             var toggle = SetSelectors.Find("1");
+                             var togglecomponent = toggle.GetComponent<Toggle>();
+                             togglecomponent.onValueChanged = new Toggle.ToggleEvent();
+                             togglecomponent.onValueChanged.AddListener((bool a) =>
+                             {
+                                 slot = 0;
+                             });
+                             var PrimSec = toggle.Find("PrimSec");
+                             //Prim
+                             {
+                                 var toggl = PrimSec.Find("Prim").GetComponent<Toggle>();
+                                 toggl.onValueChanged = new Toggle.ToggleEvent();
+                                 toggl.onValueChanged.AddListener((bool state) =>
+                                 {
+                                     slot = 0;
+                                     primorsec = true;
+                                 });
+                             }
+                             //Sec
+                             {
+                                 var toggl = PrimSec.Find("Sec").GetComponent<Toggle>();
+                                 toggl.onValueChanged = new Toggle.ToggleEvent();
+                                 toggl.onValueChanged.AddListener((bool state) =>
+                                 {
+                                     slot = 0;
+                                     primorsec = false;
+                                 });
+                             }
+                         }
+                         //2
+                         {
+                             var toggle = SetSelectors.Find("2");
+                             var togglecomponent = toggle.GetComponent<Toggle>();
+                             togglecomponent.onValueChanged = new Toggle.ToggleEvent();
+                             togglecomponent.onValueChanged.AddListener((bool a) =>
+                             {
+                                 slot = 1;
+                             });
+                             var PrimSec = toggle.Find("PrimSec");
+                             //Prim
+                             {
+                                 var toggl = PrimSec.Find("Prim").GetComponent<Toggle>();
+                                 toggl.onValueChanged = new Toggle.ToggleEvent();
+                                 toggl.onValueChanged.AddListener((bool state) =>
+                                 {
+                                     slot = 1;
+                                     primorsec = true;
+                                 });
+                             }
+                             //Sec
+                             {
+                                 var toggl = PrimSec.Find("Sec").GetComponent<Toggle>();
+                                 toggl.onValueChanged = new Toggle.ToggleEvent();
+                                 toggl.onValueChanged.AddListener((bool state) =>
+                                 {
+                                     slot = 1;
+                                     primorsec = false;
+                                 });
+                             }
+                         }
+                         //3
+                         {
+                             var toggle = SetSelectors.Find("3");
+                             var togglecomponent = toggle.GetComponent<Toggle>();
+                             togglecomponent.onValueChanged = new Toggle.ToggleEvent();
+                             togglecomponent.onValueChanged.AddListener((bool a) =>
+                             {
+                                 slot = 2;
+                             });
+                             var PrimSec = toggle.Find("PrimSec");
+                             //Prim
+                             {
+                                 var toggl = PrimSec.Find("Prim").GetComponent<Toggle>();
+                                 toggl.onValueChanged = new Toggle.ToggleEvent();
+                                 toggl.onValueChanged.AddListener((bool state) =>
+                                 {
+                                     slot = 2;
+                                     primorsec = true;
+                                 });
+                             }
+                             //Sec
+                             {
+                                 var toggl = PrimSec.Find("Sec").GetComponent<Toggle>();
+                                 toggl.onValueChanged = new Toggle.ToggleEvent();
+                                 toggl.onValueChanged.AddListener((bool state) =>
+                                 {
+                                     slot = 2;
+                                     primorsec = false;
+                                 });
+                             }
+                         }
+                         //4
+                         {
+                             var toggle = SetSelectors.Find("4");
+                             var togglecomponent = toggle.GetComponent<Toggle>();
+                             togglecomponent.onValueChanged = new Toggle.ToggleEvent();
+                             togglecomponent.onValueChanged.AddListener((bool a) =>
+                             {
+                                 slot = 3;
+                             });
+                             var PrimSec = toggle.Find("PrimSec");
+                             //Prim
+                             {
+                                 var toggl = PrimSec.Find("Prim").GetComponent<Toggle>();
+                                 toggl.onValueChanged = new Toggle.ToggleEvent();
+                                 toggl.onValueChanged.AddListener((bool state) =>
+                                 {
+                                     slot = 3;
+                                     primorsec = true;
+                                 });
+                             }
+                             //Sec
+                             {
+                                 var toggl = PrimSec.Find("Sec").GetComponent<Toggle>();
+                                 toggl.onValueChanged = new Toggle.ToggleEvent();
+                                 toggl.onValueChanged.AddListener((bool state) =>
+                                 {
+                                     slot = 3;
+                                     primorsec = false;
+                                 });
+                             }
+                         }*/
+                    }
                 }
-
+                this.transform.Find("Menus/HideEquipment").gameObject.SetActive(false);
+            }
+            catch(Exception e)
+            {
+                VisualAdjustments.Main.logger.Log(e.StackTrace);
             }
         }
 
-        void setsetting(int index,string eelguid)
+        void setsetting(int index, string eelguid)
         {
-            if (!eelguid.IsNullOrEmpty())
+            try
             {
-                switch (index)
+                if (!eelguid.IsNullOrEmpty())
                 {
-                    case 0:
+                    switch (index)
                     {
-                        settings.overrideHelm = new BlueprintRef(eelguid);
-                        break;
-                    }
-                    case 1:
-                    {
-                        settings.overrideCloak = new BlueprintRef(eelguid);
-                        break;
-                    }
-                    case 2:
-                    {
-                        settings.overrideShirt = new BlueprintRef(eelguid);
-                        break;
-                    }
-                    case 3:
-                    {
-                        settings.overrideGlasses = new BlueprintRef(eelguid);
-                        break;
-                    }
-                    case 4:
-                    {
-                        settings.overrideArmor = new BlueprintRef(eelguid);
-                        break;
-                    }
-                    case 5:
-                    {
-                        settings.overrideBracers = new BlueprintRef(eelguid);
-                        break;
-                    }
-                    case 6:
-                    {
-                        settings.overrideGloves = new BlueprintRef(eelguid);
-                        break;
-                    }
-                    case 7:
-                    {
-                        settings.overrideBoots = new BlueprintRef(eelguid);
-                        break;
-                    }
-                    case 8:
-                    {
-                        //VisualAdjustments.Main.logger.Log(eelguid);
-                        settings.overrideMythic = eelguid;
-                        break;
-                    }
-                    case 9:
-                    {
-                        //VisualAdjustments.Main.logger.Log(eelguid);
-                        settings.overrideWingsEE = eelguid;
-                        break;
+                        case 0:
+                            {
+                                settings.overrideHelm = new BlueprintRef(eelguid);
+                                break;
+                            }
+                        case 1:
+                            {
+                                settings.overrideCloak = new BlueprintRef(eelguid);
+                                break;
+                            }
+                        case 2:
+                            {
+                                settings.overrideShirt = new BlueprintRef(eelguid);
+                                break;
+                            }
+                        case 3:
+                            {
+                                settings.overrideGlasses = new BlueprintRef(eelguid);
+                                break;
+                            }
+                        case 4:
+                            {
+                                settings.overrideArmor = new BlueprintRef(eelguid);
+                                break;
+                            }
+                        case 5:
+                            {
+                                settings.overrideBracers = new BlueprintRef(eelguid);
+                                break;
+                            }
+                        case 6:
+                            {
+                                settings.overrideGloves = new BlueprintRef(eelguid);
+                                break;
+                            }
+                        case 7:
+                            {
+                                settings.overrideBoots = new BlueprintRef(eelguid);
+                                break;
+                            }
+                        case 8:
+                            {
+                                //VisualAdjustments.Main.logger.Log(eelguid);
+                                settings.overrideMythic = eelguid;
+                                break;
+                            }
+                        case 9:
+                            {
+                                //VisualAdjustments.Main.logger.Log(eelguid);
+                                settings.overrideWingsEE = eelguid;
+                                break;
+                            }
+                        case 11:
+                            {
+                                settings.weaponEnchantments[new Tuple<int, bool>(slot, primorsec).ToString()] = eelguid;
+                                break;
+                            }
+                        case 12:
+                            {
+                                settings.overrideView = eelguid;
+                                ViewManager.ReplaceView(data, settings.overrideView);
+                                break;
+                            }
                     }
                 }
+                else
+                {
+                    switch (index)
+                    {
+                        case 0:
+                            {
+                                settings.overrideHelm = null;
+                                break;
+                            }
+                        case 1:
+                            {
+                                settings.overrideCloak = null;
+                                break;
+                            }
+                        case 2:
+                            {
+                                settings.overrideShirt = null;
+                                break;
+                            }
+                        case 3:
+                            {
+                                settings.overrideGlasses = null;
+                                break;
+                            }
+                        case 4:
+                            {
+                                settings.overrideArmor = null;
+                                break;
+                            }
+                        case 5:
+                            {
+                                settings.overrideBracers = null;
+                                break;
+                            }
+                        case 6:
+                            {
+                                settings.overrideGloves = null;
+                                break;
+                            }
+                        case 7:
+                            {
+                                settings.overrideBoots = null;
+                                break;
+                            }
+                        case 8:
+                            {
+                                //VisualAdjustments.Main.logger.Log(eelguid);
+                                settings.overrideMythic = "";
+                                break;
+                            }
+                        case 9:
+                            {
+                                // VisualAdjustments.Main.logger.Log(eelguid);
+                                settings.overrideWingsEE = "";
+                                break;
+                            }
+                        case 10:
+                            {
+                                settings.weaponOverrides[new Tuple<string, int, bool>(SelectedWeaponType, slot, primorsec).ToString()] = "";
+                                break;
+                            }
+                        case 11:
+                            {
+                                settings.weaponEnchantments[new Tuple<int, bool>(slot, primorsec).ToString()] = "";
+                                break;
+                            }
+                        case 12:
+                            {
+                                // VisualAdjustments.Main.logger.Log(eelguid);
+                                settings.overrideView = "";
+                                ViewManager.ReplaceView(data, settings.overrideView);
+                                break;
+                            }
+                    }
+                }
+                UpdatePreview();
             }
-            else
+            catch (Exception e)
             {
-                switch (index)
-                {
-                    case 0:
-                        {
-                            settings.overrideHelm = null;
-                            break;
-                        }
-                    case 1:
-                        {
-                            settings.overrideCloak = null;
-                            break;
-                        }
-                    case 2:
-                        {
-                            settings.overrideShirt = null;
-                            break;
-                        }
-                    case 3:
-                        {
-                            settings.overrideGlasses = null;
-                            break;
-                        }
-                    case 4:
-                        {
-                            settings.overrideArmor = null;
-                            break;
-                        }
-                    case 5:
-                        {
-                            settings.overrideBracers = null;
-                            break;
-                        }
-                    case 6:
-                        {
-                            settings.overrideGloves = null;
-                            break;
-                        }
-                    case 7:
-                        {
-                            settings.overrideBoots = null;
-                            break;
-                        }
-                    case 8:
-                        {
-                            //VisualAdjustments.Main.logger.Log(eelguid);
-                            settings.overrideMythic = "";
-                            break;
-                        }
-                    case 9:
-                        {
-                            // VisualAdjustments.Main.logger.Log(eelguid);
-                            settings.overrideWingsEE = "";
-                            break;
-                        }
-                }
+                VisualAdjustments.Main.logger.Log(e.ToString());
             }
 
-            CharacterManager.RebuildCharacter(data);
-            CharacterManager.UpdateModel(data.View);
         }
         private Dictionary<string, Transform> buttonsEELOverride = new Dictionary<string, Transform>{};
+        private Dictionary<string, Transform> weaponbuttons = new Dictionary<string, Transform> { };
         private Dictionary<int, Dictionary<BlueprintRef, string>> EELDictionaries = new Dictionary<int, Dictionary<BlueprintRef, string>>();
         public static Dictionary<string, Dictionary<BlueprintRef, string>> EelDictionaries = new Dictionary<string, Dictionary<BlueprintRef, string>>();
         private void handleHideEquipment(bool state, ref bool settingState)
         {
             settingState = state;
             CharacterManager.RebuildCharacter(data);
-            UpdatePreview();
+           // UpdatePreview();
         }
         private void handleSliderInputField(string value,bool primorsec)
         {
@@ -1072,25 +1717,30 @@ namespace TutorialCanvas.UI
                     secondindex = 0;
                 }
             }
+            //UpdatePreview();
         }
         private void increasePrimaryButton()
         {
             primindex = primindex+1;
+          //  UpdatePreview();
         }
 
         private void decreasePrimaryButton()
         {
             primindex = primindex-1;
+          //  UpdatePreview();
         }
 
         private void increaseSecondaryButton()
         {
             secondindex = secondindex+1;
+            //UpdatePreview();
         }
 
         private void decreaseSecondaryButton()
         {
             secondindex = secondindex-1;
+           // UpdatePreview();
         }
 
         public static Char[] splitchars = new Char[] { char.Parse(" ") };
@@ -1225,8 +1875,9 @@ namespace TutorialCanvas.UI
         {
             foreach (var transform in hidebuttons)
             {
-
-                switch (transform.Key.gameObject.transform.Find("Label").GetComponent<TextMeshProUGUI>().text)
+                var txt = transform.Key.transform.Find("Label").GetComponent<TextMeshProUGUI>();
+                if (txt != null && txt.text != null)
+                switch (txt.text)
                 {
                     case "Hide Cap":
                         transform.Key.isOn = settings.hideCap;
@@ -1288,48 +1939,59 @@ namespace TutorialCanvas.UI
                 }
             }
         }
+        public static GameObject UISelectGrid;
         private void Update()
         {
-            if (hasUnitChanged())
+            if (UISelectGrid.activeInHierarchy)
             {
-                VisualAdjustments.Main.settings.Save(VisualAdjustments.Main.ModEntry);
-                HandleUnitChangedHideEEs();
-                foreach (var eebutton in currentEELButtons.Values)
+                if (hasUnitChanged())
                 {
-                    eebutton.gameObject.SafeDestroy();
-                }
-                settings = VisualAdjustments.Main.settings.GetCharacterSettings(data);
-                foreach (var kv in hidebuttons)
-                {
-                    kv.Key.isOn = kv.Value;
-                }
-                currentEELButtons.Clear();
-
-            }
-            if (haschanged)
-            {
-                HandleUnitChangedHideEEs();
-                foreach (var currentee in data.View.CharacterAvatar.EquipmentEntities)
-                {
-                    if (!currentEELButtons.ContainsKey(currentee.name))
+                    //VisualAdjustments.Main.settings.Save(VisualAdjustments.Main.ModEntry);
+                    settings = VisualAdjustments.Main.settings.GetCharacterSettings(data);
+                    //  HandleUnitChangedHideEEs();
+                    foreach (var eebutton in currentEELButtons.Values)
                     {
-                        var buttontoadd = Instantiate(buttonTemplate);
-                        var buttontoaddtext = buttontoadd.Find("TextB").GetComponent<TextMeshProUGUI>();
-                        buttontoaddtext.text = currentee.name;
-                        buttontoaddtext.font = font;
-                        buttontoaddtext.color = Color.white;
-                        buttontoadd.transform.SetParent(contentCurrentEE.transform, false);
-                        var buttontoaddbuttoncomponent = buttontoadd.GetComponent<Button>();
-                        buttontoaddbuttoncomponent.onClick = new Button.ButtonClickedEvent();
-                        buttontoaddbuttoncomponent.onClick.AddListener(new UnityAction(() =>
-                        {
-                        HandleEEClicked(buttontoaddtext.text);
-                        }));
-                        currentEELButtons.Add(currentee.name,buttontoaddbuttoncomponent);
+                        eebutton.gameObject.SafeDestroy();
                     }
-                }
 
-                haschanged = false;
+                    //foreach (var kv in hidebuttons)
+                    {
+                        //    kv.Key.isOn = kv.Value;
+                    }
+                    currentEELButtons.Clear();
+
+                }
+                if (haschanged)
+                {
+                    settings = VisualAdjustments.Main.settings.GetCharacterSettings(data);
+                    
+                    foreach (var kv in hidebuttons.ToTempList())
+                    {
+                        hidebuttons[kv.Key] = kv.Key.isOn;
+                    }
+                    foreach (var currentee in data.View.CharacterAvatar.EquipmentEntities)
+                    {
+                        if (!currentEELButtons.ContainsKey(currentee.name))
+                        {
+                            var buttontoadd = Instantiate(buttonTemplate);
+                            var buttontoaddtext = buttontoadd.Find("TextB").GetComponent<TextMeshProUGUI>();
+                            //buttontoaddtext.text = currentee.name;
+                            buttontoaddtext.text = GetTextAndSetupCategory(currentee.name);
+                            buttontoaddtext.font = font;
+                            buttontoaddtext.color = Color.white;
+                            buttontoadd.transform.SetParent(contentCurrentEE.transform, false);
+                            var buttontoaddbuttoncomponent = buttontoadd.GetComponent<Button>();
+                            buttontoaddbuttoncomponent.onClick = new Button.ButtonClickedEvent();
+                            buttontoaddbuttoncomponent.onClick.AddListener(new UnityAction(() =>
+                            {
+                                HandleEEClicked(buttontoaddtext.text);
+                            }));
+                            currentEELButtons.Add(currentee.name, buttontoaddbuttoncomponent);
+                        }
+                    }
+                    HandleUnitChangedHideEEs();
+                    haschanged = false;
+                }
             }
             //This is a unity message that runs each frame.
         }
@@ -1363,7 +2025,34 @@ namespace TutorialCanvas.UI
             {
                 AddRemoveButton.GetComponent<TextMeshProUGUI>().text = "Null";
             }
-            else if (data.View.CharacterAvatar.EquipmentEntities.Contains(EELpickerUI.selectedEntity))
+            else
+            {
+                {
+                    primindex = getColorFromPart(selectedEntity, true);
+                    secondindex = getColorFromPart(selectedEntity, false);
+                    primSlider.maxValue = selectedEntity.PrimaryRamps.Count;
+                    primSlider.value = data.View.CharacterAvatar.GetPrimaryRampIndex(selectedEntity);
+                    secondSlider.maxValue = selectedEntity.SecondaryRamps.Count;
+                    secondSlider.value = data.View.CharacterAvatar.GetSecondaryRampIndex(selectedEntity);
+                    if (selectedEntity.PrimaryColorsProfile == null)
+                    {
+                        PrimNoColor.SetActive(true);
+                    }
+                    else
+                    {
+                        PrimNoColor.SetActive(false);
+                    }
+                    if (selectedEntity.SecondaryColorsProfile == null)
+                    {
+                        SecNoColor.SetActive(true);
+                    }
+                    else
+                    {
+                        SecNoColor.SetActive(false);
+                    }
+                }
+            }
+            if (data.View.CharacterAvatar.EquipmentEntities.Contains(EELpickerUI.selectedEntity))
             {
                 AddRemoveButton.GetComponent<TextMeshProUGUI>().text = "Remove";
             }
@@ -1401,11 +2090,14 @@ namespace TutorialCanvas.UI
                     break;
             }
         }
+        public static GameObject PrimNoColor;
+        public static GameObject SecNoColor;
+
         private void HandleEEClicked(string eename)
         {
            // selectedstring = eename;
            //haschanged = true;
-            EELpickerUI.selectedEntity = ResourcesLibrary.TryGetResource<EquipmentEntity>(EquipmentResourcesManager.AllEEL[eename]);
+            EELpickerUI.selectedEntity = ResourcesLibrary.TryGetResource<EquipmentEntity>(EquipmentResourcesManager.AllEEL[FilteredAndUnfilteredEEName[eename]]);
             //this.transform.Find("InventoryViewWindow").Find("TextboxesValues").Find("Name").GetComponent<TextMeshProUGUI>().text = eename;
             // this.transform.Find("InventoryViewWindow").Find("TextboxesValues").Find("Race").GetComponent<TextMeshProUGUI>().text = eename;
             //this.transform.Find("InventoryViewWindow").Find("TextboxesValues").Find("Sex").GetComponent<TextMeshProUGUI>().text = eename;
@@ -1424,38 +2116,66 @@ namespace TutorialCanvas.UI
             }
 
             Name.text = eename;
+            Name2.text = eename;
             Race.text = getRace(selectedEntity);
             Sex.text = getGender(selectedEntity);
-            if (selectedEntity != null && data.View.CharacterAvatar.EquipmentEntities.Contains(selectedEntity))
+            if (selectedEntity != null /*&& data.View.CharacterAvatar.EquipmentEntities.Contains(selectedEntity)*/)
             {
-                primindex = getColorFromPart(selectedEntity, true);
-                secondindex = getColorFromPart(selectedEntity, false);
-                primSlider.maxValue = selectedEntity.PrimaryRamps.Count;
-                primSlider.value = data.View.CharacterAvatar.GetPrimaryRampIndex(selectedEntity);
                 secondSlider.maxValue = selectedEntity.SecondaryRamps.Count;
-                secondSlider.value = data.View.CharacterAvatar.GetSecondaryRampIndex(selectedEntity);
+                primSlider.maxValue = selectedEntity.PrimaryRamps.Count;
+                var indxprim = getColorFromPart(selectedEntity, true);
+                m_Primxindex = indxprim;
+                PrimaryIndex.text = indxprim.ToString();
+                var indxsec = getColorFromPart(selectedEntity, false);
+                m_SecondaryIndex = indxsec;
+                SecondaryIndex.text = indxsec.ToString();
 
+                //primSlider.value = data.View.CharacterAvatar.GetPrimaryRampIndex(selectedEntity);
+
+                //secondSlider.value = data.View.CharacterAvatar.GetSecondaryRampIndex(selectedEntity);
+                if(selectedEntity.PrimaryColorsProfile == null)
+                {
+                    PrimNoColor.SetActive(true);
+                }
+                else
+                {
+                    PrimNoColor.SetActive(false);
+                }
+                if (selectedEntity.SecondaryColorsProfile == null)
+                {
+                    SecNoColor.SetActive(true);
+                }
+                else
+                {
+                    SecNoColor.SetActive(false);
+                }
             }
         }
-
+        public static GameObject stash;
         private void HandleButtonClick()
         {
-            VisualAdjustments.Main.logger.Log("buttonpressed");
+            if(stash == null)
+            {
+                stash = this.transform.parent.Find("Stash").gameObject;
+            }
+           // VisualAdjustments.Main.logger.Log("buttonpressed");
             var selectiongrid = window.Find("UISelectionGrid").gameObject;
             window.Find("Menus").gameObject.SetActive(!selectiongrid.active);
             selectiongrid.SetActive(!selectiongrid.active);
+            stash.SetActive(!stash.active);
+
             //haschanged = true;
             //window.Find("InventoryViewWindow").gameObject.active = !window.Find("InventoryViewWindow").gameObject.active;
             // _text.text = "Add";
         }
     }
 
-    public static class ServiceWindowsMenuVM_Patch
+  /*  public static class ServiceWindowsMenuVM_Patch
     {
         public static void Postfix(UnitDescriptor unitDescriptor)
         {
             UIManager.data = unitDescriptor.Unit;
             VisualAdjustments.Main.logger.Log("unit" + unitDescriptor.CharacterName);
         }
-    }
+    }*/
 }

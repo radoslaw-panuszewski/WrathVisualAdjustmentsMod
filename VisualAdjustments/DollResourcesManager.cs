@@ -191,14 +191,28 @@ namespace VisualAdjustments
                 dict[eel.AssetId] = eel;
             }
         }
+        public static List<BlueprintRaceVisualPreset> racePresets;
+        public static List<BlueprintCharacterClass> classes 
+        { 
+            get
+            {
+                if(m_classes == null) m_classes = Main.blueprints.Entries.Where(a => a.Type == typeof(BlueprintCharacterClass)).Select(b => ResourcesLibrary.TryGetBlueprint<BlueprintCharacterClass>(b.Guid)).ToList();
+                return m_classes;
+            }
+            set
+            {
+                m_classes = value;
+            }
+        }
+        public static List<BlueprintCharacterClass> m_classes;
         static private void Init()
         {
-            var races = Main.blueprints.OfType<BlueprintRace>();
-            var racePresets = Main.blueprints.OfType<BlueprintRaceVisualPreset>();
-            var classes = Main.blueprints.OfType<BlueprintCharacterClass>();
-           /* var races = BluePrintThing.GetBlueprints<BlueprintRace>();
-            var racePresets = BluePrintThing.GetBlueprints<BlueprintRaceVisualPreset>();
-            var classes = BluePrintThing.GetBlueprints<BlueprintCharacterClass>();*/
+            var races = Main.blueprints.Entries.Where(a => a.Type == typeof(BlueprintRace)).Select(b => ResourcesLibrary.TryGetBlueprint<BlueprintRace>(b.Guid));
+            racePresets = Main.blueprints.Entries.Where(a => a.Type == typeof(BlueprintRaceVisualPreset)).Select(b => ResourcesLibrary.TryGetBlueprint<BlueprintRaceVisualPreset>(b.Guid)).ToList();
+            classes = Main.blueprints.Entries.Where(a => a.Type == typeof(BlueprintCharacterClass)).Select(b => ResourcesLibrary.TryGetBlueprint<BlueprintCharacterClass>(b.Guid)).ToList();
+            /* var races = BluePrintThing.GetBlueprints<BlueprintRace>();
+             var racePresets = BluePrintThing.GetBlueprints<BlueprintRaceVisualPreset>();
+             var classes = BluePrintThing.GetBlueprints<BlueprintCharacterClass>();*/
             foreach (var race in races)
             {
                 foreach (var gender in new Gender[] { Gender.Male, Gender.Female })
@@ -232,7 +246,7 @@ namespace VisualAdjustments
                 }
             }
             ///foreach(var bp in BluePrintThing.GetBlueprints<BlueprintPortrait>())
-            foreach(var bp in Main.blueprints.OfType<BlueprintPortrait>())
+            foreach(var bp in Main.blueprints.Entries.Where(a => a.Type == typeof(BlueprintPortrait)).Select(a => ResourcesLibrary.TryGetBlueprint<BlueprintPortrait>(a.Guid)))
             {
                 //Note there are two wolf portraits
                 if (bp == BlueprintRoot.Instance.CharGen.CustomPortrait || bp.Data.IsCustom)
@@ -243,7 +257,7 @@ namespace VisualAdjustments
             }
             customPortraits.AddRange(CustomPortraitsManager.Instance.GetExistingCustomPortraitIds());
             ///foreach (var bp in BluePrintThing.GetBlueprints<BlueprintUnitAsksList>())
-            foreach(var bp in Main.blueprints.OfType<BlueprintUnitAsksList>())
+            foreach(var bp in Main.blueprints.Entries.Where(a => a.Type == typeof(BlueprintUnitAsksList)).Select(a => ResourcesLibrary.TryGetBlueprint<BlueprintUnitAsksList>(a.Guid)))
             {
                 var component = bp.GetComponent<UnitAsksComponent>();
                 if (component == null) continue;
@@ -279,7 +293,8 @@ namespace VisualAdjustments
         }
         static public DollState CreateDollState(UnitEntityData unitEntityData)
         {
-            var asd = Main.blueprints.OfType<BlueprintRaceVisualPreset>().ToArray().FirstOrDefault(a => a.RaceId == unitEntityData.Progression.Race.RaceId);
+            var asd = DollResourcesManager.racePresets.FirstOrDefault(a => a.RaceId == unitEntityData.Progression.Race.RaceId);
+            //var asd = Main.blueprints.OfType<BlueprintRaceVisualPreset>().ToArray().FirstOrDefault(a => a.RaceId == unitEntityData.Progression.Race.RaceId);
             var dollData = unitEntityData.Parts.Get<UnitPartDollData>().Default;
             var dollState = new DollState
             {

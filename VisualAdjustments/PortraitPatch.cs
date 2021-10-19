@@ -34,7 +34,7 @@ namespace VisualAdjustments
 				if (!Main.settings.AllPortraits) return;
 				if(Main.settings.AllPortraits)
 				{
-					foreach (BlueprintPortrait bp in Main.blueprints.OfType<BlueprintPortrait>())
+					foreach (var bp in Main.blueprints.Entries.Where(a => a.Type == typeof(BlueprintPortrait)).Select(b => ResourcesLibrary.TryGetBlueprint<BlueprintPortrait>(b.Guid)))
 					{
 						if(bp == null) return;
 						if (!bp.InitiativePortrait && bp.Data.SmallPortrait != null && bp.Data.HalfLengthPortrait != null && bp.Data.FullLengthPortrait != null)

@@ -15,7 +15,6 @@ using Kingmaker.UnitLogic.Parts;
 using Kingmaker.Utility;
 using Kingmaker.Visual.CharacterSystem;
 using ModKit.Utility;
-using Steamworks;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityModManagerNet;
@@ -324,10 +323,8 @@ namespace VisualAdjustments
                     {
                         if (GUILayout.Button("Add", GUILayout.Width(150f * Main.UIscale)))
                         {
-
                             var eel = new EquipmentEntityLink();
                             eel.AssetId = EquipmentResourcesManager.AllEEL[selectedEntity.name];
-
                             data.View.CharacterAvatar.EquipmentEntitiesForPreload.Add(eel);
                             data.View.CharacterAvatar.m_SavedEquipmentEntities.Add(eel);
                             var ssri = new Character.SavedSelectedRampIndices();

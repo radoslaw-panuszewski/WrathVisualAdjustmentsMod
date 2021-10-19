@@ -45,7 +45,7 @@ namespace VisualAdjustments {
     }
     public class Main 
     {
-        public static SimpleBlueprint[] blueprints;
+        public static BlueprintList blueprints;
         const float DefaultLabelWidth = 200f;
         const float DefaultSliderWidth = 300f;
         public static UnityModManager.ModEntry.ModLogger logger;
@@ -106,6 +106,7 @@ namespace VisualAdjustments {
 
                 logger = modEntry.Logger;
                 settings = Settings.Load(modEntry);
+                //Assembly.Load("UITwo.dll");
                 var harmony = new Harmony(modEntry.Info.Id);
                 //if (haspatched)
                 //{
@@ -125,7 +126,8 @@ namespace VisualAdjustments {
                 modEntry.OnUnload = Unload;
 #endif
                 if (Main.blueprints == null) {
-                    Main.blueprints = Util.GetBlueprints();
+                    Main.blueprints = Utilities.GetAllBlueprints();
+                   // Main.blueprints = Util.GetBlueprints();
                 }
                 if (!classesloaded)
                 {
@@ -149,7 +151,7 @@ namespace VisualAdjustments {
                if (UnityEngine.Input.GetKey("left alt") && UnityEngine.Input.GetKeyDown("x"))
                {
                    Main.logger.Log("Hotkey");
-                   foreach (var unit in Game.Instance.Player.PartyAndPets.Concat(Game.Instance.Player.PartyAndPetsDetached))
+                   foreach (var unit in Game.Instance.Player.AllCharacters)
                    {
                        CharacterManager.RebuildCharacter(unit);
                    }
@@ -548,10 +550,13 @@ namespace VisualAdjustments {
          }*/
         public static void GetClasses()
         {
-            if (Main.blueprints.Length == 0) Main.blueprints = Util.GetBlueprints();
+            if (Main.blueprints.Entries.Count == 0) Main.blueprints = Utilities.GetAllBlueprints();
+
             if (classes.Count == 0) {
                 ///Main.logger.Log("bru");
-                foreach (BlueprintCharacterClass c in Main.blueprints.OfType<BlueprintCharacterClass>()) {
+                //foreach (BlueprintCharacterClass c in DollResourcesManager.classes) 
+                foreach(BlueprintCharacterClass c in Main.blueprints.Entries.Where(a => a.m_Type == typeof(BlueprintCharacterClass)).Select(b => ResourcesLibrary.TryGetBlueprint<BlueprintCharacterClass>(b.Guid)))
+                {
                    /* if (c.StartingItems.Any() && !c.PrestigeClass && !c.ToString().Contains("Scion"))
                     {
                         Main.logger.Log(c.ToString());
@@ -597,13 +602,17 @@ namespace VisualAdjustments {
                 if (GUILayout.Button("Fix Grey Characters (Rebuild)", UI.AutoWidth())) {
                     foreach (var ch in Game.Instance.Player.PartyAndPets.Concat(Game.Instance.Player.PartyAndPetsDetached)) {
                         CharacterManager.RebuildCharacter(ch);
+                        foreach(var asd in settings.GetCharacterSettings(ch).weaponOverrides)
+                        {
+                            Settings.ParseOverrideTuple(asd.Key);
+                        }
                     }
                 }
                 //fix this
                 //if (UnityModManager.UI.Scale(1) != UIscale)
-               // {
-                   // UIscale = UnityModManager.UI.Scale(1);
-               // }
+                // {
+                // UIscale = UnityModManager.UI.Scale(1);
+                // }
 
                 /*foreach (var VARIABLE in Game.Instance.Player.Party)
                 {
@@ -632,6 +641,12 @@ namespace VisualAdjustments {
                     var chrsttng = settings.GetCharacterSettings(playerData);
                     FxHelper.SpawnFxOnUnit(EquipmentResourcesManager.WingsFX[chrsttng.overrideWingsFX], playerData.View);
                 }*/
+#if DEBUG
+                if(GUILayout.Button("Generate EEs"))
+                {
+                    EquipmentResourcesManager.BuildEELookup();
+                }
+#endif
                 UI.DisclosureToggle("Settings", ref showsettings, 175f);
                 if (showsettings)
                 {
@@ -2042,7 +2057,7 @@ namespace VisualAdjustments {
             var portraits = bps.OfType<BlueprintPortrait>();
             var classes = bps.OfType<BlueprintCharacterClass>();
             Main.blueprints = portraits.Concat<SimpleBlueprint>(classes).ToArray();*/
-            Main.blueprints = Util.GetBlueprints();
+            Main.blueprints = Utilities.GetAllBlueprints();
         }
     }
 }

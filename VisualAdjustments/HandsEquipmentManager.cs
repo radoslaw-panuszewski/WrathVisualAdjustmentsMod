@@ -208,13 +208,40 @@ namespace VisualAdjustments
                     var characterSettings = Main.settings.GetCharacterSettings(__instance.Owner);
                     if (characterSettings == null) return;
                     if (__instance.VisibleItem == null) return;
-                    var blueprint = __instance.VisibleItem.Blueprint as BlueprintItemEquipmentHand;
-                    var animationStyle = blueprint.VisualParameters.AnimStyle.ToString();
-                    characterSettings.overrideWeapons.TryGetValue(animationStyle, out BlueprintRef blueprintId);
-                    if (blueprintId == null || blueprintId == "") return;
-                    var newBlueprint = ResourcesLibrary.TryGetBlueprint<BlueprintItemEquipmentHand>(blueprintId);
-                    if (newBlueprint == null) return;
-                    __result = newBlueprint;
+                    {
+                        var blueprint = __instance.VisibleItem.Blueprint as BlueprintItemEquipmentHand;
+                        //var tuple = new overrideinfo(blueprint.VisualParameters.AnimStyle.ToString(), __instance.Owner.View.HandsEquipment.Sets.Keys.ToList().IndexOf(__instance.Slot.HandsEquipmentSet), __instance.Slot.IsPrimaryHand);
+                        //if(characterSettings.weaponOverrides.TryGetValue(tuple, out BlueprintRef Bpref))
+                        {
+                        //    __result = ResourcesLibrary.TryGetBlueprint<BlueprintItemEquipmentHand>(Bpref);
+                        }
+                        foreach(var asd in characterSettings.weaponOverrides)
+                        {
+                            var parsedtuple = Settings.ParseOverrideTuple(asd.Key);
+                            //Main.logger.Log(parsedtuple.ToString() + "  parsed : new  " + new Tuple<string, int, bool>(blueprint.VisualParameters.AnimStyle.ToString(), __instance.Owner.View.HandsEquipment.Sets.Keys.ToList().IndexOf(__instance.Slot.HandsEquipmentSet), __instance.Slot.IsPrimaryHand));
+                            if(new Tuple<string,int,bool>(blueprint.VisualParameters.AnimStyle.ToString(), __instance.Owner.View.HandsEquipment.Sets.Keys.ToList().IndexOf(__instance.Slot.HandsEquipmentSet), __instance.Slot.IsPrimaryHand).ToString() == parsedtuple.ToString())
+                            {
+                                //Main.logger.Log("ParsedTupleMatch  :   " + parsedtuple.ToString());
+                               if(asd.Value != null && asd.Value.assetId != null)
+                                __result = ResourcesLibrary.TryGetBlueprint<BlueprintItemEquipmentHand>(asd.Value);
+                            }
+                        }
+                       //else
+                        {
+                            return;
+                        }
+                    }
+                    // Old
+                   // if(1 == 2)
+                    {
+                        /*var blueprint = __instance.VisibleItem.Blueprint as BlueprintItemEquipmentHand;
+                        var animationStyle = blueprint.VisualParameters.AnimStyle.ToString();
+                        characterSettings.overrideWeapons.TryGetValue(animationStyle, out BlueprintRef blueprintId);
+                        if (blueprintId == null || blueprintId == "") return;
+                        var newBlueprint = ResourcesLibrary.TryGetBlueprint<BlueprintItemEquipmentHand>(blueprintId);
+                        if (newBlueprint == null) return;
+                        __result = newBlueprint;*/
+                    }
                 }
                 catch (Exception ex)
                 {

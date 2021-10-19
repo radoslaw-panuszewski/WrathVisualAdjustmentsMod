@@ -165,11 +165,11 @@ namespace VisualAdjustments
                                         }
                 }
                 //Main.SetEELs(unitEntityData, DollResourcesManager.GetDoll(unitEntityData), false);
-               //  DollResourcesManager.GetDoll(unitEntityData).SetHairColor(Settings.HairColor);
-               //Add Kineticist Tattoos
+                //  DollResourcesManager.GetDoll(unitEntityData).SetHairColor(Settings.HairColor);
+                //Add Kineticist Tattoos
                 //Main.SetEELs(unitEntityData, DollResourcesManager.GetDoll(unitEntityData), false);
                 //unitEntityData.View.CharacterAvatar.OnRenderObject();
-                var component = unitEntityData.Parts.Get<UnitPartVAEELs>();
+                var component = unitEntityData.View.Data.Parts.Get<UnitPartVAEELs>();
                 if (component != null)
                 {
                     foreach (var eetoremove in component.EEToRemove)
@@ -183,10 +183,8 @@ namespace VisualAdjustments
                     foreach (var eetoadd in component.EEToAdd)
                     {
                         var ee = ResourcesLibrary.TryGetResource<EquipmentEntity>(eetoadd.AssetID);
-                        unitEntityData.View.CharacterAvatar.AddEquipmentEntity(ee,primaryRamp: eetoadd.PrimaryIndex,secondaryRamp:eetoadd.SecondaryIndex);
-                       // unitEntityData.View.CharacterAvatar.SetPrimaryRampIndex(ee, eetoadd.PrimaryIndex);
-                       // unitEntityData.View.CharacterAvatar.SetSecondaryRampIndex(ee, eetoadd.SecondaryIndex);
-                       // unitEntityData.View.CharacterAvatar.SetRampIndices(ee,eetoadd.PrimaryIndex,eetoadd.SecondaryIndex);
+                        unitEntityData.View.CharacterAvatar.AddEquipmentEntity(ee);
+                        eetoadd.Apply(ee, unitEntityData.View.CharacterAvatar);
                     }
 
                 }
@@ -820,7 +818,7 @@ namespace VisualAdjustments
                     dollpart.SetDefault(ModifiedCreateDollData.CreateDataModified(doll));
                 }*/
 
-                var component = view.Data.Parts.Get<UnitPartVAEELs>();
+               /* var component = view.Data.Parts.Get<UnitPartVAEELs>();
                 if (component != null)
                 {
                     foreach (var eetoremove in component.EEToRemove)
@@ -835,15 +833,14 @@ namespace VisualAdjustments
                     {
                         var ee = ResourcesLibrary.TryGetResource<EquipmentEntity>(eetoadd.AssetID);
                         view.CharacterAvatar.AddEquipmentEntity(ee);
-                        view.CharacterAvatar.SetPrimaryRampIndex(ee,eetoadd.PrimaryIndex);
-                        view.CharacterAvatar.SetSecondaryRampIndex(ee, eetoadd.SecondaryIndex);
+                        eetoadd.Apply(ee, view.CharacterAvatar);
                     }
 
                 }
                 if (characterSettings.customOutfitColors)
                 {
                     Main.GenerateOutfitcolor(view.Data);
-                }
+                }/*
                /* if (view.Data.Parts.Get<UnitPartDollData>())
                 {
                     view.Data.Parts.Get<UnitPartDollData>().SetDefault(ModifiedCreateDollData.CreateDataModified(doll));
@@ -1126,7 +1123,8 @@ namespace VisualAdjustments
                 }
             }
         }
-        /*[HarmonyPatch(typeof(Game), "OnAreaLoaded")]
+        /*[HarmonyPatch(typeof(Game), "OnAreaLoaded
+         * ")]
         static class Game_OnAreaLoaded_Patch
         {
             static void Postfix(Game __instance)
@@ -1191,6 +1189,8 @@ namespace VisualAdjustments
                     {
                         Main.GetClasses();
                     }
+                    TutorialCanvas.UI.UIManager.settings = null;
+                    TutorialCanvas.UI.UIManager.haschanged = true;
                     foreach (var character in Game.Instance.Player.AllCharacters)
                     {
                        /* foreach (var ee in character.View.CharacterAvatar.SavedEquipmentEntities)

@@ -157,6 +157,23 @@ namespace VisualAdjustments
                             var fxObject = RespawnFx(blueprint.WeaponFxPrefab, __instance.Slot.MaybeItem);
                             WeaponEnchantments[__instance.Slot.MaybeItem].Add(fxObject);
                         }
+                        foreach (var asd in characterSettings.weaponEnchantments)
+                        {
+                          //  Main.logger.Log(asd.Key);
+                            var parsedtuple = Settings.ParseOverrideEnchant(asd.Key);
+                            //Main.logger.Log(parsedtuple.ToString() + "  parsed : new  " + new Tuple<string, int, bool>(blueprint.VisualParameters.AnimStyle.ToString(), __instance.Owner.View.HandsEquipment.Sets.Keys.ToList().IndexOf(__instance.Slot.HandsEquipmentSet), __instance.Slot.IsPrimaryHand));
+                            if (new Tuple<int, bool>(__instance.Owner.View.HandsEquipment.Sets.Keys.ToList().IndexOf(__instance.Slot.HandsEquipmentSet), __instance.Slot.IsPrimaryHand).ToString() == parsedtuple.ToString())
+                            {
+                                // Main.logger.Log("ParsedTupleMatch  :   " + parsedtuple.ToString());
+                                if (asd.Value != null && asd.Value.assetId != null)
+                                {
+                                    var blueprint = ResourcesLibrary.TryGetBlueprint<BlueprintWeaponEnchantment>(asd.Value.assetId);
+                                    if (blueprint == null || blueprint.WeaponFxPrefab == null) continue;
+                                    var fxObject = RespawnFx(blueprint.WeaponFxPrefab, __instance.Slot.MaybeItem);
+                                    WeaponEnchantments[__instance.Slot.MaybeItem].Add(fxObject);
+                                }
+                            }
+                        }
                     }
                 } catch (Exception ex)
                 {
@@ -213,6 +230,7 @@ namespace VisualAdjustments
                                     }
                                     return false;
                                 }
+
                                 else return true;
                             }
                             else return true;
