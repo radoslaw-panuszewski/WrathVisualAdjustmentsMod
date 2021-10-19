@@ -602,7 +602,7 @@ namespace TutorialCanvas.UI
         public Dictionary<string, Button> currentEELButtons = new Dictionary<string, Button>();
         public Dictionary<string, GameObject> allEELButtons = new Dictionary<string, GameObject>();
         public Dictionary<int, string> weaponIndices = new Dictionary<int, string>();
-        public static Dictionary<Toggle, bool> hidebuttons = new Dictionary<Toggle, bool>();
+        public static Dictionary<Toggle, TextMeshProUGUI> hidebuttons = new Dictionary<Toggle, TextMeshProUGUI>();
         public static VisualAdjustments.Settings.CharacterSettings settings
         {
             get
@@ -921,168 +921,171 @@ namespace TutorialCanvas.UI
                     //hidebuttons = this.transform.Find("Menus/HideEquipment/RightSide/Toggles").Children().Select(a => a.gameObject.GetComponent<Toggle>()).ToDictionary();
                     foreach (var buttontransform in this.transform.Find("Menus/HideEquipment/RightSide/Toggles").Children().Select(a => a.gameObject.GetComponent<Toggle>()))
                     {
-                        var buttontoggle = buttontransform;
-                        buttontoggle.onValueChanged = new Toggle.ToggleEvent();
-
-                        var buttontext = buttontransform.transform.Find("Label").GetComponent<TextMeshProUGUI>();
-                        VisualAdjustments.Main.logger.Log(buttontext.text);
-                        VisualAdjustments.Main.logger.Log(settings.ToString());
-                        switch (buttontext.text)
+                        if (buttontransform != null)
                         {
-                            case "Hide Cap":
-                                buttontoggle.onValueChanged.AddListener((bool state) =>
-                                {
-                                    handleHideEquipment(state, ref settings.hideCap);
-                                });
-                                buttontoggle.isOn = settings.hideCap;
-                                hidebuttons.Add(buttontoggle, settings.hideCap);
-                                break;
-                            case "Hide Helmet":
-                                buttontoggle.onValueChanged.AddListener((bool state) =>
-                                {
-                                    handleHideEquipment(state, ref settings.hideHelmet);
-                                });
-                                buttontoggle.isOn = settings.hideHelmet;
-                                hidebuttons.Add(buttontoggle, settings.hideHelmet);
-                                break;
-                            case "Hide Glasses":
-                                buttontoggle.onValueChanged.AddListener((bool state) =>
-                                {
-                                    handleHideEquipment(state, ref settings.hideGlasses);
-                                });
-                                buttontoggle.isOn = settings.hideGlasses;
-                                hidebuttons.Add(buttontoggle, settings.hideGlasses);
-                                break;
-                            case "Hide Shirt":
-                                buttontoggle.onValueChanged.AddListener((bool state) =>
-                                {
-                                    handleHideEquipment(state, ref settings.hideShirt);
-                                });
-                                buttontoggle.isOn = settings.hideShirt;
-                                hidebuttons.Add(buttontoggle, settings.hideShirt);
-                                break;
-                            case "Hide Class Gear":
-                                buttontoggle.onValueChanged.AddListener((bool state) =>
-                                {
-                                    handleHideEquipment(state, ref settings.hideClassCloak);
-                                });
-                                buttontoggle.isOn = settings.hideClassCloak;
-                                hidebuttons.Add(buttontoggle, settings.hideClassCloak);
-                                break;
-                            case "Hide Cloak":
-                                buttontoggle.onValueChanged.AddListener((bool state) =>
-                                {
-                                    handleHideEquipment(state, ref settings.hideItemCloak);
-                                });
-                                buttontoggle.isOn = settings.hideItemCloak;
-                                hidebuttons.Add(buttontoggle, settings.hideItemCloak);
-                                break;
-                            case "Hide Armor":
-                                buttontoggle.onValueChanged.AddListener((bool state) =>
-                                {
-                                    handleHideEquipment(state, ref settings.hideArmor);
-                                });
-                                buttontoggle.isOn = settings.hideArmor;
-                                hidebuttons.Add(buttontoggle, settings.hideArmor);
-                                break;
-                            case "Hide Bracers":
-                                buttontoggle.onValueChanged.AddListener((bool state) =>
-                                {
-                                    handleHideEquipment(state, ref settings.hideBracers);
-                                });
-                                buttontoggle.isOn = settings.hideBracers;
-                                hidebuttons.Add(buttontoggle, settings.hideBracers);
-                                break;
-                            case "Hide Gloves":
-                                buttontoggle.onValueChanged.AddListener((bool state) =>
-                                {
-                                    handleHideEquipment(state, ref settings.hideGloves);
-                                });
-                                buttontoggle.isOn = settings.hideGloves;
-                                hidebuttons.Add(buttontoggle, settings.hideGloves);
-                                break;
-                            case "Hide Boots":
-                                buttontoggle.onValueChanged.AddListener((bool state) =>
-                                {
-                                    handleHideEquipment(state, ref settings.hideBoots);
-                                });
-                                buttontoggle.isOn = settings.hideBoots;
-                                hidebuttons.Add(buttontoggle, settings.hideBoots);
-                                break;
-                            case "Hide Weapons":
-                                buttontoggle.onValueChanged.AddListener((bool state) =>
-                                {
-                                    handleHideEquipment(state, ref settings.hideWeapons);
-                                });
-                                buttontoggle.isOn = settings.hideWeapons;
-                                hidebuttons.Add(buttontoggle, settings.hideWeapons);
-                                break;
-                            case "Hide Sheaths":
-                                buttontoggle.onValueChanged.AddListener((bool state) =>
-                                {
-                                    handleHideEquipment(state, ref settings.hideSheaths);
-                                });
-                                buttontoggle.isOn = settings.hideSheaths;
-                                hidebuttons.Add(buttontoggle, settings.hideSheaths);
-                                break;
-                            case "Hide Belt Items":
-                                buttontoggle.onValueChanged.AddListener((bool state) =>
-                                {
-                                    handleHideEquipment(state, ref settings.hideBeltSlots);
-                                });
-                                buttontoggle.isOn = settings.hideBeltSlots;
-                                hidebuttons.Add(buttontoggle, settings.hideBeltSlots);
-                                break;
-                            case "Hide Quiver":
-                                buttontoggle.onValueChanged.AddListener((bool state) =>
-                                {
-                                    handleHideEquipment(state, ref settings.hidequiver);
-                                });
-                                buttontoggle.isOn = settings.hidequiver;
-                                hidebuttons.Add(buttontoggle, settings.hidequiver);
-                                break;
-                            case "Hide Enchantments":
-                                buttontoggle.onValueChanged.AddListener((bool state) =>
-                                {
-                                    handleHideEquipment(state, ref settings.hideWeaponEnchantments);
-                                });
-                                buttontoggle.isOn = settings.hideWeaponEnchantments;
-                                hidebuttons.Add(buttontoggle, settings.hideWeaponEnchantments);
-                                break;
-                            case "Hide Wings":
-                                buttontoggle.onValueChanged.AddListener((bool state) =>
-                                {
-                                    handleHideEquipment(state, ref settings.hideWings);
-                                });
-                                buttontoggle.isOn = settings.hideWings;
-                                hidebuttons.Add(buttontoggle, settings.hideWings);
-                                break;
-                            case "Hide Horns":
-                                buttontoggle.onValueChanged.AddListener((bool state) =>
-                                {
-                                    handleHideEquipment(state, ref settings.hideHorns);
-                                });
-                                buttontoggle.isOn = settings.hideHorns;
-                                hidebuttons.Add(buttontoggle, settings.hideHorns);
-                                break;
-                            case "Hide Tail":
-                                buttontoggle.onValueChanged.AddListener((bool state) =>
-                                {
-                                    handleHideEquipment(state, ref settings.hideTail);
-                                });
-                                buttontoggle.isOn = settings.hideTail;
-                                hidebuttons.Add(buttontoggle, settings.hideTail);
-                                break;
-                            case "Hide Mythic":
-                                buttontoggle.onValueChanged.AddListener((bool state) =>
-                                {
-                                    handleHideEquipment(state, ref settings.hideMythic);
-                                });
-                                buttontoggle.isOn = settings.hideMythic;
-                                hidebuttons.Add(buttontoggle, settings.hideMythic);
-                                break;
+                            var buttontoggle = buttontransform;
+                            buttontoggle.onValueChanged = new Toggle.ToggleEvent();
+
+                            TextMeshProUGUI buttontext = buttontransform.transform.Find("Label").GetComponent<TextMeshProUGUI>(); ;
+                            //VisualAdjustments.Main.logger.Log(buttontext.text);
+                            //VisualAdjustments.Main.logger.Log(settings.ToString());
+                            switch (buttontext.text)
+                            {
+                                case "Hide Cap":
+                                    buttontoggle.onValueChanged.AddListener((bool state) =>
+                                    {
+                                        handleHideEquipment(state, ref settings.hideCap);
+                                    });
+                                    buttontoggle.isOn = settings.hideCap;
+                                    hidebuttons.Add(buttontoggle, buttontext);
+                                    break;
+                                case "Hide Helmet":
+                                    buttontoggle.onValueChanged.AddListener((bool state) =>
+                                    {
+                                        handleHideEquipment(state, ref settings.hideHelmet);
+                                    });
+                                    buttontoggle.isOn = settings.hideHelmet;
+                                    hidebuttons.Add(buttontoggle, buttontext);
+                                    break;
+                                case "Hide Glasses":
+                                    buttontoggle.onValueChanged.AddListener((bool state) =>
+                                    {
+                                        handleHideEquipment(state, ref settings.hideGlasses);
+                                    });
+                                    buttontoggle.isOn = settings.hideGlasses;
+                                    hidebuttons.Add(buttontoggle, buttontext);
+                                    break;
+                                case "Hide Shirt":
+                                    buttontoggle.onValueChanged.AddListener((bool state) =>
+                                    {
+                                        handleHideEquipment(state, ref settings.hideShirt);
+                                    });
+                                    buttontoggle.isOn = settings.hideShirt;
+                                    hidebuttons.Add(buttontoggle, buttontext);
+                                    break;
+                                case "Hide Class Gear":
+                                    buttontoggle.onValueChanged.AddListener((bool state) =>
+                                    {
+                                        handleHideEquipment(state, ref settings.hideClassCloak);
+                                    });
+                                    buttontoggle.isOn = settings.hideClassCloak;
+                                    hidebuttons.Add(buttontoggle, buttontext);
+                                    break;
+                                case "Hide Cloak":
+                                    buttontoggle.onValueChanged.AddListener((bool state) =>
+                                    {
+                                        handleHideEquipment(state, ref settings.hideItemCloak);
+                                    });
+                                    buttontoggle.isOn = settings.hideItemCloak;
+                                    hidebuttons.Add(buttontoggle, buttontext);
+                                    break;
+                                case "Hide Armor":
+                                    buttontoggle.onValueChanged.AddListener((bool state) =>
+                                    {
+                                        handleHideEquipment(state, ref settings.hideArmor);
+                                    });
+                                    buttontoggle.isOn = settings.hideArmor;
+                                    hidebuttons.Add(buttontoggle, buttontext);
+                                    break;
+                                case "Hide Bracers":
+                                    buttontoggle.onValueChanged.AddListener((bool state) =>
+                                    {
+                                        handleHideEquipment(state, ref settings.hideBracers);
+                                    });
+                                    buttontoggle.isOn = settings.hideBracers;
+                                    hidebuttons.Add(buttontoggle, buttontext);
+                                    break;
+                                case "Hide Gloves":
+                                    buttontoggle.onValueChanged.AddListener((bool state) =>
+                                    {
+                                        handleHideEquipment(state, ref settings.hideGloves);
+                                    });
+                                    buttontoggle.isOn = settings.hideGloves;
+                                    hidebuttons.Add(buttontoggle, buttontext);
+                                    break;
+                                case "Hide Boots":
+                                    buttontoggle.onValueChanged.AddListener((bool state) =>
+                                    {
+                                        handleHideEquipment(state, ref settings.hideBoots);
+                                    });
+                                    buttontoggle.isOn = settings.hideBoots;
+                                    hidebuttons.Add(buttontoggle, buttontext);
+                                    break;
+                                case "Hide Weapons":
+                                    buttontoggle.onValueChanged.AddListener((bool state) =>
+                                    {
+                                        handleHideEquipment(state, ref settings.hideWeapons);
+                                    });
+                                    buttontoggle.isOn = settings.hideWeapons;
+                                    hidebuttons.Add(buttontoggle, buttontext);
+                                    break;
+                                case "Hide Sheaths":
+                                    buttontoggle.onValueChanged.AddListener((bool state) =>
+                                    {
+                                        handleHideEquipment(state, ref settings.hideSheaths);
+                                    });
+                                    buttontoggle.isOn = settings.hideSheaths;
+                                    hidebuttons.Add(buttontoggle, buttontext);
+                                    break;
+                                case "Hide Belt Items":
+                                    buttontoggle.onValueChanged.AddListener((bool state) =>
+                                    {
+                                        handleHideEquipment(state, ref settings.hideBeltSlots);
+                                    });
+                                    buttontoggle.isOn = settings.hideBeltSlots;
+                                    hidebuttons.Add(buttontoggle, buttontext);
+                                    break;
+                                case "Hide Quiver":
+                                    buttontoggle.onValueChanged.AddListener((bool state) =>
+                                    {
+                                        handleHideEquipment(state, ref settings.hidequiver);
+                                    });
+                                    buttontoggle.isOn = settings.hidequiver;
+                                    hidebuttons.Add(buttontoggle, buttontext);
+                                    break;
+                                case "Hide Enchantments":
+                                    buttontoggle.onValueChanged.AddListener((bool state) =>
+                                    {
+                                        handleHideEquipment(state, ref settings.hideWeaponEnchantments);
+                                    });
+                                    buttontoggle.isOn = settings.hideWeaponEnchantments;
+                                    hidebuttons.Add(buttontoggle, buttontext);
+                                    break;
+                                case "Hide Wings":
+                                    buttontoggle.onValueChanged.AddListener((bool state) =>
+                                    {
+                                        handleHideEquipment(state, ref settings.hideWings);
+                                    });
+                                    buttontoggle.isOn = settings.hideWings;
+                                    hidebuttons.Add(buttontoggle, buttontext);
+                                    break;
+                                case "Hide Horns":
+                                    buttontoggle.onValueChanged.AddListener((bool state) =>
+                                    {
+                                        handleHideEquipment(state, ref settings.hideHorns);
+                                    });
+                                    buttontoggle.isOn = settings.hideHorns;
+                                    hidebuttons.Add(buttontoggle, buttontext);
+                                    break;
+                                case "Hide Tail":
+                                    buttontoggle.onValueChanged.AddListener((bool state) =>
+                                    {
+                                        handleHideEquipment(state, ref settings.hideTail);
+                                    });
+                                    buttontoggle.isOn = settings.hideTail;
+                                    hidebuttons.Add(buttontoggle, buttontext);
+                                    break;
+                                case "Hide Mythic":
+                                    buttontoggle.onValueChanged.AddListener((bool state) =>
+                                    {
+                                        handleHideEquipment(state, ref settings.hideMythic);
+                                    });
+                                    buttontoggle.isOn = settings.hideMythic;
+                                    hidebuttons.Add(buttontoggle, buttontext);
+                                    break;
+                            }
+                            buttontext.color = Color.white;
                         }
-                        buttontext.color = Color.white;
 
                     }
                     //Overrides
@@ -1522,7 +1525,7 @@ namespace TutorialCanvas.UI
             }
             catch(Exception e)
             {
-                VisualAdjustments.Main.logger.Log(e.StackTrace);
+                VisualAdjustments.Main.logger.Log(e.ToString());
             }
         }
 
@@ -1873,70 +1876,78 @@ namespace TutorialCanvas.UI
 
         private void HandleUnitChangedHideEEs()
         {
-            foreach (var transform in hidebuttons)
+            try
             {
-                var txt = transform.Key.transform.Find("Label").GetComponent<TextMeshProUGUI>();
-                if (txt != null && txt.text != null)
-                switch (txt.text)
+                foreach (var transform in hidebuttons)
                 {
-                    case "Hide Cap":
-                        transform.Key.isOn = settings.hideCap;
-                        break;
-                    case "Hide Helmet":
-                        transform.Key.isOn = settings.hideHelmet;
-                        break;
-                    case "Hide Glasses":
-                        transform.Key.isOn = settings.hideGlasses ;
-                        break;
-                    case "Hide Shirt":
-                        transform.Key.isOn = settings.hideShirt ;
-                        break;
-                    case "Hide Class Gear":
-                        transform.Key.isOn = settings.hideClassCloak ;
-                        break;
-                    case "Hide Cloak":
-                        transform.Key.isOn = settings.hideItemCloak ;
-                        break;
-                    case "Hide Armor":
-                        transform.Key.isOn = settings.hideArmor ;
-                        break;
-                    case "Hide Bracers":
-                        transform.Key.isOn = settings.hideBracers ;
-                        break;
-                    case "Hide Gloves":
-                        transform.Key.isOn = settings.hideGloves ;
-                        break;
-                    case "Hide Boots":
-                        transform.Key.isOn = settings.hideBoots ;
-                        break;
-                    case "Hide Weapons":
-                        transform.Key.isOn = settings.hideWeapons ;
-                        break;
-                    case "Hide Sheaths":
-                        transform.Key.isOn = settings.hideSheaths ;
-                        break;
-                    case "Hide Belt Items":
-                        transform.Key.isOn = settings.hideBeltSlots ;
-                        break;
-                    case "Hide Quiver":
-                        transform.Key.isOn = settings.hidequiver ;
-                        break;
-                    case "Hide Enchantments":
-                        transform.Key.isOn = settings.hideWeaponEnchantments ;
-                        break;
-                    case "Hide Wings":
-                        transform.Key.isOn = settings.hideWings ;
-                        break;
-                    case "Hide Horns":
-                        transform.Key.isOn = settings.hideHorns ;
-                        break;
-                    case "Hide Tail":
-                        transform.Key.isOn = settings.hideTail ;
-                        break;
-                    case "Hide Mythic":
-                        transform.Key.isOn = settings.hideMythic ;
-                        break;
+                    var txt = transform.Value;
+                   // var txt = transform.Key.transform.Find("Label")?.GetComponent<TextMeshProUGUI>();
+                    if (txt != null && txt.text != null)
+                        switch (txt.text)
+                        {
+                            case "Hide Cap":
+                                transform.Key.isOn = settings.hideCap;
+                                break;
+                            case "Hide Helmet":
+                                transform.Key.isOn = settings.hideHelmet;
+                                break;
+                            case "Hide Glasses":
+                                transform.Key.isOn = settings.hideGlasses;
+                                break;
+                            case "Hide Shirt":
+                                transform.Key.isOn = settings.hideShirt;
+                                break;
+                            case "Hide Class Gear":
+                                transform.Key.isOn = settings.hideClassCloak;
+                                break;
+                            case "Hide Cloak":
+                                transform.Key.isOn = settings.hideItemCloak;
+                                break;
+                            case "Hide Armor":
+                                transform.Key.isOn = settings.hideArmor;
+                                break;
+                            case "Hide Bracers":
+                                transform.Key.isOn = settings.hideBracers;
+                                break;
+                            case "Hide Gloves":
+                                transform.Key.isOn = settings.hideGloves;
+                                break;
+                            case "Hide Boots":
+                                transform.Key.isOn = settings.hideBoots;
+                                break;
+                            case "Hide Weapons":
+                                transform.Key.isOn = settings.hideWeapons;
+                                break;
+                            case "Hide Sheaths":
+                                transform.Key.isOn = settings.hideSheaths;
+                                break;
+                            case "Hide Belt Items":
+                                transform.Key.isOn = settings.hideBeltSlots;
+                                break;
+                            case "Hide Quiver":
+                                transform.Key.isOn = settings.hidequiver;
+                                break;
+                            case "Hide Enchantments":
+                                transform.Key.isOn = settings.hideWeaponEnchantments;
+                                break;
+                            case "Hide Wings":
+                                transform.Key.isOn = settings.hideWings;
+                                break;
+                            case "Hide Horns":
+                                transform.Key.isOn = settings.hideHorns;
+                                break;
+                            case "Hide Tail":
+                                transform.Key.isOn = settings.hideTail;
+                                break;
+                            case "Hide Mythic":
+                                transform.Key.isOn = settings.hideMythic;
+                                break;
+                        }
                 }
+            }
+            catch(Exception e)
+            {
+                VisualAdjustments.Main.logger.Log(e.StackTrace);
             }
         }
         public static GameObject UISelectGrid;
@@ -1965,10 +1976,10 @@ namespace TutorialCanvas.UI
                 {
                     settings = VisualAdjustments.Main.settings.GetCharacterSettings(data);
                     
-                    foreach (var kv in hidebuttons.ToTempList())
+                    /*foreach (var kv in hidebuttons)
                     {
                         hidebuttons[kv.Key] = kv.Key.isOn;
-                    }
+                    }*/
                     foreach (var currentee in data.View.CharacterAvatar.EquipmentEntities)
                     {
                         if (!currentEELButtons.ContainsKey(currentee.name))
@@ -2162,7 +2173,7 @@ namespace TutorialCanvas.UI
             var selectiongrid = window.Find("UISelectionGrid").gameObject;
             window.Find("Menus").gameObject.SetActive(!selectiongrid.active);
             selectiongrid.SetActive(!selectiongrid.active);
-            stash.SetActive(!stash.active);
+            stash.SetActive(!selectiongrid.active);
 
             //haschanged = true;
             //window.Find("InventoryViewWindow").gameObject.active = !window.Find("InventoryViewWindow").gameObject.active;
