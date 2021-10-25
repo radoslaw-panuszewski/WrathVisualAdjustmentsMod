@@ -11,10 +11,11 @@ public class ColorApplyButtonScript : MonoBehaviour
     public GameObject tohide;
     public List<GameObject> toshow;
     public TMPro.TextMeshProUGUI txt;
+    public TutorialCanvas.UI.UIManager uimanager;
     public void ApplyColor(bool col)
     {
         VisualAdjustments.Main.logger.Log("ColSet");
-        TutorialCanvas.UI.UIManager.setCustomColorToEEPart(fcp.color, primorsec);
+        uimanager.setCustomColorToEEPart(fcp.color, primorsec);
     }
     public void SetPrimOrSec(bool primorsecin)
     {

@@ -43,6 +43,20 @@ namespace VisualAdjustments {
         public string GUID;
         public string Name;
     }
+    class UpdateDataForUGUI : IHandleInventoryInitialized
+    {
+        public void OnInventoryInitialized(UnitDescriptor data)
+        {
+            Main.logger.Log(data.CharacterName);
+        }
+    }
+    class TestPubSub : IAreaActivationHandler
+    {
+        public void OnAreaActivated()
+        {
+            Main.logger.Log("loaded");
+        }
+    }
     public class Main 
     {
         public static BlueprintList blueprints;
@@ -133,8 +147,8 @@ namespace VisualAdjustments {
                 {
                     Main.GetClasses();
                 }
-
-                
+                EventBus.Subscribe(new UpdateDataForUGUI());
+                EventBus.Subscribe(new TestPubSub());
             }
             catch (Exception e) {
                 Log(e.ToString() + "\n" + e.StackTrace);
@@ -602,10 +616,37 @@ namespace VisualAdjustments {
                 if (GUILayout.Button("Fix Grey Characters (Rebuild)", UI.AutoWidth())) {
                     foreach (var ch in Game.Instance.Player.PartyAndPets.Concat(Game.Instance.Player.PartyAndPetsDetached)) {
                         CharacterManager.RebuildCharacter(ch);
-                        foreach(var asd in settings.GetCharacterSettings(ch).weaponOverrides)
+                        /*foreach(var asd in settings.GetCharacterSettings(ch).weaponOverrides)
                         {
                             Settings.ParseOverrideTuple(asd.Key);
-                        }
+                        }*/
+                    }
+                }
+                if (GUILayout.Button("Spawn Override FX", UI.AutoWidth()))
+                {
+                    foreach (var ch in Game.Instance.Player.PartyAndPets.Concat(Game.Instance.Player.PartyAndPetsDetached))
+                    {
+                        ch.SpawnOverrideBuffs();
+                        /*foreach(var asd in settings.GetCharacterSettings(ch).weaponOverrides)
+                        {
+                            Settings.ParseOverrideTuple(asd.Key);
+                        }*/
+                    }
+                }
+                var strings = new List<string>();
+                if (GUILayout.Button("Generate FX Map"))
+                {
+                    foreach (var kv in Main.blueprints.Entries.Where(a => a.Type == typeof(Kingmaker.UnitLogic.Buffs.Blueprints.BlueprintBuff)).Select(b => ResourcesLibrary.TryGetBlueprint<Kingmaker.UnitLogic.Buffs.Blueprints.BlueprintBuff>(b.Guid)).Where(a => a.FxOnRemove != null || a.FxOnStart != null).ToArray())
+                    {
+                        Main.logger.Log("m_AllFX[■" + kv.name + "■] = ■" + kv.AssetGuid + "■");
+                    }
+                }
+                if(GUILayout.Button("Print FX Asset ID's to Log"))
+                {
+                    foreach(var assetid in strings)
+                    {
+                        var thing = ResourcesLibrary.TryGetResource<UnityEngine.Object>(assetid);
+                        Main.logger.Log("m_AllFX[■" + thing.name + "■] = ■" + assetid+"■");
                     }
                 }
                 //fix this

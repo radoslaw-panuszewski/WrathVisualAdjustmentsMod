@@ -61,6 +61,8 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="Accessors.cs" />
+    <Compile Include="BubbleFuzzyMatch\FuzzyMatchContext.cs" />
+    <Compile Include="BuffHandler.cs" />
     <Compile Include="CabariusModKitUII\GUIHelper.cs" />
     <Compile Include="CabariusModKitUII\Private\Toggle.cs" />
     <Compile Include="CabariusModKitUII\RichText.cs" />
@@ -103,6 +105,7 @@
     <Compile Include="UGUI\Unity Scripts\ColorApplyButtonScript.cs" />
     <Compile Include="UGUI\Unity Scripts\FCP_SpriteMeshEditor.cs" />
     <Compile Include="UGUI\Unity Scripts\FlexibleColorPicker.cs" />
+    <Compile Include="UGUI\Unity Scripts\FXUIHandler.cs" />
     <Compile Include="UGUI\Unity Scripts\SelectedWeaponSlotHandler.cs" />
     <Compile Include="UnorderedList.cs" />
     <Compile Include="Util.cs" />

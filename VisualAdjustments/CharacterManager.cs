@@ -1189,6 +1189,8 @@ namespace VisualAdjustments
                     {
                         Main.GetClasses();
                     }
+                  //  TutorialCanvas.UI.UIManager.loaded2 = false;
+                    //FXUIHandlerHandler.loaded = false;
                     TutorialCanvas.UI.UIManager.settings = null;
                     TutorialCanvas.UI.UIManager.haschanged = true;
                     foreach (var character in Game.Instance.Player.AllCharacters)
@@ -1239,6 +1241,25 @@ namespace VisualAdjustments
                         //Thread.Sleep(250);
                         //UpdateModel(character.View);
                         /// character.View.HandsEquipment.UpdateAll();
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Main.Error(ex);
+                }
+            }
+        }
+        [HarmonyPatch(typeof(Kingmaker.UI.ServiceWindow.DollRoom), "SetupInfo")]
+        static class SetupInfoDollRoom_Patch
+        {
+            static void Postfix(Kingmaker.UI.ServiceWindow.DollRoom __instance, UnitEntityData player, bool force = false, BlueprintClassAdditionalVisualSettings additionalVisualSettings = null)
+            {
+                try
+                {
+                    if (!Main.enabled) return;
+                    if (Main.settings.GetCharacterSettings(player).hideMythic)
+                    {
+                        __instance.m_Avatar.SetAdditionalVisualSettings(null);
                     }
                 }
                 catch (Exception ex)

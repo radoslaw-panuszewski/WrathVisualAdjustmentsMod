@@ -173,6 +173,24 @@ namespace VisualAdjustments
         [JsonProperty] public List<EEStorage> EEToAdd = new List<EEStorage>();
         [JsonProperty] public List<string> EEToRemove = new List<string>();
 
+
+    }
+    public class UnitPartVAFX : UnitPart
+    {
+        [JsonProperty] public bool blackorwhitelist;
+        [JsonProperty] public List<FXInfo> blackwhitelist = new List<FXInfo>();
+        [JsonProperty] public List<FXInfo> overrides = new List<FXInfo>();
+        [NonSerialized()] public Dictionary<string,GameObject> currentoverrides = new Dictionary<string, GameObject>();
+    }
+    public class FXInfo
+    {
+        public string AssetID;
+        public string Name;
+        public FXInfo(string assetid,string name)
+        {
+            AssetID = assetid;
+            Name = name;
+        }
     }
 
 }

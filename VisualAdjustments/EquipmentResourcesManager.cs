@@ -3134,6 +3134,7 @@ namespace VisualAdjustments
         static void BuildWeaponEnchantmentLookup()
         {
             ///var enchantments = BluePrintThing.GetBlueprints<BlueprintWeaponEnchantment>()
+            ///
             var enchantments = Main.blueprints.Entries.Where(a => a.Type == typeof(BlueprintWeaponEnchantment)).Select(b => ResourcesLibrary.TryGetBlueprint<BlueprintWeaponEnchantment>(b.Guid))
                     .Where(bp => bp.WeaponFxPrefab != null)
                     .OrderBy(bp => bp.WeaponFxPrefab.name);

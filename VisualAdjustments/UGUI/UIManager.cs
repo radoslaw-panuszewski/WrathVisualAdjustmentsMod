@@ -50,6 +50,7 @@ using Kingmaker.View.Animation;
 using Kingmaker.Blueprints.Classes;
 using Kingmaker.View;
 using Kingmaker.Visual.Animation;
+using Kingmaker.PubSubSystem;
 
 namespace TutorialCanvas.Enums
 {
@@ -68,6 +69,11 @@ namespace TutorialCanvas.UI
     }
     public class UIManager : MonoBehaviour
     {
+
+        public GameObject OutfitDoll;
+        public GameObject EEPicker;
+        public GameObject FX;
+        public GameObject Equipment;
 
         public static string GetTextAndSetupCategory(string ee)
         {
@@ -134,7 +140,7 @@ namespace TutorialCanvas.UI
                     {
                         newarray.Add("Female");
                     }
-                    else if (s != "EE" && s != "Any" && s != "KEE" && s.Length > 1)
+                    else if ((s != "EE" && s != "Any" && s != "KEE" && s != "Buff") && s.Length > 1)
                     {
                         StringBuilder SB = new System.Text.StringBuilder(s);
                         var b = 0;
@@ -234,7 +240,7 @@ namespace TutorialCanvas.UI
             return "N/A";
         }
 
-        void resetEEPart()
+        public void resetEEPart()
         {
             var part = data.Parts.Get<UnitPartVAEELs>();
             if (part != null)
@@ -259,8 +265,8 @@ namespace TutorialCanvas.UI
                     // buttontoaddtext.text = currentee.name;
                     buttontoaddtext.text = GetTextAndSetupCategory(currentee.name);
                    // buttontoaddtext.text = GetTextAndSetupCategory(currentee);
-                    buttontoaddtext.font = font;
-                    buttontoaddtext.color = Color.white;
+                   // buttontoaddtext.font = font;
+                    //buttontoaddtext.color = Color.white;
                     buttontoadd.transform.SetParent(contentCurrentEE.transform, false);
                     var buttontoaddbuttoncomponent = buttontoadd.GetComponent<Button>();
                     buttontoaddbuttoncomponent.onClick = new Button.ButtonClickedEvent();
@@ -272,7 +278,7 @@ namespace TutorialCanvas.UI
                 }
             }
         }
-        public static void setCustomColorToEEPart(Color col, bool primorsec)
+        public void setCustomColorToEEPart(Color col, bool primorsec)
         {
             var component = data.Parts.Ensure<UnitPartVAEELs>();
             if (component.EEToAdd.Contains(a => a.AssetID == EquipmentResourcesManager.AllEEL[selectedEntity.name]))
@@ -313,13 +319,13 @@ namespace TutorialCanvas.UI
                     }
                 }
             }
-            primSlider.maxValue = selectedEntity.PrimaryRamps.Count;
-            primSlider.value = data.View.CharacterAvatar.GetPrimaryRampIndex(selectedEntity);
-            secondSlider.maxValue = selectedEntity.SecondaryRamps.Count;
-            secondSlider.value = data.View.CharacterAvatar.GetSecondaryRampIndex(selectedEntity);
+           // primSlider.maxValue = selectedEntity.PrimaryRamps.Count;
+            //primSlider.value = data.View.CharacterAvatar.GetPrimaryRampIndex(selectedEntity);
+           // secondSlider.maxValue = selectedEntity.SecondaryRamps.Count;
+           // secondSlider.value = data.View.CharacterAvatar.GetSecondaryRampIndex(selectedEntity);
             UpdatePreview();
         }
-        void removeFromRemoveEEPart(EquipmentEntity ee)
+        public void removeFromRemoveEEPart(EquipmentEntity ee)
         {
             var component = m_Data.Parts.Get<UnitPartVAEELs>();
             if (component == null)
@@ -333,7 +339,7 @@ namespace TutorialCanvas.UI
             }
 
         }
-        void addToRemoveEEPart(EquipmentEntity ee)
+        public void addToRemoveEEPart(EquipmentEntity ee)
         {
             var component = m_Data.Parts.Get<UnitPartVAEELs>();
             if (component == null)
@@ -346,7 +352,7 @@ namespace TutorialCanvas.UI
                 component.EEToRemove.Add(EquipmentResourcesManager.AllEEL[ee.name]);
             }
         }
-        void addToAddEEPart(EquipmentEntity ee, int primary, int secondary)
+        public void addToAddEEPart(EquipmentEntity ee, int primary, int secondary)
         {
             var component = m_Data.Parts.Get<UnitPartVAEELs>();
             if (component == null)
@@ -361,7 +367,7 @@ namespace TutorialCanvas.UI
                 //Main.logger.Log("add" + ee.name + EquipmentResourcesManager.AllEEL[ee.name]);
             }
         }
-        void removeFromAddEEpart(EquipmentEntity ee)
+        public void removeFromAddEEpart(EquipmentEntity ee)
         {
             var component = m_Data.Parts.Get<UnitPartVAEELs>();
             if (component == null)
@@ -374,7 +380,7 @@ namespace TutorialCanvas.UI
                 component.EEToAdd.Remove(a => a.AssetID == EquipmentResourcesManager.AllEEL[ee.name]);
             }
         }
-        static void setColorAddEEPart(EquipmentEntity ee, int primaryIndex, int secondaryIndex)
+        public void setColorAddEEPart(EquipmentEntity ee, int primaryIndex, int secondaryIndex)
         {
             var component = m_Data.Parts.Get<UnitPartVAEELs>();
             if (component == null)
@@ -410,7 +416,7 @@ namespace TutorialCanvas.UI
             }
             return 0;
         }
-        bool hasUnitChanged()
+        public static bool hasUnitChanged()
         {
             if (m_Data != null && m_Data.CharacterName != data.CharacterName)
             {
@@ -421,19 +427,25 @@ namespace TutorialCanvas.UI
         }
         public const string Source = "TutorialCanvas";
         public static Transform window;
-        private TextMeshProUGUI _text;
+       // public TextMeshProUGUI _text;
         public static bool haschanged = true;
-        private static InventoryDollPCView dollPcView;
+        
         private static string SelectedWeaponType = "";
         public static int slot = 0;
         public static bool primorsec;
         public static bool loaded = false;
+        public static bool loaded2 = false;
         public static UnitEntityData data
         {
             get
             {
                 var newData = Kingmaker.UI.Common.UIUtility.GetCurrentCharacter();
-                if (m_Data.UniqueId != newData.UniqueId)
+                if (m_Data == null)
+                {
+                    m_Data = newData;
+                    haschanged = true;
+                }
+                else if (m_Data.UniqueId != newData.UniqueId)
                 {
                     m_Data = newData;
                     haschanged = true;
@@ -448,36 +460,36 @@ namespace TutorialCanvas.UI
             }
         }
 
-        private static void UpdatePreview()
+        private void UpdatePreview()
         {
-            // if (window.parent.Find("Doll").TryGetComponent<InventoryDollPCView>(out dollPcView))
+            // if (window.parent.Find("Doll").TryGetComponent<InventoryFXUIHandlerHandler.dollPcView>(out FXUIHandlerHandler.dollPcView))
             {
                 try
                 {
                     // fix this
-                    if (dollPcView == null)
+                    if (FXUIHandler.    dollPcView == null)
                     {
-                        dollPcView = window.parent.Find("Doll").GetComponent<InventoryDollPCView>();
+                        FXUIHandler.dollPcView = window.parent.Find("Doll").GetComponent<InventoryDollPCView>();
                     }
                     else
                     {
 
-                        //dollPcView.Initialize();
-                      // dollPcView.SwitchOffDoll();
-                       // dollPcView.SwitchOnDoll();
-                        // dollPcView.BindViewImplementation();
-                          //dollPcView.OnHide();
-                       // dollPcView.BindViewImplementation();
-                        //dollPcView.OnShow();
-                        if(UISelectGrid.activeInHierarchy)/* && dollPcView.Room && dollPcView.IsBinded)*/
+                        //FXUIHandlerHandler.dollPcView.Initialize();
+                      // FXUIHandlerHandler.dollPcView.SwitchOffDoll();
+                       // FXUIHandlerHandler.dollPcView.SwitchOnDoll();
+                        // FXUIHandlerHandler.dollPcView.BindViewImplementation();
+                          //FXUIHandlerHandler.dollPcView.OnHide();
+                       // FXUIHandlerHandler.dollPcView.BindViewImplementation();
+                        //FXUIHandlerHandler.dollPcView.OnShow();
+                        if(UISelectGrid.activeInHierarchy)/* && FXUIHandlerHandler.dollPcView.Room && FXUIHandlerHandler.dollPcView.IsBinded)*/
                         {
                             VisualAdjustments.Main.logger.Log("UpdatedPreview");
                             CharacterManager.RebuildCharacter(data);
-                            dollPcView.OnHide();
-                            dollPcView.RefreshView();
-                            dollPcView.OnShow();
+                            FXUIHandler.dollPcView.OnHide();
+                            FXUIHandler.dollPcView.RefreshView();
+                            FXUIHandler.dollPcView.OnShow();
                             
-                            //  dollPcView.RefreshView();
+                            //  FXUIHandlerHandler.dollPcView.RefreshView();
                         }
                         
                     }
@@ -511,11 +523,11 @@ namespace TutorialCanvas.UI
                     //Game.Instance.UI.Common.DollRoom.DollRoomVisualSettingsOff(); (Hide mythics???)
                     Game.Instance.UI.Common.DollRoom.GetAvatar();*/
                     //Game.Instance.UI.Common.DollRoom.SetAvatar(data.View.CharacterAvatar);
-                    /* dollPcView.OnHide();
-                     //dollPcView.BindViewImplementation();
-                     dollPcView.OnShow();
-                     dollPcView.RefreshView();
-                     dollPcView.*/
+                    /* FXUIHandlerHandler.dollPcView.OnHide();
+                     //FXUIHandlerHandler.dollPcView.BindViewImplementation();
+                     FXUIHandlerHandler.dollPcView.OnShow();
+                     FXUIHandlerHandler.dollPcView.RefreshView();
+                     FXUIHandlerHandler.dollPcView.*/
                     //data.View.CharacterAvatar.IsDirty = true;
                 }
                 catch (Exception e)
@@ -526,8 +538,8 @@ namespace TutorialCanvas.UI
             }
         }
 
-        private static Slider primSlider;
-        public static int primindex
+        public Slider primSlider;
+        public int primindex
         {
             get
             {
@@ -554,9 +566,9 @@ namespace TutorialCanvas.UI
             }
         }
         public static int m_Primxindex = 0;
-        private static TMP_InputField PrimaryIndex;
-        private static Slider secondSlider;
-        public static int secondindex
+        public TMP_InputField PrimaryIndex;
+        public Slider secondSlider;
+        public int secondindex
         {
             get
             {
@@ -584,21 +596,21 @@ namespace TutorialCanvas.UI
             }
         }
         public static int m_SecondaryIndex = 0;
-        private static TMP_InputField SecondaryIndex;
+        public TMP_InputField SecondaryIndex;
         //public static int secondindex
         //{
 
         // }
-        private TextMeshProUGUI Name;
-        private TextMeshProUGUI Name2;
-        private TextMeshProUGUI Race;
-        private TextMeshProUGUI Sex;
-        private GameObject AddRemoveButton;
+        public TextMeshProUGUI Name;
+        public TextMeshProUGUI Name2;
+        public TextMeshProUGUI Race;
+        public TextMeshProUGUI Sex;
+        public TextMeshProUGUI AddRemoveButton;
         private static UnitEntityData m_Data;
-        private TMP_FontAsset font;
-        private Transform contentAllEE;
-        private Transform contentCurrentEE;
-        private static Transform buttonTemplate;
+        //public static TMP_FontAsset font;
+        public Transform contentAllEE;
+        public Transform contentCurrentEE;
+        public Transform buttonTemplate;
         public Dictionary<string, Button> currentEELButtons = new Dictionary<string, Button>();
         public Dictionary<string, GameObject> allEELButtons = new Dictionary<string, GameObject>();
         public Dictionary<int, string> weaponIndices = new Dictionary<int, string>();
@@ -667,16 +679,16 @@ namespace TutorialCanvas.UI
                 //
                 window = Instantiate(BundleManger.LoadedPrefabs[Source].transform.Find("Canvas")); //We ditch the TutorialCanvas as talked about in the Wiki, we will attach it to a different parent
                                                                                                    //window.localScale = new Vector3((float)0.76, (float)0.76, (float)0.76);
-                VisualAdjustments.Main.logger.Log("createdobject2");
+                //VisualAdjustments.Main.logger.Log("createdobject2");
                 window.SetParent(staticCanvas, false); //Attaches our window to the static canvas
                 window.SetAsLastSibling(); //Our window will always be under other UI elements as not to interfere with the game. Top of the list has the lowest priority
                                            // if(SettingsWrapper.Reuse) window.Find("Background").GetComponent<Image>().sprite = background.sprite; //Sets the background sprite to the one used in CombatLog_New
                 window.localPosition = new Vector3(0, 27, 0);
                 window.localScale = new Vector3((float)0.76, (float)0.76, (float)0.76);
                 window.Find("Menus").gameObject.active = false;
-                VisualAdjustments.Main.logger.Log("createdobject3");
+                //VisualAdjustments.Main.logger.Log("createdobject3");
                 // content = ;
-                var cmp = window.gameObject.AddComponent<UIManager>();
+                var cmp = window.gameObject.EnsureComponent<UIManager>();
                // cmp.Awake();
                 return cmp; //This adds this class as a component so it can handle events, button clicks, awake, update, etc.
             }
@@ -686,11 +698,14 @@ namespace TutorialCanvas.UI
             }
             return new UIManager();
         }
-
+        public Transform overridesobject;
+        public static bool initiated = false;
         private void Awake()
         {
+            //if (loaded2) return;
             try
             {
+                
                 //This is a unity message that runs once when the script activates (Check Unity documenation for the differences between Start() and Awake()
 
                 //
@@ -700,24 +715,34 @@ namespace TutorialCanvas.UI
 
 
                 // Setup scrollview content
-                contentAllEE = this.transform.Find("Menus/InventoryViewWindow/AllEEs/Scroll View/Viewport/Content");
-                contentCurrentEE = this.transform.Find("Menus/InventoryViewWindow/CurrentEEs/Scroll View/Viewport/Content");
+              //  contentAllEE = this.transform.Find("Menus/InventoryViewWindow/AllEEs/Scroll View/Viewport/Content");
+                //contentCurrentEE = this.transform.Find("Menus/InventoryViewWindow/CurrentEEs/Scroll View/Viewport/Content");
                 
-                buttonTemplate = this.transform.Find("NewButton");
-                font = this.transform.parent.Find("Doll/DollTitle/TitleLabel").GetComponent<TextMeshProUGUI>().font;
-                foreach (var txt in this.transform.GetComponentsInChildren<TextMeshProUGUI>(true))
+                //buttonTemplate = this.transform.Find("NewButton");
+                //font = this.transform.parent.Find("Doll/DollTitle/TitleLabel").GetComponent<TextMeshProUGUI>().font;
+                /*foreach (var txt in this.transform.GetComponentsInChildren<TextMeshProUGUI>(true))
                 {
                     txt.font = font;
                     txt.color = Color.black;
                 }
+                foreach (var txt in this.transform.Find("Menus/FXBrowser/All FXs/Scroll View").GetComponentsInChildren<TextMeshProUGUI>())
+                {
+                    //txt.font = font;
+                    txt.color = Color.white;
+                }
+                foreach (var txt in this.transform.Find("Menus/FXBrowser/FXInfo").GetComponentsInChildren<TextMeshProUGUI>())
+                {
+                   // txt.font = font;
+                    txt.color = Color.white;
+                }*/
                 foreach (var eename in VisualAdjustments.EquipmentResourcesManager.AllEEL)
                 {
                     var buttontoadd = Instantiate(buttonTemplate);
                     var buttontoaddtext = buttontoadd.Find("TextB").GetComponent<TextMeshProUGUI>();
                     buttontoaddtext.text = GetTextAndSetupCategory(eename.Key);
                     // buttontoaddtext.text = eename.Key;
-                    buttontoaddtext.font = font;
-                    buttontoaddtext.color = Color.white;
+                   // buttontoaddtext.font = font;
+                   // buttontoaddtext.color = Color.white;
                     buttontoadd.transform.SetParent(contentAllEE.transform, false);
                     var buttontoaddbuttoncomponent = buttontoadd.GetComponent<Button>();
                     buttontoaddbuttoncomponent.onClick = new Button.ButtonClickedEvent();
@@ -726,7 +751,7 @@ namespace TutorialCanvas.UI
                     allEELButtons.Add(eename.Key, buttontoadd.gameObject);
                 }
                 m_Data = Kingmaker.UI.Common.UIUtility.GetCurrentCharacter();
-                UISelectGrid = transform.Find("UISelectionGrid").gameObject;
+               // UISelectGrid = transform.Find("UISelectionGrid").gameObject;
                 //switch font
                 //var texts = ;
 
@@ -735,7 +760,7 @@ namespace TutorialCanvas.UI
 
                 // setup UI toggles
                 {
-                    //primary toggle
+                  /*  //primary toggle
                     var button = this.transform.Find("ToggleButton").GetComponent<Button>();
                     this.transform.Find("ToggleButton/Text (TMP)").GetComponent<TextMeshProUGUI>().color = Color.white;
                     button.onClick = new Button.ButtonClickedEvent();
@@ -752,12 +777,12 @@ namespace TutorialCanvas.UI
                             HandleUIToggle(UISelectionGrid.Find("OutfitDoll/Text (TMP)").GetComponent<TextMeshProUGUI>().text);
                         }));
 
-                        //Overrides
-                        var Overrides = UISelectionGrid.Find("Overrides").GetComponent<Button>();
-                        Overrides.onClick = new Button.ButtonClickedEvent();
-                        Overrides.onClick.AddListener(new UnityAction(() =>
+                        //FX Browser
+                        var FXBrowser = UISelectionGrid.Find("FX").GetComponent<Button>();
+                        FXBrowser.onClick = new Button.ButtonClickedEvent();
+                        FXBrowser.onClick.AddListener(new UnityAction(() =>
                         {
-                            HandleUIToggle(UISelectionGrid.Find("Overrides/Text (TMP)").GetComponent<TextMeshProUGUI>().text);
+                            HandleUIToggle(UISelectionGrid.Find("FX/Text (TMP)").GetComponent<TextMeshProUGUI>().text);
                         }));
 
                         //EEPicker
@@ -779,11 +804,11 @@ namespace TutorialCanvas.UI
 
 
 
-                    }
+                    }*/
                 }
                 // setup EE Picker
                 {
-                    var eepicker = this.transform.Find("Menus/InventoryViewWindow/EEInfo");
+                  /*  var eepicker = this.transform.Find("Menus/InventoryViewWindow/EEInfo");
                     foreach (var text in eepicker.GetComponentsInChildren<TextMeshProUGUI>())
                     {
                         text.color = Color.white;
@@ -804,18 +829,18 @@ namespace TutorialCanvas.UI
                     AddRemoveButtonButton.onClick.AddListener(new UnityAction(() =>
                     {
                         addRemoveButton();
-                    }));
+                    }));*/
 
 
                     //Primary Color Picker
                     {
-                        PrimaryIndex = eepicker.Find("ColorSelectors/Primary/InputFieldIndex").GetComponent<TMP_InputField>();
-                        PrimaryIndex.onValueChanged = new TMP_InputField.OnChangeEvent();
-                        PrimaryIndex.onValueChanged.AddListener((string val) =>
-                        {
-                            handleSliderInputField(val, true);
-                        });
-                        PrimaryIndex.textComponent.color = Color.white;
+                       // PrimaryIndex = EE.Find("ColorSelectors/Primary/InputFieldIndex").GetComponent<TMP_InputField>();
+                      //  PrimaryIndex.onValueChanged = new TMP_InputField.OnChangeEvent();
+                      //  PrimaryIndex.onValueChanged.AddListener((string val) =>
+                       // {
+                       //     handleSliderInputField(val, true);
+                       // });
+                      /*  PrimaryIndex.textComponent.color = Color.white;
                         var IncreaseButton = eepicker.Find("ColorSelectors/Primary/PositiveIncrement").GetComponent<Button>();
                         var DecreaseButton = eepicker.Find("ColorSelectors/Primary/NegativeIncrement").GetComponent<Button>();
                         IncreaseButton.onClick = new Button.ButtonClickedEvent();
@@ -871,7 +896,7 @@ namespace TutorialCanvas.UI
                         // UpdatePreview();
                     }));
                         SecNoColor = eepicker.Find("ColorSelectors/Secondary/Available").gameObject;
-                        SecNoColor.transform.Find("Text (TMP)").GetComponent<TextMeshProUGUI>().color = Color.white;
+                        SecNoColor.transform.Find("Text (TMP)").GetComponent<TextMeshProUGUI>().color = Color.white;*/
                     }
                     //Custom Color Picker
                     {
@@ -879,7 +904,7 @@ namespace TutorialCanvas.UI
                     }
                     // setup filter fields
                     {
-                        // All EE's
+                       /* // All EE's
                         var AllEETxtField = this.transform.Find("Menus/InventoryViewWindow/AllEEs/FilterArea/InputField (TMP)").GetComponent<TMP_InputField>();
                         var placeholder = AllEETxtField.gameObject.transform.Find("Text Area/Placeholder").GetComponent<TextMeshProUGUI>();
                         placeholder.color = new Color((float)0.05, (float)0.05, (float)0.05, (float)0.6);
@@ -901,7 +926,7 @@ namespace TutorialCanvas.UI
                         resetbutton.GetComponent<Button>().onClick = new Button.ButtonClickedEvent();
                         resetbutton.GetComponent<Button>().onClick.AddListener(resetEEPart);
                         var resetbuttonText = resetbutton.Find("Text (TMP)").GetComponent<TextMeshProUGUI>();
-                        resetbuttonText.color = Color.white;
+                        resetbuttonText.color = Color.white;*/
                     }
                     // button.gameObject.AddComponent<DraggableWindow>(); //Add draggable windows component allowing the window to be dragged when the button is pressed down
 
@@ -1088,9 +1113,10 @@ namespace TutorialCanvas.UI
                         }
 
                     }
-                    //Overrides
+                   // overridesobject = this.transform.Find("Menus/HideEquipment/Overrides");
+                    //Overridesbe
                     {
-                        var overridesobject = this.transform.Find("Menus/HideEquipment/Overrides");
+                        
                         //var options = new List<TMP_Dropdown.OptionData>();
                         //options[0] = new TMP_Dropdown.OptionData().text;
                         var overridesdropdown = overridesobject.Find("OverrideSelect").GetComponent<TMP_Dropdown>();
@@ -1293,97 +1319,100 @@ namespace TutorialCanvas.UI
                             else
                             {
                                 overridesobject.Find("WeaponStyleSelect").gameObject.SetActive(true);
+                                
                             }
                         }
                     }
 
                 }
-                //Weaponstyle Selector
+                //var overridesobject = this.transform.Find("Menus/HideEquipment/Overrides");
+                void HandleWeaponSelectorSelected(int index)
                 {
-                    var overridesobject = this.transform.Find("Menus/HideEquipment/Overrides");
-                    void HandleWeaponSelectorSelected(int index)
+                    if (weaponIndices.TryGetValue(index, out string weaponstyle))
                     {
-                        if (weaponIndices.TryGetValue(index, out string weaponstyle))
+                        SelectedWeaponType = weaponstyle;
+                        if (EquipmentResourcesManager.Weapons.TryGetValue(weaponstyle, out Dictionary<BlueprintRef, string> Weapons))
                         {
-                            SelectedWeaponType = weaponstyle;
-                            if (EquipmentResourcesManager.Weapons.TryGetValue(weaponstyle, out Dictionary<BlueprintRef, string> Weapons))
+                            var overridecontent = overridesobject.Find("Scroll View/Viewport/Content");
+                            foreach (var thing in buttonsEELOverride)
                             {
-                                var overridecontent = overridesobject.Find("Scroll View/Viewport/Content");
-                                foreach (var thing in buttonsEELOverride)
+                                if (!Weapons.ContainsKey(thing.Key) && thing.Key != "None")
                                 {
-                                    if (!Weapons.ContainsKey(thing.Key) && thing.Key != "None")
-                                    {
-                                        thing.Value.gameObject.SetActive(false);
-                                    }
-                                    else if (thing.Key == "None")
-                                    {
-                                        thing.Value.gameObject.SetActive(true);
-                                    }
-                                    else
-                                    {
-                                        thing.Value.gameObject.SetActive(true);
-                                    }
+                                    thing.Value.gameObject.SetActive(false);
                                 }
-                                if (!buttonsEELOverride.ContainsKey("None"))
+                                else if (thing.Key == "None")
                                 {
-                                    var buttontoaddD = Instantiate(buttonTemplate);
-                                    var buttontoaddtextt = buttontoaddD.Find("TextB").GetComponent<TextMeshProUGUI>();
-                                    buttontoaddtextt.text = "None";
-                                    //buttontoaddtext.font = font;
-                                    buttontoaddtextt.color = Color.white;
-                                    buttontoaddD.transform.SetParent(overridecontent.transform, false);
-                                    var buttontoaddbuttoncomponentt = buttontoaddD.GetComponent<Button>();
-                                    buttontoaddbuttoncomponentt.onClick = new Button.ButtonClickedEvent();
-                                    buttontoaddbuttoncomponentt.onClick.AddListener(new UnityAction(() =>
-                                    {
+                                    thing.Value.gameObject.SetActive(true);
+                                }
+                                else
+                                {
+                                    thing.Value.gameObject.SetActive(true);
+                                }
+                            }
+                            if (!buttonsEELOverride.ContainsKey("None"))
+                            {
+                                var buttontoaddD = Instantiate(buttonTemplate);
+                                var buttontoaddtextt = buttontoaddD.Find("TextB").GetComponent<TextMeshProUGUI>();
+                                buttontoaddtextt.text = "None";
+                                //buttontoaddtext.font = font;
+                                buttontoaddtextt.color = Color.white;
+                                buttontoaddD.transform.SetParent(overridecontent.transform, false);
+                                var buttontoaddbuttoncomponentt = buttontoaddD.GetComponent<Button>();
+                                buttontoaddbuttoncomponentt.onClick = new Button.ButtonClickedEvent();
+                                buttontoaddbuttoncomponentt.onClick.AddListener(new UnityAction(() =>
+                                {
                                     //settings.weaponOverrides[(new OverrideInfo(weaponstyle, slot, primorsec))] = null;
                                     //settings.weaponOverrides[(new Tuple<string, int, bool>(weaponstyle, slot, primorsec))] = null;
                                     settings.weaponOverrides[new Tuple<string, int, bool>(weaponstyle, slot, primorsec).ToString()] = null;
-                                        VisualAdjustments.Main.logger.Log("settonull");
-                                        UpdatePreview();
+                                    VisualAdjustments.Main.logger.Log("settonull");
+                                    UpdatePreview();
                                     //Set appropriate assetguid to nothing
                                     // setsetting(overridesdropdown.value, "");
                                 }));
-                                    buttonsEELOverride.Add("None", buttontoaddD);
-                                }
-                                foreach (var weapon in Weapons)
+                                buttonsEELOverride.Add("None", buttontoaddD);
+                            }
+                            foreach (var weapon in Weapons)
+                            {
+                                if (!buttonsEELOverride.ContainsKey(weapon.Key.assetId))
                                 {
-                                    if (!buttonsEELOverride.ContainsKey(weapon.Key.assetId))
+                                    try
                                     {
-                                        try
+                                        var buttontoadd = Instantiate(buttonTemplate);
+                                        var buttontoaddtext = buttontoadd.Find("TextB").GetComponent<TextMeshProUGUI>();
+                                        // if ()
                                         {
-                                            var buttontoadd = Instantiate(buttonTemplate);
-                                            var buttontoaddtext = buttontoadd.Find("TextB").GetComponent<TextMeshProUGUI>();
-                                            // if ()
-                                            {
-                                                buttontoaddtext.text = weapon.Value;
-                                                //buttontoaddtext.text = Kingmaker.Cheats.Utilities.GetBlueprint<BlueprintScriptableObject>(eename.Key.assetId).name;
-                                            }
-                                            //buttontoaddtext.font = font;
-                                            buttontoaddtext.color = Color.white;
-                                            buttontoadd.transform.SetParent(overridecontent.transform, false);
-                                            var buttontoaddbuttoncomponent = buttontoadd.GetComponent<Button>();
-                                            buttontoaddbuttoncomponent.onClick = new Button.ButtonClickedEvent();
-                                            buttonsEELOverride.Add(weapon.Key.assetId, buttontoadd);
-                                            buttontoaddbuttoncomponent.onClick.AddListener(new UnityAction(() =>
-                                            {
-                                                settings.weaponOverrides[new Tuple<string, int, bool>(weaponstyle, slot, primorsec).ToString()] = weapon.Key;
-                                                UpdatePreview();
+                                            buttontoaddtext.text = weapon.Value;
+                                            //buttontoaddtext.text = Kingmaker.Cheats.Utilities.GetBlueprint<BlueprintScriptableObject>(eename.Key.assetId).name;
+                                        }
+                                        //buttontoaddtext.font = font;
+                                        buttontoaddtext.color = Color.white;
+                                        buttontoadd.transform.SetParent(overridecontent.transform, false);
+                                        var buttontoaddbuttoncomponent = buttontoadd.GetComponent<Button>();
+                                        buttontoaddbuttoncomponent.onClick = new Button.ButtonClickedEvent();
+                                        buttonsEELOverride.Add(weapon.Key.assetId, buttontoadd);
+                                        buttontoaddbuttoncomponent.onClick.AddListener(new UnityAction(() =>
+                                        {
+                                            settings.weaponOverrides[new Tuple<string, int, bool>(weaponstyle, slot, primorsec).ToString()] = weapon.Key;
+                                            UpdatePreview();
                                             //settings.weaponOverrides[(new Tuple<string,int,bool>(weaponstyle, slot, primorsec))] = weapon.Key;
                                             //Set appropriate weapon override
                                             //setsetting(index, weapon.Key.assetId);
                                         }));
-                                        }
-                                        catch (Exception e)
-                                        {
-                                            VisualAdjustments.Main.logger.Log(e.ToString());
-                                            throw;
-                                        }
+                                    }
+                                    catch (Exception e)
+                                    {
+                                        VisualAdjustments.Main.logger.Log(e.ToString());
+                                        throw;
                                     }
                                 }
                             }
                         }
                     }
+                }
+                //Weaponstyle Selector
+                {
+                    
+                    
                     var WeaponSelector = overridesobject.Find("WeaponStyleSelect").GetComponent<TMP_Dropdown>();
                     WeaponSelector.onValueChanged = new TMP_Dropdown.DropdownEvent();
                     WeaponSelector.onValueChanged.AddListener(new UnityAction<int>((int index) =>
@@ -1521,7 +1550,11 @@ namespace TutorialCanvas.UI
                          }*/
                     }
                 }
-                this.transform.Find("Menus/HideEquipment").gameObject.SetActive(false);
+                FX.SetActive(false);
+                EEPicker.SetActive(false);
+                UISelectGrid.SetActive(false);
+                //this.transform.Find("Menus/HideEquipment").gameObject.SetActive(false);
+                initiated = true;
             }
             catch(Exception e)
             {
@@ -1529,7 +1562,7 @@ namespace TutorialCanvas.UI
             }
         }
 
-        void setsetting(int index, string eelguid)
+        public void setsetting(int index, string eelguid)
         {
             try
             {
@@ -1689,72 +1722,80 @@ namespace TutorialCanvas.UI
         private Dictionary<string, Transform> weaponbuttons = new Dictionary<string, Transform> { };
         private Dictionary<int, Dictionary<BlueprintRef, string>> EELDictionaries = new Dictionary<int, Dictionary<BlueprintRef, string>>();
         public static Dictionary<string, Dictionary<BlueprintRef, string>> EelDictionaries = new Dictionary<string, Dictionary<BlueprintRef, string>>();
-        private void handleHideEquipment(bool state, ref bool settingState)
+        public void handleHideEquipment(bool state, ref bool settingState)
         {
             settingState = state;
             CharacterManager.RebuildCharacter(data);
            // UpdatePreview();
         }
-        private void handleSliderInputField(string value,bool primorsec)
+        public void handleSliderInputFieldPrim(string value)
         {
             //ar numvalue = int.Parse(value);
+            //value = primSlider.value.ToString(); 
             if (int.TryParse(value, out int result))
             {
-                if (primorsec)
                 {
                     primindex = result;
-                }
-                else
-                {
-                    secondindex = result;
                 }
             }
             else
             {
-                if (primorsec)
                 {
                     primindex = 0;
                 }
-                else
+            }
+            //UpdatePreview();
+        }
+        public void handleSliderInputFieldSec(string value)
+        {
+            //ar numvalue = int.Parse(value);
+           // value = secondSlider.value.ToString();
+            if (int.TryParse(value, out int result))
+            {
+                    secondindex = result;
+            }
+            else
+            {
                 {
                     secondindex = 0;
                 }
             }
             //UpdatePreview();
         }
-        private void increasePrimaryButton()
+        public void increasePrimaryButton()
         {
             primindex = primindex+1;
           //  UpdatePreview();
         }
 
-        private void decreasePrimaryButton()
+        public void decreasePrimaryButton()
         {
             primindex = primindex-1;
           //  UpdatePreview();
         }
 
-        private void increaseSecondaryButton()
+        public void increaseSecondaryButton()
         {
             secondindex = secondindex+1;
             //UpdatePreview();
         }
 
-        private void decreaseSecondaryButton()
+        public void decreaseSecondaryButton()
         {
             secondindex = secondindex-1;
            // UpdatePreview();
         }
 
         public static Char[] splitchars = new Char[] { char.Parse(" ") };
-        private void HandleFilterChangedAll(string value)
+        public void HandleFilterChangedAll(string value)
         {
-           // VisualAdjustments.Main.logger.Log("filterchange");
+            // VisualAdjustments.Main.logger.Log("filterchange");
             /*var buttonstodisable = allEELButtons.Except(a => a.Key.Contains(value));
             foreach (var button in buttonstodisable)
             {
                 button.Value.SetActive(false);
             }*/
+           // value = AllInputField.text;
             bool hassplitter = value.Contains(" ");
             var splitstring = value.Split(splitchars);
             //splitstring = splitstring.Select(a => a.Trim()).Where(b => !b.IsNullOrEmpty()).ToArray();
@@ -1820,7 +1861,7 @@ namespace TutorialCanvas.UI
 
             }
         }
-        private void HandleFilterChangedCurrent(string value)
+        public void HandleFilterChangedCurrent(string value)
         {
             //VisualAdjustments.Main.logger.Log("filterchange");
             /*var buttonstodisable = allEELButtons.Except(a => a.Key.Contains(value));
@@ -1828,6 +1869,7 @@ namespace TutorialCanvas.UI
             {
                 button.Value.SetActive(false);
             }*/
+            value = CurrentInputField.text;
             bool hassplitter = value.Contains(" ");
             var splitstring = value.Split(splitchars);
             foreach (var eelbutton in currentEELButtons)
@@ -1874,7 +1916,7 @@ namespace TutorialCanvas.UI
             }
         }
 
-        private void HandleUnitChangedHideEEs()
+        public void HandleUnitChangedHideEEs()
         {
             try
             {
@@ -1950,8 +1992,8 @@ namespace TutorialCanvas.UI
                 VisualAdjustments.Main.logger.Log(e.StackTrace);
             }
         }
-        public static GameObject UISelectGrid;
-        private void Update()
+        public GameObject UISelectGrid;
+        public void Update()
         {
             if (UISelectGrid.activeInHierarchy)
             {
@@ -1980,6 +2022,7 @@ namespace TutorialCanvas.UI
                     {
                         hidebuttons[kv.Key] = kv.Key.isOn;
                     }*/
+
                     foreach (var currentee in data.View.CharacterAvatar.EquipmentEntities)
                     {
                         if (!currentEELButtons.ContainsKey(currentee.name))
@@ -1988,8 +2031,8 @@ namespace TutorialCanvas.UI
                             var buttontoaddtext = buttontoadd.Find("TextB").GetComponent<TextMeshProUGUI>();
                             //buttontoaddtext.text = currentee.name;
                             buttontoaddtext.text = GetTextAndSetupCategory(currentee.name);
-                            buttontoaddtext.font = font;
-                            buttontoaddtext.color = Color.white;
+                           // buttontoaddtext.font = font;
+                           // buttontoaddtext.color = Color.white;
                             buttontoadd.transform.SetParent(contentCurrentEE.transform, false);
                             var buttontoaddbuttoncomponent = buttontoadd.GetComponent<Button>();
                             buttontoaddbuttoncomponent.onClick = new Button.ButtonClickedEvent();
@@ -2007,7 +2050,7 @@ namespace TutorialCanvas.UI
             //This is a unity message that runs each frame.
         }
 
-        private void addRemoveButton()
+        public void addRemoveButton()
         {
             haschanged = true;
             if (EELpickerUI.selectedEntity == null)
@@ -2072,112 +2115,130 @@ namespace TutorialCanvas.UI
                 AddRemoveButton.GetComponent<TextMeshProUGUI>().text = "Add";
             }
         }
-        private void HandleUIToggle(string button)
+        public void HandleUIToggle(string button)
         {
-            var OutfitDoll = this.transform.Find("Menus/OutfitDoll");
-            OutfitDoll.gameObject.SetActive(false);
+            //OutfitDoll = this.transform.Find("Menus/OutfitDoll");
+            OutfitDoll.SetActive(false);
 
-            var HideEquipment = this.transform.Find("Menus/HideEquipment");
-            HideEquipment.gameObject.SetActive(false);
+            //var HideEquipment = this.transform.Find("Menus/HideEquipment");
+            Equipment.SetActive(false);
 
-            var Overrides = this.transform.Find("Menus/Overrides");
-            Overrides.gameObject.SetActive(false);
+            //var FXBrowser = this.transform.Find("Menus/FXBrowser");
+            FX.gameObject.SetActive(false);
 
-            var EEPicker = this.transform.Find("Menus/InventoryViewWindow");
-            EEPicker.gameObject.SetActive(false);
+            //var EEPicker = this.transform.Find("Menus/InventoryViewWindow");
+            EEPicker.SetActive(false);
             switch (button)
             {
                 case "Outfit/Doll":
-                    OutfitDoll.gameObject.SetActive(true);
+                    OutfitDoll.SetActive(true);
                     break;
                 case "EE Picker":
-                    EEPicker.gameObject.SetActive(true);
+                    EEPicker.SetActive(true);
                     break;
                 case "Equipment":
-                    HideEquipment.gameObject.SetActive(true);
+                    Equipment.SetActive(true);
                     break;
-                case "Overrides":
-                    Overrides.gameObject.SetActive(true);
+                case "FX":
+                    FX.SetActive(true);
                     break;
             }
         }
-        public static GameObject PrimNoColor;
-        public static GameObject SecNoColor;
+        public  GameObject PrimNoColor;
+        public  GameObject SecNoColor;
 
         private void HandleEEClicked(string eename)
         {
-           // selectedstring = eename;
-           //haschanged = true;
-            EELpickerUI.selectedEntity = ResourcesLibrary.TryGetResource<EquipmentEntity>(EquipmentResourcesManager.AllEEL[FilteredAndUnfilteredEEName[eename]]);
-            //this.transform.Find("InventoryViewWindow").Find("TextboxesValues").Find("Name").GetComponent<TextMeshProUGUI>().text = eename;
-            // this.transform.Find("InventoryViewWindow").Find("TextboxesValues").Find("Race").GetComponent<TextMeshProUGUI>().text = eename;
-            //this.transform.Find("InventoryViewWindow").Find("TextboxesValues").Find("Sex").GetComponent<TextMeshProUGUI>().text = eename;
-
-            if (EELpickerUI.selectedEntity == null)
+            try
             {
-                AddRemoveButton.GetComponent<TextMeshProUGUI>().text = "Null";
-            }
-            else if (data.View.CharacterAvatar.EquipmentEntities.Contains(EELpickerUI.selectedEntity))
-            {
-                AddRemoveButton.GetComponent<TextMeshProUGUI>().text = "Remove";
-            }
-            else
-            {
-                AddRemoveButton.GetComponent<TextMeshProUGUI>().text = "Add";
-            }
+                // selectedstring = eename;
+                //haschanged = true;
+                selectedEntity = ResourcesLibrary.TryGetResource<EquipmentEntity>(EquipmentResourcesManager.AllEEL[FilteredAndUnfilteredEEName[eename]]);
+                //this.transform.Find("InventoryViewWindow").Find("TextboxesValues").Find("Name").GetComponent<TextMeshProUGUI>().text = eename;
+                // this.transform.Find("InventoryViewWindow").Find("TextboxesValues").Find("Race").GetComponent<TextMeshProUGUI>().text = eename;
+                //this.transform.Find("InventoryViewWindow").Find("TextboxesValues").Find("Sex").GetComponent<TextMeshProUGUI>().text = eename;
 
-            Name.text = eename;
-            Name2.text = eename;
-            Race.text = getRace(selectedEntity);
-            Sex.text = getGender(selectedEntity);
-            if (selectedEntity != null /*&& data.View.CharacterAvatar.EquipmentEntities.Contains(selectedEntity)*/)
-            {
-                secondSlider.maxValue = selectedEntity.SecondaryRamps.Count;
-                primSlider.maxValue = selectedEntity.PrimaryRamps.Count;
-                var indxprim = getColorFromPart(selectedEntity, true);
-                m_Primxindex = indxprim;
-                PrimaryIndex.text = indxprim.ToString();
-                var indxsec = getColorFromPart(selectedEntity, false);
-                m_SecondaryIndex = indxsec;
-                SecondaryIndex.text = indxsec.ToString();
-
-                //primSlider.value = data.View.CharacterAvatar.GetPrimaryRampIndex(selectedEntity);
-
-                //secondSlider.value = data.View.CharacterAvatar.GetSecondaryRampIndex(selectedEntity);
-                if(selectedEntity.PrimaryColorsProfile == null)
+                if (selectedEntity == null)
                 {
-                    PrimNoColor.SetActive(true);
+                    AddRemoveButton.text = "Null";
+                }
+                else if (data.View.CharacterAvatar.EquipmentEntities.Contains(selectedEntity))
+                {
+                    AddRemoveButton.text = "Remove";
                 }
                 else
                 {
-                    PrimNoColor.SetActive(false);
+                    AddRemoveButton.text = "Add";
                 }
-                if (selectedEntity.SecondaryColorsProfile == null)
+
+                Name.text = eename;
+                Name2.text = eename;
+                Race.text = getRace(selectedEntity);
+                Sex.text = getGender(selectedEntity);
+                /*if (selectedEntity != null /*&& data.View.CharacterAvatar.EquipmentEntities.Contains(selectedEntity)*///)
                 {
-                    SecNoColor.SetActive(true);
+                    secondSlider.maxValue = selectedEntity.SecondaryRamps.Count;
+                    primSlider.maxValue = selectedEntity.PrimaryRamps.Count;
+                    var indxprim = getColorFromPart(selectedEntity, true);
+                    m_Primxindex = indxprim;
+                    PrimaryIndex.text = indxprim.ToString();
+                    var indxsec = getColorFromPart(selectedEntity, false);
+                    m_SecondaryIndex = indxsec;
+                    SecondaryIndex.text = indxsec.ToString();
+
+                    //primSlider.value = data.View.CharacterAvatar.GetPrimaryRampIndex(selectedEntity);
+
+                    //secondSlider.value = data.View.CharacterAvatar.GetSecondaryRampIndex(selectedEntity);
+                    if(selectedEntity.PrimaryColorsProfile == null)
+                    {
+                        PrimNoColor.SetActive(true);
+                    }
+                    else
+                    {
+                        PrimNoColor.SetActive(false);
+                    }
+                    if (selectedEntity.SecondaryColorsProfile == null)
+                    {
+                        SecNoColor.SetActive(true);
+                    }
+                    else
+                    {
+                        SecNoColor.SetActive(false);
+                    }
                 }
-                else
-                {
-                    SecNoColor.SetActive(false);
-                }
+            }
+            catch(Exception e)
+            {
+                VisualAdjustments.Main.logger.Error(e.ToString());
             }
         }
         public static GameObject stash;
-        private void HandleButtonClick()
+        public GameObject menus;
+        public TMP_InputField CurrentInputField;
+        public TMP_InputField AllInputField;
+        public void HandleButtonClick()
         {
             if(stash == null)
             {
-                stash = this.transform.parent.Find("Stash").gameObject;
+                stash = this.transform.parent.Find("Stash/StashContainer/PC_FilterBlock").gameObject;
             }
            // VisualAdjustments.Main.logger.Log("buttonpressed");
-            var selectiongrid = window.Find("UISelectionGrid").gameObject;
-            window.Find("Menus").gameObject.SetActive(!selectiongrid.active);
-            selectiongrid.SetActive(!selectiongrid.active);
-            stash.SetActive(!selectiongrid.active);
+            //var selectiongrid = window.Find("UISelectionGrid").gameObject;
+            menus.SetActive(!UISelectGrid.active);
+            UISelectGrid.SetActive(!UISelectGrid.active);
+            stash.SetActive(!UISelectGrid.active);
 
             //haschanged = true;
             //window.Find("InventoryViewWindow").gameObject.active = !window.Find("InventoryViewWindow").gameObject.active;
             // _text.text = "Add";
+        }
+        public void SliderColPrimary()
+        {
+            primindex = (int)primSlider.value;
+        }
+        public void SliderColSecondary()
+        {
+            secondindex = (int)secondSlider.value;
         }
     }
 
