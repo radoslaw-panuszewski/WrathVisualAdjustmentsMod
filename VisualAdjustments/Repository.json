@@ -1,13 +1,8 @@
 {
 	"Releases":
 	[
-		{
-			"Id": "VisualAdjustments",
-			"Version": "1.11.0d"
-		}
-		{
-			"Id": "VisualAdjustments",
-			"Version": "1.11.0e"
-		}
+		{"Id": "1.11.0e","Version": "1.11.0e"}
 	]
+	
+	
 }
