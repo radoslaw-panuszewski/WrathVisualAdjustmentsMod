@@ -33,6 +33,7 @@ using ModMaker.Utility;
 //using TutorialCanvas.UI;
 using UnityEngine.UI;
 using Object = UnityEngine.Object;
+using Kingmaker.UnitLogic.Buffs.Blueprints;
 
 namespace VisualAdjustments {
 #if DEBUG
@@ -43,7 +44,7 @@ namespace VisualAdjustments {
         public string GUID;
         public string Name;
     }
-    class UpdateDataForUGUI : IHandleInventoryInitialized
+    /*class UpdateDataForUGUI : IHandleInventoryInitialized
     {
         public void OnInventoryInitialized(UnitDescriptor data)
         {
@@ -56,7 +57,7 @@ namespace VisualAdjustments {
         {
             Main.logger.Log("loaded");
         }
-    }
+    }*/
     public class Main 
     {
         public static BlueprintList blueprints;
@@ -147,8 +148,8 @@ namespace VisualAdjustments {
                 {
                     Main.GetClasses();
                 }
-                EventBus.Subscribe(new UpdateDataForUGUI());
-                EventBus.Subscribe(new TestPubSub());
+              //  EventBus.Subscribe(new UpdateDataForUGUI());
+                //EventBus.Subscribe(new TestPubSub());
             }
             catch (Exception e) {
                 Log(e.ToString() + "\n" + e.StackTrace);
@@ -622,33 +623,7 @@ namespace VisualAdjustments {
                         }*/
                     }
                 }
-                if (GUILayout.Button("Spawn Override FX", UI.AutoWidth()))
-                {
-                    foreach (var ch in Game.Instance.Player.PartyAndPets.Concat(Game.Instance.Player.PartyAndPetsDetached))
-                    {
-                        ch.SpawnOverrideBuffs();
-                        /*foreach(var asd in settings.GetCharacterSettings(ch).weaponOverrides)
-                        {
-                            Settings.ParseOverrideTuple(asd.Key);
-                        }*/
-                    }
-                }
-                var strings = new List<string>();
-                if (GUILayout.Button("Generate FX Map"))
-                {
-                    foreach (var kv in Main.blueprints.Entries.Where(a => a.Type == typeof(Kingmaker.UnitLogic.Buffs.Blueprints.BlueprintBuff)).Select(b => ResourcesLibrary.TryGetBlueprint<Kingmaker.UnitLogic.Buffs.Blueprints.BlueprintBuff>(b.Guid)).Where(a => a.FxOnRemove != null || a.FxOnStart != null).ToArray())
-                    {
-                        Main.logger.Log("m_AllFX[■" + kv.name + "■] = ■" + kv.AssetGuid + "■");
-                    }
-                }
-                if(GUILayout.Button("Print FX Asset ID's to Log"))
-                {
-                    foreach(var assetid in strings)
-                    {
-                        var thing = ResourcesLibrary.TryGetResource<UnityEngine.Object>(assetid);
-                        Main.logger.Log("m_AllFX[■" + thing.name + "■] = ■" + assetid+"■");
-                    }
-                }
+
                 //fix this
                 //if (UnityModManager.UI.Scale(1) != UIscale)
                 // {
@@ -686,6 +661,40 @@ namespace VisualAdjustments {
                 if(GUILayout.Button("Generate EEs"))
                 {
                     EquipmentResourcesManager.BuildEELookup();
+                }
+                if (GUILayout.Button("Print Buffs"))
+                {
+                    foreach(var buff in blueprints.Entries.Where(a => a.Type == typeof(BlueprintBuff)).Select(b => ResourcesLibrary.TryGetBlueprint<BlueprintBuff>(b.Guid)).Where(c => c.FxOnStart != null))
+                    {
+                        Main.logger.Log("m_AllFX[\"" + buff.NameForAcronym+ "\"] = \"" + buff.AssetGuidThreadSafe + "\";");
+                    }
+                }
+                if (GUILayout.Button("Spawn Override FX", UI.AutoWidth()))
+                {
+                    foreach (var ch in Game.Instance.Player.PartyAndPets.Concat(Game.Instance.Player.PartyAndPetsDetached))
+                    {
+                        ch.SpawnOverrideBuffs();
+                        /*foreach(var asd in settings.GetCharacterSettings(ch).weaponOverrides)
+                        {
+                            Settings.ParseOverrideTuple(asd.Key);
+                        }*/
+                    }
+                }
+                var strings = new List<string>();
+                if (GUILayout.Button("Generate FX Map"))
+                {
+                    foreach (var kv in Main.blueprints.Entries.Where(a => a.Type == typeof(Kingmaker.UnitLogic.Buffs.Blueprints.BlueprintBuff)).Select(b => ResourcesLibrary.TryGetBlueprint<Kingmaker.UnitLogic.Buffs.Blueprints.BlueprintBuff>(b.Guid)).Where(a => a.FxOnRemove != null || a.FxOnStart != null).ToArray())
+                    {
+                        Main.logger.Log("m_AllFX[■" + kv.name + "■] = ■" + kv.AssetGuid + "■");
+                    }
+                }
+                if (GUILayout.Button("Print FX Asset ID's to Log"))
+                {
+                    foreach (var assetid in strings)
+                    {
+                        var thing = ResourcesLibrary.TryGetResource<UnityEngine.Object>(assetid);
+                        Main.logger.Log("m_AllFX[■" + thing.name + "■] = ■" + assetid + "■");
+                    }
                 }
 #endif
                 UI.DisclosureToggle("Settings", ref showsettings, 175f);
@@ -1904,6 +1913,8 @@ namespace VisualAdjustments {
             void onHideEquipment() {
                 CharacterManager.UpdateModel(unitEntityData.View);
                 CharacterManager.RebuildCharacter(unitEntityData);
+                foreach (var buff in unitEntityData.Buffs)
+                    buff.ClearParticleEffect();
             }
             void onHideBuff() {
                 foreach (var buff in unitEntityData.Buffs)
@@ -2031,7 +2042,7 @@ namespace VisualAdjustments {
             Util.ChooseSlider("Override Boots", EquipmentResourcesManager.Boots, ref characterSettings.overrideBoots, onEquipment);
             Util.ChooseSlider("Override Tattoos", EquipmentResourcesManager.Tattoos, ref characterSettings.overrideTattoo, onEquipment);
             Util.ChooseSlider("Override WingsFX", EquipmentResourcesManager.WingsFX, ref characterSettings.overrideWingsFX, onEquipment);
-            Util.ChooseSlider("Override WingsEE", EquipmentResourcesManager.WingsEE, ref characterSettings.overrideWingsEE, onEquipment);
+            Util.ChooseSliderInvert<string>("Override WingsEE", EquipmentResourcesManager.WingsEE, ref characterSettings.overrideWingsEE, onEquipment);
             Util.ChooseSlider("Override Horns", EquipmentResourcesManager.HornsEE, ref characterSettings.overrideHorns, onEquipment);
             Util.ChooseSlider("Override Tail", EquipmentResourcesManager.TailsEE, ref characterSettings.overrideTail, onEquipment);
             Util.ChooseSliderM("Override Mythic",EquipmentResourcesManager.MythicOptions,ref characterSettings.overrideMythic,onEquipment);

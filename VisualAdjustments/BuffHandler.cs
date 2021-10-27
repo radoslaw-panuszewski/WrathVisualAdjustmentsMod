@@ -22,14 +22,14 @@ namespace VisualAdjustments
             if (component == null) return true;
             if(component.blackorwhitelist)
             {
-                if(component.blackwhitelist.Any(a => a.AssetID == __instance.Blueprint.AssetGuidThreadSafe))
+                if(component.blackwhitelist.ContainsKey(__instance.Blueprint.AssetGuidThreadSafe))
                 {
                     return false;
                 }
             }
             else
             {
-                if (!component.blackwhitelist.Any(a => a.AssetID == __instance.Blueprint.AssetGuidThreadSafe))
+                if (!component.blackwhitelist.ContainsKey(__instance.Blueprint.AssetGuidThreadSafe))
                 {
                     return false;
                 }

@@ -100,6 +100,7 @@
     <Compile Include="UGUI\DefaultLanguage.cs" />
     <Compile Include="UGUI\Main.cs" />
     <Compile Include="UGUI\Settings.cs" />
+    <Compile Include="UGUI\UGUIPatches.cs" />
     <Compile Include="UGUI\UIController.cs" />
     <Compile Include="UGUI\UIManager.cs" />
     <Compile Include="UGUI\Unity Scripts\ColorApplyButtonScript.cs" />

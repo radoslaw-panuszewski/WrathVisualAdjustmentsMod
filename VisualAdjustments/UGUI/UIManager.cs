@@ -51,6 +51,7 @@ using Kingmaker.Blueprints.Classes;
 using Kingmaker.View;
 using Kingmaker.Visual.Animation;
 using Kingmaker.PubSubSystem;
+using UnityEngine.EventSystems;
 
 namespace TutorialCanvas.Enums
 {
@@ -62,23 +63,28 @@ namespace TutorialCanvas.UI
     ///  MAKE THE EES MORE READABLE
     /// </summary>
     /// 
-    public class EEButtonCategories
+    public class EEButtonCategories4
     {
         public string gender = "N/A";
         public string race = "N/A";
     }
     public class UIManager : MonoBehaviour
     {
-
+        public static UIManager manager;
         public GameObject OutfitDoll;
         public GameObject EEPicker;
         public GameObject FX;
         public GameObject Equipment;
-
+        public GameObject overridecontent;
+        public bool shouldrebuildhidebuttons = true;
         public static string GetTextAndSetupCategory(string ee)
         {
             try
             {
+              //  if(ee.Contains("_SU"))
+               // {
+               //     VisualAdjustments.Main.logger.Log(ee);
+             //ok   }
                 /*var str = ee;
                 if(ee.Contains("_M_"))
                 {
@@ -140,7 +146,11 @@ namespace TutorialCanvas.UI
                     {
                         newarray.Add("Female");
                     }
-                    else if ((s != "EE" && s != "Any" && s != "KEE" && s != "Buff") && s.Length > 1)
+                    else if(s == "Any")
+                    {
+                        newarray.Add("Unisex");
+                    }
+                    else if ((s != "EE" && s != "KEE" && s != "Buff") && s.Length > 1)
                     {
                         StringBuilder SB = new System.Text.StringBuilder(s);
                         var b = 0;
@@ -252,31 +262,7 @@ namespace TutorialCanvas.UI
             CharacterManager.RebuildCharacter(data);
             CharacterManager.UpdateModel(data.View);
             UpdatePreview();
-            foreach (var button in currentEELButtons.Except(a => data.View.CharacterAvatar.EquipmentEntities.Contains(c => c.name == a.Key)))
-            {
-                button.Value.SafeDestroy();
-            }
-            foreach (var currentee in data.View.CharacterAvatar.EquipmentEntities)
-            {
-                if (!currentEELButtons.ContainsKey(currentee.name))
-                {
-                    var buttontoadd = Instantiate(buttonTemplate);
-                    var buttontoaddtext = buttontoadd.Find("TextB").GetComponent<TextMeshProUGUI>();
-                    // buttontoaddtext.text = currentee.name;
-                    buttontoaddtext.text = GetTextAndSetupCategory(currentee.name);
-                   // buttontoaddtext.text = GetTextAndSetupCategory(currentee);
-                   // buttontoaddtext.font = font;
-                    //buttontoaddtext.color = Color.white;
-                    buttontoadd.transform.SetParent(contentCurrentEE.transform, false);
-                    var buttontoaddbuttoncomponent = buttontoadd.GetComponent<Button>();
-                    buttontoaddbuttoncomponent.onClick = new Button.ButtonClickedEvent();
-                    buttontoaddbuttoncomponent.onClick.AddListener(new UnityAction(() =>
-                    {
-                        HandleEEClicked(buttontoaddtext.text);
-                    }));
-                    currentEELButtons.Add(currentee.name, buttontoaddbuttoncomponent);
-                }
-            }
+            RebuildCurrentEEButtons();
         }
         public void setCustomColorToEEPart(Color col, bool primorsec)
         {
@@ -319,10 +305,10 @@ namespace TutorialCanvas.UI
                     }
                 }
             }
-           // primSlider.maxValue = selectedEntity.PrimaryRamps.Count;
-            //primSlider.value = data.View.CharacterAvatar.GetPrimaryRampIndex(selectedEntity);
-           // secondSlider.maxValue = selectedEntity.SecondaryRamps.Count;
-           // secondSlider.value = data.View.CharacterAvatar.GetSecondaryRampIndex(selectedEntity);
+            primSlider.maxValue = selectedEntity.PrimaryRamps.Count;
+            primSlider.value = data.View.CharacterAvatar.GetPrimaryRampIndex(selectedEntity);
+            secondSlider.maxValue = selectedEntity.SecondaryRamps.Count;
+            secondSlider.value = data.View.CharacterAvatar.GetSecondaryRampIndex(selectedEntity);
             UpdatePreview();
         }
         public void removeFromRemoveEEPart(EquipmentEntity ee)
@@ -337,7 +323,6 @@ namespace TutorialCanvas.UI
             {
                 component.EEToRemove.Remove(EquipmentResourcesManager.AllEEL[ee.name]);
             }
-
         }
         public void addToRemoveEEPart(EquipmentEntity ee)
         {
@@ -439,7 +424,7 @@ namespace TutorialCanvas.UI
         {
             get
             {
-                var newData = Kingmaker.UI.Common.UIUtility.GetCurrentCharacter();
+                /*var newData = Kingmaker.UI.Common.UIUtility.GetCurrentCharacter();
                 if (m_Data == null)
                 {
                     m_Data = newData;
@@ -449,14 +434,92 @@ namespace TutorialCanvas.UI
                 {
                     m_Data = newData;
                     haschanged = true;
-                }
-                // m_Data = Kingmaker.UI.Common.UIUtility.GetCurrentCharacter();
+                }*/
+
+                if(m_Data == null) m_Data = Kingmaker.UI.Common.UIUtility.GetCurrentCharacter();
                 return m_Data;
             }
             set
             {
-                m_Data = value;
-                haschanged = true;
+                try
+                {
+
+                    if (value != null && (m_Data == null || (m_Data != null && (m_Data.UniqueId != value.UniqueId))))
+                    {
+                        m_Data = value;
+                        //VisualAdjustments.Main.logger.Log("ChangedUnit : " + value.CharacterName);
+                        // FXUIHandler.currentUnitPart = value.Parts.Ensure<UnitPartVAFX>();
+                        // FXUIHandler.handler.WhiteOrBlackList = FXUIHandler.currentUnitPart.blackorwhitelist;
+                        settings = VisualAdjustments.Main.settings.GetCharacterSettings(value);
+                        // haschanged = true;
+                        //  if ((manager?.UISelectGrid?.activeInHierarchy?))
+                        if (manager != null && manager.UISelectGrid.activeInHierarchy)
+                        {
+                            // if (hasUnitChanged())
+                            {
+                                //VisualAdjustments.Main.settings.Save(VisualAdjustments.Main.ModEntry);
+                                // settings = VisualAdjustments.Main.settings.GetCharacterSettings(m_Data);
+                                //  HandleUnitChangedHideEEs();
+                                foreach (var eebutton in manager.currentEELButtons.Values)
+                                {
+                                    eebutton.gameObject.SafeDestroy();
+                                }
+
+                                //foreach (var kv in hidebuttons)
+                                {
+                                    //    kv.Key.isOn = kv.Value;
+                                }
+                                manager.currentEELButtons.Clear();
+
+                            }
+                            // if (haschanged)
+                            {
+                                // settings = VisualAdjustments.Main.settings.GetCharacterSettings(m_Data);
+
+                               /* foreach (var kv in hidebuttons)
+                                {
+                                    hidebuttons[kv.Key] = kv.Key.isOn;
+                                }*/
+
+                                foreach (var currentee in data.View.CharacterAvatar.EquipmentEntities)
+                                {
+                                    if (!manager.currentEELButtons.ContainsKey(currentee.name))
+                                    {
+                                        var buttontoadd = Instantiate(manager.buttonTemplate);
+                                        var buttontoaddtext = buttontoadd.Find("TextB").GetComponent<TextMeshProUGUI>();
+                                        //buttontoaddtext.text = currentee.name;
+                                        buttontoaddtext.text = GetTextAndSetupCategory(currentee.name);
+                                        // buttontoaddtext.font = font;
+                                        // buttontoaddtext.color = Color.white;
+                                        buttontoadd.transform.SetParent(manager.contentCurrentEE.transform, false);
+                                        var buttontoaddbuttoncomponent = buttontoadd.GetComponent<Button>();
+                                        buttontoaddbuttoncomponent.onClick = new Button.ButtonClickedEvent();
+                                        buttontoaddbuttoncomponent.onClick.AddListener(new UnityAction(() =>
+                                        {
+                                            manager.HandleEEClicked(buttontoaddtext.text);
+                                        }));
+                                        manager.currentEELButtons.Add(buttontoaddtext.text, buttontoaddbuttoncomponent);
+                                    }
+                                }
+                                manager.HandleUnitChangedHideEEs();
+                                //haschanged = false;
+                            }
+                        }
+                        else
+                        {
+                            haschanged = true;
+                        }
+                    }
+
+                    else
+                    {
+                        m_Data = value;
+                    }
+                }
+                catch(Exception e)
+                {
+                    VisualAdjustments.Main.logger.Log(e.ToString());
+                }
             }
         }
 
@@ -467,11 +530,11 @@ namespace TutorialCanvas.UI
                 try
                 {
                     // fix this
-                    if (FXUIHandler.    dollPcView == null)
+                    if (FXUIHandler.dollPcView == null && window != null)
                     {
-                        FXUIHandler.dollPcView = window.parent.Find("Doll").GetComponent<InventoryDollPCView>();
+                        FXUIHandler.dollPcView = window.parent.Find("Doll")?.GetComponent<InventoryDollPCView>();
                     }
-                    else
+                    else if(FXUIHandler.dollPcView != null)
                     {
 
                         //FXUIHandlerHandler.dollPcView.Initialize();
@@ -481,10 +544,10 @@ namespace TutorialCanvas.UI
                           //FXUIHandlerHandler.dollPcView.OnHide();
                        // FXUIHandlerHandler.dollPcView.BindViewImplementation();
                         //FXUIHandlerHandler.dollPcView.OnShow();
-                        if(UISelectGrid.activeInHierarchy)/* && FXUIHandlerHandler.dollPcView.Room && FXUIHandlerHandler.dollPcView.IsBinded)*/
+                        if(UISelectGrid?.activeInHierarchy == true)/* && FXUIHandlerHandler.dollPcView.Room && FXUIHandlerHandler.dollPcView.IsBinded)*/
                         {
-                            VisualAdjustments.Main.logger.Log("UpdatedPreview");
-                            CharacterManager.RebuildCharacter(data);
+                           // VisualAdjustments.Main.logger.Log("UpdatedPreview");
+                           // CharacterManager.RebuildCharacter(data);
                             FXUIHandler.dollPcView.OnHide();
                             FXUIHandler.dollPcView.RefreshView();
                             FXUIHandler.dollPcView.OnShow();
@@ -619,7 +682,7 @@ namespace TutorialCanvas.UI
         {
             get
             {
-                if (m_settings == null || data != m_Data || loaded)
+                if (m_settings == null /*|| data != m_Data*/ || loaded)
                 {
                     if (VisualAdjustments.Main.settings.characterSettings.TryGetValue(data.UniqueId, out VisualAdjustments.Settings.CharacterSettings setting))
                     {
@@ -689,6 +752,7 @@ namespace TutorialCanvas.UI
                 //VisualAdjustments.Main.logger.Log("createdobject3");
                 // content = ;
                 var cmp = window.gameObject.EnsureComponent<UIManager>();
+                manager = cmp;
                // cmp.Awake();
                 return cmp; //This adds this class as a component so it can handle events, button clicks, awake, update, etc.
             }
@@ -699,7 +763,171 @@ namespace TutorialCanvas.UI
             return new UIManager();
         }
         public Transform overridesobject;
+        public TMP_Dropdown overridedropdown;
         public static bool initiated = false;
+        public void handleOverrideDropdownChanged(int index)
+        {
+            VisualAdjustments.Main.logger.Log(index.ToString());
+            if (index != 10)
+            {
+                overridesobject.Find("WeaponStyleSelect").gameObject.SetActive(false);
+                foreach (var thing in buttonsEELOverride)
+                {
+                    if (!EELDictionaries[index].ContainsKey(thing.Key) && thing.Key != "None")
+                    {
+                        thing.Value.gameObject.SetActive(false);
+                    }
+                    else if (thing.Key == "None")
+                    {
+                        thing.Value.gameObject.SetActive(true);
+                    }
+                    else
+                    {
+                        thing.Value.gameObject.SetActive(true);
+                    }
+                }
+                if (!buttonsEELOverride.ContainsKey("None"))
+                {
+                    var buttontoaddD = Instantiate(buttonTemplate);
+                    var buttontoaddtextt = buttontoaddD.Find("TextB").GetComponent<TextMeshProUGUI>();
+                    buttontoaddtextt.text = "None";
+                    //buttontoaddtext.font = font;
+                    buttontoaddtextt.color = Color.white;
+                    buttontoaddD.transform.SetParent(overridecontent.transform, false);
+                    var buttontoaddbuttoncomponentt = buttontoaddD.GetComponent<Button>();
+                    buttontoaddbuttoncomponentt.onClick = new Button.ButtonClickedEvent();
+                    buttontoaddbuttoncomponentt.onClick.AddListener(new UnityAction(() =>
+                    {
+                        setsetting(overridedropdown.value, "");
+                        UpdatePreview();
+                    }));
+                    buttonsEELOverride.Add("None", buttontoaddD);
+                }
+
+                foreach (var eename in EELDictionaries[index])
+                {
+                    if (!buttonsEELOverride.ContainsKey(eename.Key.assetId))
+                    {
+                        try
+                        {
+                            var buttontoadd = Instantiate(buttonTemplate);
+                            var buttontoaddtext = buttontoadd.Find("TextB").GetComponent<TextMeshProUGUI>();
+                            // if ()
+                            {
+                                //buttontoaddtext.text = eename.Value;
+                                buttontoaddtext.text = GetTextAndSetupCategory(eename.Value);
+                                //buttontoaddtext.text = Kingmaker.Cheats.Utilities.GetBlueprint<BlueprintScriptableObject>(eename.Key.assetId).name;
+                            }
+
+                            //buttontoaddtext.font = font;
+                            //buttontoaddtext.color = Color.white;
+                            buttontoadd.transform.SetParent(overridecontent.transform, false);
+                            var buttontoaddbuttoncomponent = buttontoadd.GetComponent<Button>();
+                            buttontoaddbuttoncomponent.onClick = new Button.ButtonClickedEvent();
+                            buttonsEELOverride.Add(eename.Key.assetId, buttontoadd);
+                            buttontoaddbuttoncomponent.onClick.AddListener(new UnityAction(() =>
+                            {
+                                setsetting(index, eename.Key.assetId);
+                                UpdatePreview();
+                            }));
+                        }
+                        catch (Exception e)
+                        {
+                            VisualAdjustments.Main.logger.Log(e.ToString());
+                            throw;
+                        }
+                    }
+                }
+            }
+            else
+            {
+                overridesobject.Find("WeaponStyleSelect").gameObject.SetActive(true);
+                HandleWeaponSelectorSelected(0);
+            }
+        }
+         public void HandleWeaponSelectorSelected(int index)
+        {
+            if (weaponIndices.TryGetValue(index, out string weaponstyle))
+            {
+                SelectedWeaponType = weaponstyle;
+                if (EquipmentResourcesManager.Weapons.TryGetValue(weaponstyle, out Dictionary<BlueprintRef, string> Weapons))
+                {
+                    //overridecontent; //= overridesobject.Find("Scroll View/Viewport/Content");
+                    foreach (var thing in buttonsEELOverride)
+                    {
+                        if (!Weapons.ContainsKey(thing.Key) && thing.Key != "None")
+                        {
+                            thing.Value.gameObject.SetActive(false);
+                        }
+                        else if (thing.Key == "None")
+                        {
+                            thing.Value.gameObject.SetActive(true);
+                        }
+                        else
+                        {
+                            thing.Value.gameObject.SetActive(true);
+                        }
+                    }
+                    if (!buttonsEELOverride.ContainsKey("None"))
+                    {
+                        var buttontoaddD = Instantiate(buttonTemplate);
+                        var buttontoaddtextt = buttontoaddD.Find("TextB").GetComponent<TextMeshProUGUI>();
+                        buttontoaddtextt.text = "None";
+                        //buttontoaddtext.font = font;
+                        buttontoaddtextt.color = Color.white;
+                        buttontoaddD.transform.SetParent(overridecontent.transform, false);
+                        var buttontoaddbuttoncomponentt = buttontoaddD.GetComponent<Button>();
+                        buttontoaddbuttoncomponentt.onClick = new Button.ButtonClickedEvent();
+                        buttontoaddbuttoncomponentt.onClick.AddListener(new UnityAction(() =>
+                        {
+                            //settings.weaponOverrides[(new OverrideInfo(weaponstyle, slot, primorsec))] = null;
+                            //settings.weaponOverrides[(new Tuple<string, int, bool>(weaponstyle, slot, primorsec))] = null;
+                            settings.weaponOverrides[new Tuple<string, int, bool>(weaponstyle, slot, primorsec).ToString()] = null;
+                            //  VisualAdjustments.Main.logger.Log("settonull");
+                            UpdatePreview();
+                            //Set appropriate assetguid to nothing
+                            // setsetting(overridesdropdown.value, "");
+                        }));
+                        buttonsEELOverride.Add("None", buttontoaddD);
+                    }
+                    foreach (var weapon in Weapons)
+                    {
+                        if (!buttonsEELOverride.ContainsKey(weapon.Key.assetId))
+                        {
+                            try
+                            {
+                                var buttontoadd = Instantiate(buttonTemplate);
+                                var buttontoaddtext = buttontoadd.Find("TextB").GetComponent<TextMeshProUGUI>();
+                                // if ()
+                                {
+                                    buttontoaddtext.text = weapon.Value;
+                                    //buttontoaddtext.text = Kingmaker.Cheats.Utilities.GetBlueprint<BlueprintScriptableObject>(eename.Key.assetId).name;
+                                }
+                                //buttontoaddtext.font = font;
+                                // buttontoaddtext.color = Color.white;
+                                buttontoadd.transform.SetParent(overridecontent.transform, false);
+                                var buttontoaddbuttoncomponent = buttontoadd.GetComponent<Button>();
+                                buttontoaddbuttoncomponent.onClick = new Button.ButtonClickedEvent();
+                                buttonsEELOverride.Add(weapon.Key.assetId, buttontoadd);
+                                buttontoaddbuttoncomponent.onClick.AddListener(new UnityAction(() =>
+                                {
+                                    settings.weaponOverrides[new Tuple<string, int, bool>(weaponstyle, slot, primorsec).ToString()] = weapon.Key;
+                                    UpdatePreview();
+                                    //settings.weaponOverrides[(new Tuple<string,int,bool>(weaponstyle, slot, primorsec))] = weapon.Key;
+                                    //Set appropriate weapon override
+                                    //setsetting(index, weapon.Key.assetId);
+                                }));
+                            }
+                            catch (Exception e)
+                            {
+                                VisualAdjustments.Main.logger.Log(e.ToString());
+                                throw;
+                            }
+                        }
+                    }
+                }
+            }
+        }
         private void Awake()
         {
             //if (loaded2) return;
@@ -711,7 +939,7 @@ namespace TutorialCanvas.UI
                 //
                 // Setup the listeners when the script starts
                 //
-                VisualAdjustments.Main.logger.Log("awake");
+               // VisualAdjustments.Main.logger.Log("awake");
 
 
                 // Setup scrollview content
@@ -748,9 +976,9 @@ namespace TutorialCanvas.UI
                     buttontoaddbuttoncomponent.onClick = new Button.ButtonClickedEvent();
                     buttontoaddbuttoncomponent.onClick.AddListener(new UnityAction(() => { HandleEEClicked(buttontoaddtext.text);
                     }));
-                    allEELButtons.Add(eename.Key, buttontoadd.gameObject);
+                    allEELButtons.Add(buttontoaddtext.text, buttontoadd.gameObject);
                 }
-                m_Data = Kingmaker.UI.Common.UIUtility.GetCurrentCharacter();
+                //m_Data = Kingmaker.UI.Common.UIUtility.GetCurrentCharacter();
                // UISelectGrid = transform.Find("UISelectionGrid").gameObject;
                 //switch font
                 //var texts = ;
@@ -951,11 +1179,13 @@ namespace TutorialCanvas.UI
                             var buttontoggle = buttontransform;
                             buttontoggle.onValueChanged = new Toggle.ToggleEvent();
 
-                            TextMeshProUGUI buttontext = buttontransform.transform.Find("Label").GetComponent<TextMeshProUGUI>(); ;
+                            TextMeshProUGUI buttontext = buttontransform.transform.Find("Label").GetComponent<TextMeshProUGUI>();
+                            
                             //VisualAdjustments.Main.logger.Log(buttontext.text);
                             //VisualAdjustments.Main.logger.Log(settings.ToString());
                             switch (buttontext.text)
                             {
+
                                 case "Hide Cap":
                                     buttontoggle.onValueChanged.AddListener((bool state) =>
                                     {
@@ -1109,7 +1339,7 @@ namespace TutorialCanvas.UI
                                     hidebuttons.Add(buttontoggle, buttontext);
                                     break;
                             }
-                            buttontext.color = Color.white;
+                           // buttontext.color = Color.white;
                         }
 
                     }
@@ -1119,58 +1349,58 @@ namespace TutorialCanvas.UI
                         
                         //var options = new List<TMP_Dropdown.OptionData>();
                         //options[0] = new TMP_Dropdown.OptionData().text;
-                        var overridesdropdown = overridesobject.Find("OverrideSelect").GetComponent<TMP_Dropdown>();
-                        overridesdropdown.transform.Find("Label").GetComponent<TextMeshProUGUI>().color = Color.white;
-                        overridesdropdown.onValueChanged = new TMP_Dropdown.DropdownEvent();
-                        var overridecontent = overridesobject.Find("Scroll View/Viewport/Content");
+                       // var overridesdropdown = overridesobject.Find("OverrideSelect").GetComponent<TMP_Dropdown>();
+                       // overridesdropdown.transform.Find("Label").GetComponent<TextMeshProUGUI>().color = Color.white;
+                       // overridesdropdown.onValueChanged = new TMP_Dropdown.DropdownEvent();
+                        //overridecontent;// = overridesobject.Find("Scroll View/Viewport/Content");
                         var index2 = 0;
                         {
-                            var optiondata = new TMP_Dropdown.OptionData("Helmet");
+                            //var optiondata = new TMP_Dropdown.OptionData("Helmet");
                             EELDictionaries.Add(index2, EquipmentResourcesManager.Helm);
                             index2++;
-                            overridesdropdown.options.Add(optiondata);
+                            //overridesdropdown.options.Add(optiondata);
                         }
                         {
-                            var optiondata = new TMP_Dropdown.OptionData("Cloak");
+                            //var optiondata = new TMP_Dropdown.OptionData("Cloak");
                             EELDictionaries.Add(index2, EquipmentResourcesManager.Cloak);
                             index2++;
-                            overridesdropdown.options.Add(optiondata);
+                           // overridesdropdown.options.Add(optiondata);
                         }
                         {
-                            var optiondata = new TMP_Dropdown.OptionData("Shirt");
+                           //var optiondata = new TMP_Dropdown.OptionData("Shirt");
                             EELDictionaries.Add(index2, EquipmentResourcesManager.Shirt);
                             index2++;
-                            overridesdropdown.options.Add(optiondata);
+                            // overridesdropdown.options.Add(optiondata);
                         }
                         {
-                            var optiondata = new TMP_Dropdown.OptionData("Glasses/Mask");
+                            //var optiondata = new TMP_Dropdown.OptionData("Glasses/Mask");
                             EELDictionaries.Add(index2, EquipmentResourcesManager.Glasses);
                             index2++;
-                            overridesdropdown.options.Add(optiondata);
+                            // overridesdropdown.options.Add(optiondata);
                         }
                         {
-                            var optiondata = new TMP_Dropdown.OptionData("Armor");
+                            //var optiondata = new TMP_Dropdown.OptionData("Armor");
                             EELDictionaries.Add(index2, EquipmentResourcesManager.Armor);
                             index2++;
-                            overridesdropdown.options.Add(optiondata);
+                            // overridesdropdown.options.Add(optiondata);
                         }
                         {
-                            var optiondata = new TMP_Dropdown.OptionData("Bracers");
+                           // var optiondata = new TMP_Dropdown.OptionData("Bracers");
                             EELDictionaries.Add(index2, EquipmentResourcesManager.Bracers);
                             index2++;
-                            overridesdropdown.options.Add(optiondata);
+                           // overridesdropdown.options.Add(optiondata);
                         }
                         {
-                            var optiondata = new TMP_Dropdown.OptionData("Gloves");
+                           // var optiondata = new TMP_Dropdown.OptionData("Gloves");
                             EELDictionaries.Add(index2, EquipmentResourcesManager.Gloves);
                             index2++;
-                            overridesdropdown.options.Add(optiondata);
+                          // overridesdropdown.options.Add(optiondata);
                         }
                         {
-                            var optiondata = new TMP_Dropdown.OptionData("Boots");
+                           // var optiondata = new TMP_Dropdown.OptionData("Boots");
                             EELDictionaries.Add(index2, EquipmentResourcesManager.Boots);
                             index2++;
-                            overridesdropdown.options.Add(optiondata);
+                            //overridesdropdown.options.Add(optiondata);
                         }
                         /* {
                              var optiondata = new TMP_Dropdown.OptionData("Wings (FX)");
@@ -1179,13 +1409,13 @@ namespace TutorialCanvas.UI
                              overridesdropdown.options.Add(optiondata);
                          }*/
                         {
-                            var optiondata = new TMP_Dropdown.OptionData("Mythic");
+                            // var optiondata = new TMP_Dropdown.OptionData("Mythic");
                             EELDictionaries.Add(index2, EquipmentResourcesManager.MythicOptions);
                             index2++;
-                            overridesdropdown.options.Add(optiondata);
+                            //overridesdropdown.options.Add(optiondata);
                         }
                         {
-                            var optiondata = new TMP_Dropdown.OptionData("Wings");
+                            //var optiondata = new TMP_Dropdown.OptionData("Wings");
                             var newwings = new Dictionary<BlueprintRef, string>();
                             foreach (var wingpair in EquipmentResourcesManager.WingsEE)
                             {
@@ -1194,14 +1424,14 @@ namespace TutorialCanvas.UI
                             }
                             EELDictionaries.Add(index2, newwings);
                             index2++;
-                            overridesdropdown.options.Add(optiondata);
+                            // overridesdropdown.options.Add(optiondata);
                         }
                         //Weapons
                         {
-                            var optiondata = new TMP_Dropdown.OptionData("Weapons");
-                            overridesdropdown.options.Add(optiondata);
+                         //   var optiondata = new TMP_Dropdown.OptionData("Weapons");
+                           // overridesdropdown.options.Add(optiondata);
                             index2++;
-                            VisualAdjustments.Main.logger.Log(index2.ToString());
+                           // VisualAdjustments.Main.logger.Log(index2.ToString());
                             // Weaponstyles dropdown
                             {
                                 var weapondropdown = overridesobject.Find("WeaponStyleSelect").GetComponent<TMP_Dropdown>();
@@ -1219,15 +1449,15 @@ namespace TutorialCanvas.UI
                         }
                         //Enchantments
                         {
-                            var optiondata = new TMP_Dropdown.OptionData("Enchantments");
+                            // var optiondata = new TMP_Dropdown.OptionData("Enchantments");
                             //VisualAdjustments.Main.logger.Log("Enchantments" + index2);
                             EELDictionaries.Add(index2, EquipmentResourcesManager.WeaponEnchantments);
                             index2++;
-                            overridesdropdown.options.Add(optiondata);
+                            // overridesdropdown.options.Add(optiondata);
                         }
                         //Views
                         {
-                            var optiondata = new TMP_Dropdown.OptionData("View");
+                            //var optiondata = new TMP_Dropdown.OptionData("View");
                             // VisualAdjustments.Main.logger.Log("View" + index2);
                             var newunits = new Dictionary<BlueprintRef, string>();
                             foreach (var unit in EquipmentResourcesManager.Units)
@@ -1237,189 +1467,28 @@ namespace TutorialCanvas.UI
                             }
                             EELDictionaries.Add(index2, newunits);
                             index2++;
-                            overridesdropdown.options.Add(optiondata);
+                            // overridesdropdown.options.Add(optiondata);
                         }
 
-                        overridesdropdown.onValueChanged.AddListener(handleOverrideDropdownChanged);
+                        //overridesdropdown.onValueChanged.AddListener(handleOverrideDropdownChanged);
                         handleOverrideDropdownChanged(0);
-                        void handleOverrideDropdownChanged(int index)
-                        {
-                            VisualAdjustments.Main.logger.Log(index.ToString());
-                            if (index != 10)
-                            {
-                                overridesobject.Find("WeaponStyleSelect").gameObject.SetActive(false);
-                                foreach (var thing in buttonsEELOverride)
-                                {
-                                    if (!EELDictionaries[index].ContainsKey(thing.Key) && thing.Key != "None")
-                                    {
-                                        thing.Value.gameObject.SetActive(false);
-                                    }
-                                    else if (thing.Key == "None")
-                                    {
-                                        thing.Value.gameObject.SetActive(true);
-                                    }
-                                    else
-                                    {
-                                        thing.Value.gameObject.SetActive(true);
-                                    }
-                                }
-                                if (!buttonsEELOverride.ContainsKey("None"))
-                                {
-                                    var buttontoaddD = Instantiate(buttonTemplate);
-                                    var buttontoaddtextt = buttontoaddD.Find("TextB").GetComponent<TextMeshProUGUI>();
-                                    buttontoaddtextt.text = "None";
-                                    //buttontoaddtext.font = font;
-                                    buttontoaddtextt.color = Color.white;
-                                    buttontoaddD.transform.SetParent(overridecontent.transform, false);
-                                    var buttontoaddbuttoncomponentt = buttontoaddD.GetComponent<Button>();
-                                    buttontoaddbuttoncomponentt.onClick = new Button.ButtonClickedEvent();
-                                    buttontoaddbuttoncomponentt.onClick.AddListener(new UnityAction(() =>
-                                    {
-                                        setsetting(overridesdropdown.value, "");
-                                        UpdatePreview();
-                                    }));
-                                    buttonsEELOverride.Add("None", buttontoaddD);
-                                }
 
-                                foreach (var eename in EELDictionaries[index])
-                                {
-                                    if (!buttonsEELOverride.ContainsKey(eename.Key.assetId))
-                                    {
-                                        try
-                                        {
-                                            var buttontoadd = Instantiate(buttonTemplate);
-                                            var buttontoaddtext = buttontoadd.Find("TextB").GetComponent<TextMeshProUGUI>();
-                                            // if ()
-                                            {
-                                                //buttontoaddtext.text = eename.Value;
-                                                buttontoaddtext.text = GetTextAndSetupCategory(eename.Value);
-                                                //buttontoaddtext.text = Kingmaker.Cheats.Utilities.GetBlueprint<BlueprintScriptableObject>(eename.Key.assetId).name;
-                                            }
-
-                                            //buttontoaddtext.font = font;
-                                            buttontoaddtext.color = Color.white;
-                                            buttontoadd.transform.SetParent(overridecontent.transform, false);
-                                            var buttontoaddbuttoncomponent = buttontoadd.GetComponent<Button>();
-                                            buttontoaddbuttoncomponent.onClick = new Button.ButtonClickedEvent();
-                                            buttonsEELOverride.Add(eename.Key.assetId, buttontoadd);
-                                            buttontoaddbuttoncomponent.onClick.AddListener(new UnityAction(() =>
-                                            {
-                                                setsetting(index, eename.Key.assetId);
-                                                UpdatePreview();
-                                            }));
-                                        }
-                                        catch (Exception e)
-                                        {
-                                            VisualAdjustments.Main.logger.Log(e.ToString());
-                                            throw;
-                                        }
-                                    }
-                                }
-                            }
-                            else
-                            {
-                                overridesobject.Find("WeaponStyleSelect").gameObject.SetActive(true);
-                                
-                            }
-                        }
                     }
 
                 }
                 //var overridesobject = this.transform.Find("Menus/HideEquipment/Overrides");
-                void HandleWeaponSelectorSelected(int index)
-                {
-                    if (weaponIndices.TryGetValue(index, out string weaponstyle))
-                    {
-                        SelectedWeaponType = weaponstyle;
-                        if (EquipmentResourcesManager.Weapons.TryGetValue(weaponstyle, out Dictionary<BlueprintRef, string> Weapons))
-                        {
-                            var overridecontent = overridesobject.Find("Scroll View/Viewport/Content");
-                            foreach (var thing in buttonsEELOverride)
-                            {
-                                if (!Weapons.ContainsKey(thing.Key) && thing.Key != "None")
-                                {
-                                    thing.Value.gameObject.SetActive(false);
-                                }
-                                else if (thing.Key == "None")
-                                {
-                                    thing.Value.gameObject.SetActive(true);
-                                }
-                                else
-                                {
-                                    thing.Value.gameObject.SetActive(true);
-                                }
-                            }
-                            if (!buttonsEELOverride.ContainsKey("None"))
-                            {
-                                var buttontoaddD = Instantiate(buttonTemplate);
-                                var buttontoaddtextt = buttontoaddD.Find("TextB").GetComponent<TextMeshProUGUI>();
-                                buttontoaddtextt.text = "None";
-                                //buttontoaddtext.font = font;
-                                buttontoaddtextt.color = Color.white;
-                                buttontoaddD.transform.SetParent(overridecontent.transform, false);
-                                var buttontoaddbuttoncomponentt = buttontoaddD.GetComponent<Button>();
-                                buttontoaddbuttoncomponentt.onClick = new Button.ButtonClickedEvent();
-                                buttontoaddbuttoncomponentt.onClick.AddListener(new UnityAction(() =>
-                                {
-                                    //settings.weaponOverrides[(new OverrideInfo(weaponstyle, slot, primorsec))] = null;
-                                    //settings.weaponOverrides[(new Tuple<string, int, bool>(weaponstyle, slot, primorsec))] = null;
-                                    settings.weaponOverrides[new Tuple<string, int, bool>(weaponstyle, slot, primorsec).ToString()] = null;
-                                    VisualAdjustments.Main.logger.Log("settonull");
-                                    UpdatePreview();
-                                    //Set appropriate assetguid to nothing
-                                    // setsetting(overridesdropdown.value, "");
-                                }));
-                                buttonsEELOverride.Add("None", buttontoaddD);
-                            }
-                            foreach (var weapon in Weapons)
-                            {
-                                if (!buttonsEELOverride.ContainsKey(weapon.Key.assetId))
-                                {
-                                    try
-                                    {
-                                        var buttontoadd = Instantiate(buttonTemplate);
-                                        var buttontoaddtext = buttontoadd.Find("TextB").GetComponent<TextMeshProUGUI>();
-                                        // if ()
-                                        {
-                                            buttontoaddtext.text = weapon.Value;
-                                            //buttontoaddtext.text = Kingmaker.Cheats.Utilities.GetBlueprint<BlueprintScriptableObject>(eename.Key.assetId).name;
-                                        }
-                                        //buttontoaddtext.font = font;
-                                        buttontoaddtext.color = Color.white;
-                                        buttontoadd.transform.SetParent(overridecontent.transform, false);
-                                        var buttontoaddbuttoncomponent = buttontoadd.GetComponent<Button>();
-                                        buttontoaddbuttoncomponent.onClick = new Button.ButtonClickedEvent();
-                                        buttonsEELOverride.Add(weapon.Key.assetId, buttontoadd);
-                                        buttontoaddbuttoncomponent.onClick.AddListener(new UnityAction(() =>
-                                        {
-                                            settings.weaponOverrides[new Tuple<string, int, bool>(weaponstyle, slot, primorsec).ToString()] = weapon.Key;
-                                            UpdatePreview();
-                                            //settings.weaponOverrides[(new Tuple<string,int,bool>(weaponstyle, slot, primorsec))] = weapon.Key;
-                                            //Set appropriate weapon override
-                                            //setsetting(index, weapon.Key.assetId);
-                                        }));
-                                    }
-                                    catch (Exception e)
-                                    {
-                                        VisualAdjustments.Main.logger.Log(e.ToString());
-                                        throw;
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
+                
                 //Weaponstyle Selector
                 {
                     
                     
-                    var WeaponSelector = overridesobject.Find("WeaponStyleSelect").GetComponent<TMP_Dropdown>();
+                    /*var WeaponSelector = overridesobject.Find("WeaponStyleSelect").GetComponent<TMP_Dropdown>();
                     WeaponSelector.onValueChanged = new TMP_Dropdown.DropdownEvent();
                     WeaponSelector.onValueChanged.AddListener(new UnityAction<int>((int index) =>
                     {
                         HandleWeaponSelectorSelected(index);
                         VisualAdjustments.Main.logger.Log(index.ToString());
-                    }));
+                    }));*/
                     //handleOverrideDropdownChanged(0);
                     //Weapon Slot Selector
                     {
@@ -1711,6 +1780,7 @@ namespace TutorialCanvas.UI
                     }
                 }
                 UpdatePreview();
+                CharacterManager.RebuildCharacter(data);
             }
             catch (Exception e)
             {
@@ -1725,8 +1795,12 @@ namespace TutorialCanvas.UI
         public void handleHideEquipment(bool state, ref bool settingState)
         {
             settingState = state;
-            CharacterManager.RebuildCharacter(data);
-           // UpdatePreview();
+            if (shouldrebuildhidebuttons)
+            {
+                CharacterManager.RebuildCharacter(data);
+                UpdatePreview();
+                // UpdatePreview();
+            }
         }
         public void handleSliderInputFieldPrim(string value)
         {
@@ -1805,11 +1879,11 @@ namespace TutorialCanvas.UI
                 {
                     if (splitstring.All(a => eelbutton.Key.Contains(a,StringComparison.OrdinalIgnoreCase)))
                     {
-                        eelbutton.Value.SetActive(true);
+                        if (!eelbutton.Value.activeSelf)  eelbutton.Value.SetActive(true);
                     }
                     else
                     {
-                        eelbutton.Value.SetActive(false);
+                        if (eelbutton.Value.activeSelf) eelbutton.Value.SetActive(false);
                     }
                     /*bool shoulddisable = true;
                     foreach (var String in splitstring)
@@ -1847,15 +1921,15 @@ namespace TutorialCanvas.UI
                 {
                     if (value.IsNullOrEmpty())
                     {
-                        eelbutton.Value.SetActive(true);
+                        if (!eelbutton.Value.activeSelf) eelbutton.Value.SetActive(true);
                     }
                     else if (eelbutton.Key.Contains(value, StringComparison.OrdinalIgnoreCase))
                     {
-                        eelbutton.Value.SetActive(true);
+                        if (!eelbutton.Value.activeSelf) eelbutton.Value.SetActive(true);
                     }
                     else
                     {
-                        eelbutton.Value.SetActive(false);
+                        if (eelbutton.Value.activeSelf) eelbutton.Value.SetActive(false);
                     }
                 }
 
@@ -1920,72 +1994,77 @@ namespace TutorialCanvas.UI
         {
             try
             {
+                shouldrebuildhidebuttons = false;
                 foreach (var transform in hidebuttons)
                 {
+                    //VisualAdjustments.Main.logger.Log(transform.Value.text);
                     var txt = transform.Value;
-                   // var txt = transform.Key.transform.Find("Label")?.GetComponent<TextMeshProUGUI>();
-                    if (txt != null && txt.text != null)
+                    // var txt = transform.Key.transform.Find("Label")?.GetComponent<TextMeshProUGUI>();
+                    //if (txt != null && txt.text != null)
+                    
                         switch (txt.text)
                         {
                             case "Hide Cap":
-                                transform.Key.isOn = settings.hideCap;
+                                transform.Key.isOn = m_settings.hideCap;
                                 break;
                             case "Hide Helmet":
-                                transform.Key.isOn = settings.hideHelmet;
+                                transform.Key.isOn = m_settings.hideHelmet;
                                 break;
                             case "Hide Glasses":
-                                transform.Key.isOn = settings.hideGlasses;
+                                transform.Key.isOn = m_settings.hideGlasses;
                                 break;
                             case "Hide Shirt":
-                                transform.Key.isOn = settings.hideShirt;
+                                transform.Key.isOn = m_settings.hideShirt;
                                 break;
                             case "Hide Class Gear":
-                                transform.Key.isOn = settings.hideClassCloak;
+                                transform.Key.isOn = m_settings.hideClassCloak;
                                 break;
                             case "Hide Cloak":
-                                transform.Key.isOn = settings.hideItemCloak;
+                                transform.Key.isOn = m_settings.hideItemCloak;
                                 break;
                             case "Hide Armor":
-                                transform.Key.isOn = settings.hideArmor;
+                                transform.Key.isOn = m_settings.hideArmor;
                                 break;
                             case "Hide Bracers":
-                                transform.Key.isOn = settings.hideBracers;
+                                transform.Key.isOn = m_settings.hideBracers;
                                 break;
                             case "Hide Gloves":
-                                transform.Key.isOn = settings.hideGloves;
+                                transform.Key.isOn = m_settings.hideGloves;
                                 break;
                             case "Hide Boots":
-                                transform.Key.isOn = settings.hideBoots;
+                                transform.Key.isOn = m_settings.hideBoots;
                                 break;
                             case "Hide Weapons":
-                                transform.Key.isOn = settings.hideWeapons;
+                                transform.Key.isOn = m_settings.hideWeapons;
                                 break;
                             case "Hide Sheaths":
-                                transform.Key.isOn = settings.hideSheaths;
+                                transform.Key.isOn = m_settings.hideSheaths;
                                 break;
                             case "Hide Belt Items":
-                                transform.Key.isOn = settings.hideBeltSlots;
+                                transform.Key.isOn = m_settings.hideBeltSlots;
                                 break;
                             case "Hide Quiver":
-                                transform.Key.isOn = settings.hidequiver;
+                                transform.Key.isOn = m_settings.hidequiver;
                                 break;
                             case "Hide Enchantments":
-                                transform.Key.isOn = settings.hideWeaponEnchantments;
+                                transform.Key.isOn = m_settings.hideWeaponEnchantments;
                                 break;
                             case "Hide Wings":
-                                transform.Key.isOn = settings.hideWings;
+                                transform.Key.isOn = m_settings.hideWings;
                                 break;
                             case "Hide Horns":
-                                transform.Key.isOn = settings.hideHorns;
+                                transform.Key.isOn = m_settings.hideHorns;
                                 break;
                             case "Hide Tail":
-                                transform.Key.isOn = settings.hideTail;
+                                transform.Key.isOn = m_settings.hideTail;
                                 break;
                             case "Hide Mythic":
-                                transform.Key.isOn = settings.hideMythic;
+                                transform.Key.isOn = m_settings.hideMythic;
                                 break;
                         }
+                    
                 }
+                shouldrebuildhidebuttons = true;
             }
             catch(Exception e)
             {
@@ -1993,66 +2072,59 @@ namespace TutorialCanvas.UI
             }
         }
         public GameObject UISelectGrid;
+        public void RebuildCurrentEEButtons()
+        {
+            m_Data = Kingmaker.UI.Common.UIUtility.GetCurrentCharacter();
+            foreach (var eebutton in currentEELButtons.Values)
+            {
+                eebutton.gameObject.SafeDestroy();
+            }
+            currentEELButtons.Clear();
+            foreach (var currentee in data.View.CharacterAvatar.EquipmentEntities)
+            {
+                if (!currentEELButtons.ContainsKey(currentee.name))
+                {
+                    var buttontoadd = Instantiate(buttonTemplate);
+                    var buttontoaddtext = buttontoadd.Find("TextB").GetComponent<TextMeshProUGUI>();
+                    //buttontoaddtext.text = currentee.name;
+                    buttontoaddtext.text = GetTextAndSetupCategory(currentee.name);
+                    // buttontoaddtext.font = font;
+                    // buttontoaddtext.color = Color.white;
+                    buttontoadd.transform.SetParent(contentCurrentEE.transform, false);
+                    var buttontoaddbuttoncomponent = buttontoadd.GetComponent<Button>();
+                    buttontoaddbuttoncomponent.onClick = new Button.ButtonClickedEvent();
+                    buttontoaddbuttoncomponent.onClick.AddListener(new UnityAction(() =>
+                    {
+                        HandleEEClicked(buttontoaddtext.text);
+                    }));
+                    currentEELButtons.Add(buttontoaddtext.text, buttontoaddbuttoncomponent);
+                }
+            }
+        }
         public void Update()
         {
-            if (UISelectGrid.activeInHierarchy)
+            try
             {
-                if (hasUnitChanged())
+                if (UISelectGrid.activeInHierarchy && haschanged)
                 {
-                    //VisualAdjustments.Main.settings.Save(VisualAdjustments.Main.ModEntry);
-                    settings = VisualAdjustments.Main.settings.GetCharacterSettings(data);
-                    //  HandleUnitChangedHideEEs();
-                    foreach (var eebutton in currentEELButtons.Values)
                     {
-                        eebutton.gameObject.SafeDestroy();
+                        settings = VisualAdjustments.Main.settings.GetCharacterSettings(data);
+                        RebuildCurrentEEButtons();
+                        HandleUnitChangedHideEEs();
+                        haschanged = false;
                     }
-
-                    //foreach (var kv in hidebuttons)
-                    {
-                        //    kv.Key.isOn = kv.Value;
-                    }
-                    currentEELButtons.Clear();
-
                 }
-                if (haschanged)
-                {
-                    settings = VisualAdjustments.Main.settings.GetCharacterSettings(data);
-                    
-                    /*foreach (var kv in hidebuttons)
-                    {
-                        hidebuttons[kv.Key] = kv.Key.isOn;
-                    }*/
-
-                    foreach (var currentee in data.View.CharacterAvatar.EquipmentEntities)
-                    {
-                        if (!currentEELButtons.ContainsKey(currentee.name))
-                        {
-                            var buttontoadd = Instantiate(buttonTemplate);
-                            var buttontoaddtext = buttontoadd.Find("TextB").GetComponent<TextMeshProUGUI>();
-                            //buttontoaddtext.text = currentee.name;
-                            buttontoaddtext.text = GetTextAndSetupCategory(currentee.name);
-                           // buttontoaddtext.font = font;
-                           // buttontoaddtext.color = Color.white;
-                            buttontoadd.transform.SetParent(contentCurrentEE.transform, false);
-                            var buttontoaddbuttoncomponent = buttontoadd.GetComponent<Button>();
-                            buttontoaddbuttoncomponent.onClick = new Button.ButtonClickedEvent();
-                            buttontoaddbuttoncomponent.onClick.AddListener(new UnityAction(() =>
-                            {
-                                HandleEEClicked(buttontoaddtext.text);
-                            }));
-                            currentEELButtons.Add(currentee.name, buttontoaddbuttoncomponent);
-                        }
-                    }
-                    HandleUnitChangedHideEEs();
-                    haschanged = false;
-                }
+            }
+            catch(Exception e)
+            {
+                VisualAdjustments.Main.logger.Log(e.ToString());
             }
             //This is a unity message that runs each frame.
         }
 
         public void addRemoveButton()
         {
-            haschanged = true;
+            //haschanged = true;
             if (EELpickerUI.selectedEntity == null)
             {
                 
@@ -2114,33 +2186,39 @@ namespace TutorialCanvas.UI
             {
                 AddRemoveButton.GetComponent<TextMeshProUGUI>().text = "Add";
             }
+            RebuildCurrentEEButtons();
         }
         public void HandleUIToggle(string button)
         {
-            //OutfitDoll = this.transform.Find("Menus/OutfitDoll");
-            OutfitDoll.SetActive(false);
-
-            //var HideEquipment = this.transform.Find("Menus/HideEquipment");
-            Equipment.SetActive(false);
-
-            //var FXBrowser = this.transform.Find("Menus/FXBrowser");
-            FX.gameObject.SetActive(false);
-
-            //var EEPicker = this.transform.Find("Menus/InventoryViewWindow");
-            EEPicker.SetActive(false);
+            //OutfitDoll.SetActive(false);
+            //Equipment.SetActive(false);
+           // FX.SetActive(false);
+            //EEPicker.SetActive(false);
             switch (button)
             {
                 case "Outfit/Doll":
                     OutfitDoll.SetActive(true);
+                    Equipment.SetActive(false);
+                    FX.SetActive(false);
+                    EEPicker.SetActive(false);
                     break;
                 case "EE Picker":
                     EEPicker.SetActive(true);
+                    OutfitDoll.SetActive(false);
+                    Equipment.SetActive(false);
+                    FX.SetActive(false);
                     break;
                 case "Equipment":
                     Equipment.SetActive(true);
+                    OutfitDoll.SetActive(false);
+                    FX.SetActive(false);
+                    EEPicker.SetActive(false);
                     break;
                 case "FX":
                     FX.SetActive(true);
+                    OutfitDoll.SetActive(false);
+                    Equipment.SetActive(false);
+                    EEPicker.SetActive(false);
                     break;
             }
         }
@@ -2222,11 +2300,15 @@ namespace TutorialCanvas.UI
             {
                 stash = this.transform.parent.Find("Stash/StashContainer/PC_FilterBlock").gameObject;
             }
-           // VisualAdjustments.Main.logger.Log("buttonpressed");
+            // VisualAdjustments.Main.logger.Log("buttonpressed");
             //var selectiongrid = window.Find("UISelectionGrid").gameObject;
+
             menus.SetActive(!UISelectGrid.active);
             UISelectGrid.SetActive(!UISelectGrid.active);
             stash.SetActive(!UISelectGrid.active);
+
+            //menus.SetActiveFast();
+            //UISelectGrid.SetActiveFast();
 
             //haschanged = true;
             //window.Find("InventoryViewWindow").gameObject.active = !window.Find("InventoryViewWindow").gameObject.active;
@@ -2250,4 +2332,21 @@ namespace TutorialCanvas.UI
             VisualAdjustments.Main.logger.Log("unit" + unitDescriptor.CharacterName);
         }
     }*/
+    public static class GameObjectExtensions
+    {
+        /// <summary>
+        /// Sets local scale instead of disabling, should be faster
+        /// </summary>
+        public static void SetActiveFast(this GameObject gameObject)
+        {
+            if(gameObject.transform.localScale == new Vector3(1, 1, 1))
+            {
+                gameObject.transform.localScale = new Vector3(0, 0, 0);
+            }
+            else
+            {
+                gameObject.transform.localScale = new Vector3(1, 1, 1);
+            }
+        }
+    }
 }

@@ -15,6 +15,7 @@ using Kingmaker.UI.MVVM._PCView.ServiceWindows.Inventory;
 
 public class FXUIHandler : MonoBehaviour
 {
+    public static FXUIHandler handler;
     public  TextMeshProUGUI ListToggle;
     public  TextMeshProUGUI ListCurrent;
     public  TextMeshProUGUI Name;
@@ -64,7 +65,7 @@ public class FXUIHandler : MonoBehaviour
                     var buttontoadd = UnityEngine.Object.Instantiate(ButtonForCloning);
                     var buttontoaddtext = buttontoadd.Find("TextB").GetComponent<TextMeshProUGUI>();
                     // buttontoaddtext.text = currentee.name;
-                    buttontoaddtext.text = UIManager.GetTextAndSetupCategory(FX.Name);
+                    buttontoaddtext.text = FX.Value.Name; //UIManager.GetTextAndSetupCategory(FX.Value.Name);
                     //buttontoaddtext.text = FX.Name;
                     // buttontoaddtext.text = GetTextAndSetupCategory(currentee);
                     buttontoaddtext.color = Color.white;
@@ -75,7 +76,7 @@ public class FXUIHandler : MonoBehaviour
                     {
                         selectedfx = (buttontoaddtext.text);
                     }));
-                    currentfxbuttons.Add(FX.Name, buttontoaddbuttoncomponent);
+                    currentfxbuttons.Add(FX.Value.Name, buttontoaddbuttoncomponent);
                 }
             }
         }
@@ -110,6 +111,7 @@ public class FXUIHandler : MonoBehaviour
                 }
             }
         }
+        this.WhiteOrBlackList = currentUnitPart.blackorwhitelist;
         UIManager.data.RefreshBuffs();
         UIManager.data.SpawnOverrideBuffs();
     }
@@ -120,6 +122,7 @@ public class FXUIHandler : MonoBehaviour
             if (UIManager.hasUnitChanged() || m_currentUnitPart == null || UIManager.loaded)
             {
                 m_currentUnitPart = UIManager.data.Parts.Ensure<VisualAdjustments.UnitPartVAFX>();
+                m_WhiteOrBlackList = m_currentUnitPart.blackorwhitelist;
                 //listoroverride = m_currentUnitPart.blackorwhitelist;
             }
             return m_currentUnitPart;
@@ -135,8 +138,8 @@ public class FXUIHandler : MonoBehaviour
     {
         set
         {
-            currentUnitPart.blackorwhitelist = value;
-            HandleUnitChangedOrUpdate();
+            //currentUnitPart.blackorwhitelist = value;
+           // HandleUnitChangedOrUpdate();
             m_WhiteOrBlackList = value;
                 if (value)
                 {
@@ -214,6 +217,7 @@ public class FXUIHandler : MonoBehaviour
         {
             try
             {
+                handler = this;
                 //var buttontoinstantiate = this.transform.parent.parent.Find("NewButton");
                 //this.ButtonForCloning = buttontoinstantiate.gameObject;
                // var font = this.transform.parent.parent.parent.Find("Doll/DollTitle/TitleLabel").GetComponent<TextMeshProUGUI>().font;
@@ -229,7 +233,7 @@ public class FXUIHandler : MonoBehaviour
                     // Main.logger.Log("SetText");
                     // buttontoaddtext.text = eename.Key;
                     //buttontoaddtext.font = font;
-                    buttontoaddtext.color = Color.white;
+                    //buttontoaddtext.color = Color.white;
                     buttontoadd.transform.SetParent(content.transform, false);
                    // Main.logger.Log("SetParent");
                      var buttontoaddbuttoncomponent = buttontoadd.GetComponent<Button>();
@@ -240,12 +244,12 @@ public class FXUIHandler : MonoBehaviour
                     AllFXButtons.Add(fx.Key, buttontoaddbuttoncomponent);
                 }
                 {
-                    var placeholder = AllFXInput.gameObject.transform.Find("Text Area/Placeholder").GetComponent<TextMeshProUGUI>();
-                    placeholder.color = new Color((float)0.05, (float)0.05, (float)0.05, (float)0.6);
+                   // var placeholder = AllFXInput.gameObject.transform.Find("Text Area/Placeholder").GetComponent<TextMeshProUGUI>();
+                   // placeholder.color = new Color((float)0.05, (float)0.05, (float)0.05, (float)0.6);
                 }
                 {
-                    var placeholder = CurrentFXInput.gameObject.transform.Find("Text Area/Placeholder").GetComponent<TextMeshProUGUI>();
-                    placeholder.color = new Color((float)0.05, (float)0.05, (float)0.05, (float)0.6);
+                   // var placeholder = CurrentFXInput.gameObject.transform.Find("Text Area/Placeholder").GetComponent<TextMeshProUGUI>();
+                   // placeholder.color = new Color((float)0.05, (float)0.05, (float)0.05, (float)0.6);
                 }
                // FXUIHandlerHandler.loaded = true;
             }
@@ -307,7 +311,7 @@ public class FXUIHandler : MonoBehaviour
         bool hassplitter = value.Contains(" ");
         var splitstring = value.Split(UIManager.splitchars);
         bool isempty = value.IsNullOrEmpty();
-        if (!value.IsNullOrEmpty())
+        /*if (!value.IsNullOrEmpty())
         {
             var searchresults = AllFXButtons.Keys.ToList().FuzzyMatch(bp => bp, value);
             foreach (var todisable in AllFXButtons)
@@ -330,10 +334,11 @@ public class FXUIHandler : MonoBehaviour
         {
             foreach(var toenable in AllFXButtons)
             {
+                if(!toenable.Value.gameObject.activeSelf)
                 toenable.Value.gameObject.SetActive(true);
             }
-        }
-        /*foreach (var eelbutton in FXUIHandlerHandler.AllFXButtons)
+        }*/
+        foreach (var eelbutton in AllFXButtons)
         {
             if (hassplitter)
             {
@@ -362,9 +367,9 @@ public class FXUIHandler : MonoBehaviour
                 }
             }
 
-        }*/
+        }
     }
-    public BlueprintExplorer.FuzzyMatchContext<List<string>> sdasddasdsa;
+   // public BlueprintExplorer.FuzzyMatchContext<List<string>> sdasddasdsa;
     public void HandleFilterChangedCurrent(string val)
     {
         var value = CurrentFXInput.text;
@@ -375,26 +380,27 @@ public class FXUIHandler : MonoBehaviour
         {
             if (hassplitter)
             {
-                if (splitstring.All(a => eelbutton.Key.Contains(a, StringComparison.OrdinalIgnoreCase)))
+                if (splitstring.All(a => eelbutton.Key.Contains(a, StringComparison.OrdinalIgnoreCase)) && !eelbutton.Value.gameObject.activeSelf)
                 {
                     eelbutton.Value.gameObject.SetActive(true);
                 }
-                else
+                else if(eelbutton.Value.gameObject.activeSelf)
                 {
+
                     eelbutton.Value.gameObject.SetActive(false);
                 }
             }
             else
             {
-                if (value.IsNullOrEmpty())
+                if (value.IsNullOrEmpty() && !eelbutton.Value.gameObject.activeSelf)
                 {
                     eelbutton.Value.gameObject.SetActive(true);
                 }
-                else if (eelbutton.Key.Contains(value, StringComparison.OrdinalIgnoreCase))
+                else if (eelbutton.Key.Contains(value, StringComparison.OrdinalIgnoreCase) && !eelbutton.Value.gameObject.activeSelf)
                 {
                     eelbutton.Value.gameObject.SetActive(true);
                 }
-                else
+                else if(eelbutton.Value.gameObject.activeSelf)
                 {
                     eelbutton.Value.gameObject.SetActive(false);
                 }
@@ -405,6 +411,7 @@ public class FXUIHandler : MonoBehaviour
     public void HandleModeChanged()
     {
         WhiteOrBlackList = !WhiteOrBlackList;
+        currentUnitPart.blackorwhitelist = WhiteOrBlackList;
     }
     public void ResetButton()
     {
@@ -437,15 +444,15 @@ public class FXUIHandler : MonoBehaviour
     }
     public void AddList()
     {
-        if (!(currentUnitPart).blackwhitelist.Any(a => a.Name == selectedfx))
+        if (!(currentUnitPart).blackwhitelist.ContainsKey(EffectsManager.AllFX[UIManager.FilteredAndUnfilteredEEName[selectedfx]]))
         {
-            (currentUnitPart).blackwhitelist.Add(new FXInfo(EffectsManager.AllFX[UIManager.FilteredAndUnfilteredEEName[selectedfx]], selectedfx));
+            (currentUnitPart).blackwhitelist.Add(EffectsManager.AllFX[UIManager.FilteredAndUnfilteredEEName[selectedfx]], new FXInfo(EffectsManager.AllFX[UIManager.FilteredAndUnfilteredEEName[selectedfx]], selectedfx));
             HandleUnitChangedOrUpdate();
         }
     }
     public void RemoveList()
     {
-        (currentUnitPart).blackwhitelist.RemoveAll(a => a.Name == UIManager.FilteredAndUnfilteredEEName[selectedfx]);
+        (currentUnitPart).blackwhitelist.Remove(UIManager.FilteredAndUnfilteredEEName[selectedfx]);
         HandleUnitChangedOrUpdate();
     }
     public void SwitchMode()

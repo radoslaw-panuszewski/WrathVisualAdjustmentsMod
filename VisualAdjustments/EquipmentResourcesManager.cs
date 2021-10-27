@@ -2772,7 +2772,7 @@ namespace VisualAdjustments
                     m_WingsEE["EE_WingsAngelic_Black_F"] ="da9f766f4de989f4e865a2d019b55098";
                     m_WingsEE["EE_WingsColoxus_F"] ="faf4e32b97ebb614fbb321e36d207c8a";
                     m_WingsEE["EE_WingsDemonic_F"] ="317c89eb4850e0a45a5eb3e4ae0124a9";
-                    m_WingsEE["EE_WingsAngelicMythic_M"] ="e810ab7d95644cf41979f83c06576eb4";
+                    //m_WingsEE["EE_WingsAngelicMythic_M"] ="e810ab7d95644cf41979f83c06576eb4";
                     m_WingsEE["EE_WingsAngelicMythic_F"] ="f3e3e309560d1f94a8f3c7b29016ef69";
                     m_WingsEE["EE_WingsAzataMythic_M"] ="c6d020c1203745041b449706dcacee2d";
                     m_WingsEE["EE_WingsAzataMythic_F"] ="c6366318b30792944b31b5fccc1db3c8";
@@ -2791,147 +2791,141 @@ namespace VisualAdjustments
                 return m_WingsEE;
             }
         }
-        public static Dictionary<string, EquipmentEntity> HornsEE
+        public static Dictionary<string, string> HornsEE
         {
             get
             {
                 if (m_HornsEE.Count == 0)
                 {
-                    m_HornsEE["EE_Horns01_M_SU"] = ResourcesLibrary.TryGetResource<EquipmentEntity>("f44f0bcefb40afd4b86e241599b83660");
-                    m_HornsEE["EE_Horns02_M_TL"] = ResourcesLibrary.TryGetResource<EquipmentEntity>("cecad00f0d5d83f4ba37aa45c11c1bbe");
-                    m_HornsEE["EE_Horns01_F_TL"] = ResourcesLibrary.TryGetResource<EquipmentEntity>("665d8734bad3ce648be0786de09f5f4c");
-                    m_HornsEE["EE_Horns05_F_TL"] = ResourcesLibrary.TryGetResource<EquipmentEntity>("dea42645c2027524ca40d93e4265e247");
-                    m_HornsEE["EE_Horns01_M_TL"] = ResourcesLibrary.TryGetResource<EquipmentEntity>("a68e700e882e1b8438df4ba92d247daf");
-                    m_HornsEE["EE_Horns04Woljif_M_TL"] = ResourcesLibrary.TryGetResource<EquipmentEntity>("c2186f297c1bc3e4c86283495e3f1ee6");
-                    m_HornsEE["EE_Horns03_M_TL"] = ResourcesLibrary.TryGetResource<EquipmentEntity>("d1dde611ca8670845978721380de3bdc");
-                    m_HornsEE["EE_Horns05_M_TL"] = ResourcesLibrary.TryGetResource<EquipmentEntity>("16265666ad82f9d4e8a3ae1a563179b9");
-                    m_HornsEE["EE_MongrelHorns01_F_EL"] = ResourcesLibrary.TryGetResource<EquipmentEntity>("10cc8cd2baa38384291f7640cd7227bb");
-                    m_HornsEE["EE_Horns03_F_TL"] = ResourcesLibrary.TryGetResource<EquipmentEntity>("0d78bd95d563f3441bf8349bebfb48bf");
-                    m_HornsEE["EE_HornsSkeleton_M_HM"] = ResourcesLibrary.TryGetResource<EquipmentEntity>("fd29ef04a3577d64aaad460f6bb9d6af");
-                    m_HornsEE["EE_HornsSkeleton_F_HM"] = ResourcesLibrary.TryGetResource<EquipmentEntity>("61b1f8b3a96c93541a322d6c609ade56");
-                    m_HornsEE["EE_HornsSkeleton_M_EL"] = ResourcesLibrary.TryGetResource<EquipmentEntity>("dfd0ce83f630d3242a102aede2b3f36a");
-                    m_HornsEE["EE_HornsSkeleton_F_EL"] = ResourcesLibrary.TryGetResource<EquipmentEntity>("0e75fda397fa06a4481667e7281e4ea7");
-                    m_HornsEE["EE_HornsSkeleton_M_DW"] = ResourcesLibrary.TryGetResource<EquipmentEntity>("5d83ffbbda65cf645bcf4ed6aa871ca2");
-                    m_HornsEE["EE_HornsSkeleton_F_DW"] = ResourcesLibrary.TryGetResource<EquipmentEntity>("12c7ff3a92b8713428eaceb01ac9b48c");
-                    m_HornsEE["EE_HornsSkeleton_M_HL"] = ResourcesLibrary.TryGetResource<EquipmentEntity>("50c1a9b7e226a7340a357b55ea74a995");
-                    m_HornsEE["EE_HornsSkeleton_F_HL"] = ResourcesLibrary.TryGetResource<EquipmentEntity>("f599850541e79dd41b1ff42a3894e4c6");
-                    m_HornsEE["EE_HornsSkeleton_M_GN"] = ResourcesLibrary.TryGetResource<EquipmentEntity>("2b472c8dcaa33164d832fa9242c70670");
-                    m_HornsEE["EE_HornsSkeleton_F_GN"] = ResourcesLibrary.TryGetResource<EquipmentEntity>("760a1b3c204652d4d921c4e3ffce4d4c");
-                    m_HornsEE["EE_HornsSkeleton_M_TL"] = ResourcesLibrary.TryGetResource<EquipmentEntity>("2ce2247d7efd20c41a1493211e2a2e42");
-                    m_HornsEE["EE_HornsSkeleton_F_TL"] = ResourcesLibrary.TryGetResource<EquipmentEntity>("cea99d99eeabafb4f9e77bb84dcfcf3f");
-                    m_HornsEE["EE_MongrelHorns01_M_HM"] = ResourcesLibrary.TryGetResource<EquipmentEntity>("7ae57d4a307b8cc47acd57cf56c99b5e");
-                    m_HornsEE["EE_MongrelHorns01_F_HM"] = ResourcesLibrary.TryGetResource<EquipmentEntity>("784bb887aceb5a045996974a71e78875");
-                    m_HornsEE["EE_MongrelHorns01_M_EL"] = ResourcesLibrary.TryGetResource<EquipmentEntity>("8439da993972eca44b8c7f555e33f780");
-                    m_HornsEE["EE_MongrelHorns01_M_DW"] = ResourcesLibrary.TryGetResource<EquipmentEntity>("11e8c436c8c969844a3defbfca96efdc");
-                    m_HornsEE["EE_MongrelHorns01_F_DW"] = ResourcesLibrary.TryGetResource<EquipmentEntity>("5f9f5f3315f286a4d97918347b28eea1");
-                    m_HornsEE["EE_MongrelHorns01_M_HL"] = ResourcesLibrary.TryGetResource<EquipmentEntity>("9a17220e985b8404487082cb82980875");
-                    m_HornsEE["EE_MongrelHorns01_F_HL"] = ResourcesLibrary.TryGetResource<EquipmentEntity>("59ed3e2b1cc341046a68b55f0da80305");
-                    m_HornsEE["EE_MongrelHorns01_M_GN"] = ResourcesLibrary.TryGetResource<EquipmentEntity>("408401bf088b0ad4a9a9747be66bb67d");
-                    m_HornsEE["EE_MongrelHorns01_F_GN"] = ResourcesLibrary.TryGetResource<EquipmentEntity>("394a429941adb66489229d721c7ad61a");
-                    m_HornsEE["EE_MongrelHorns01_M_TL"] = ResourcesLibrary.TryGetResource<EquipmentEntity>("fcbe9a67ef4b4f14aa3aec7501eb0993");
-                    m_HornsEE["EE_MongrelHorns01_F_TL"] = ResourcesLibrary.TryGetResource<EquipmentEntity>("378fd4b65e9799e40adbe18b702a0dbf");
-                    m_HornsEE["EE_MongrelHorns02_M_HM"] = ResourcesLibrary.TryGetResource<EquipmentEntity>("fed897cada6bd7e4196260cd6543e31b");
-                    m_HornsEE["EE_MongrelHorns02_F_HM"] = ResourcesLibrary.TryGetResource<EquipmentEntity>("ce26bc3e359a0b84c9095b2a012bc877");
-                    m_HornsEE["EE_MongrelHorns02_M_EL"] = ResourcesLibrary.TryGetResource<EquipmentEntity>("01fe52a14df1d8f4dad1bd2b4d064d9b");
-                    m_HornsEE["EE_MongrelHorns02_F_EL"] = ResourcesLibrary.TryGetResource<EquipmentEntity>("fdf97bfe79e511943b5f4e39e87e330d");
-                    m_HornsEE["EE_MongrelHorns02_M_DW"] = ResourcesLibrary.TryGetResource<EquipmentEntity>("d7f72406fc0ff5c4ab463fb3932a8e41");
-                    m_HornsEE["EE_MongrelHorns02_F_DW"] = ResourcesLibrary.TryGetResource<EquipmentEntity>("170f88fc0bd84d84d9b0aface2307604");
-                    m_HornsEE["EE_MongrelHorns02_M_HL"] = ResourcesLibrary.TryGetResource<EquipmentEntity>("323ddc3b2ba0d1c49995cf755e6a0b0a");
-                    m_HornsEE["EE_MongrelHorns02_F_HL"] = ResourcesLibrary.TryGetResource<EquipmentEntity>("a45c52286c60a954bbe81e9ac0740795");
-                    m_HornsEE["EE_MongrelHorns02_M_GN"] = ResourcesLibrary.TryGetResource<EquipmentEntity>("c3f01fb66b55e354392321770961088c");
-                    m_HornsEE["EE_MongrelHorns02_F_GN"] = ResourcesLibrary.TryGetResource<EquipmentEntity>("da4bbee5eeadb90439229a6703ccfbdf");
-                    m_HornsEE["EE_MongrelHorns02_M_TL"] = ResourcesLibrary.TryGetResource<EquipmentEntity>("2e661c135188d594d81aeda28028bf3c");
-                    m_HornsEE["EE_MongrelHorns02_F_TL"] = ResourcesLibrary.TryGetResource<EquipmentEntity>("6131624f5969745449ab39e371d96e60");
-                    m_HornsEE["EE_MongrelHorns03_M_HM"] = ResourcesLibrary.TryGetResource<EquipmentEntity>("e900a1a0ecd6d754ea05b63fb38334bb");
-                    m_HornsEE["EE_MongrelHorns03_F_HM"] = ResourcesLibrary.TryGetResource<EquipmentEntity>("10d6c6e9b22b3a64bb8fdca64b77ed2a");
-                    m_HornsEE["EE_MongrelHorns03_M_EL"] = ResourcesLibrary.TryGetResource<EquipmentEntity>("7d49bbefc2d0ad94e9adf219091aac6b");
-                    m_HornsEE["EE_MongrelHorns03_F_EL"] = ResourcesLibrary.TryGetResource<EquipmentEntity>("3a80435506254fa4eb692d3e02b8bd8f");
-                    m_HornsEE["EE_MongrelHorns03_M_DW"] = ResourcesLibrary.TryGetResource<EquipmentEntity>("d0eb291feec381a43a46c49d8170ee94");
-                    m_HornsEE["EE_MongrelHorns03_F_DW"] = ResourcesLibrary.TryGetResource<EquipmentEntity>("cc71eae536cd1a147b8e4d5a7430dc65");
-                    m_HornsEE["EE_MongrelHorns03_M_HL"] = ResourcesLibrary.TryGetResource<EquipmentEntity>("dbdd1794de34186498684a56bf0b270d");
-                    m_HornsEE["EE_MongrelHorns03_F_HL"] = ResourcesLibrary.TryGetResource<EquipmentEntity>("ab525b1dbe2928540bd8be8d408dd45d");
-                    m_HornsEE["EE_MongrelHorns03_M_GN"] = ResourcesLibrary.TryGetResource<EquipmentEntity>("458655d1da1bbc74e8d5b50a589914b8");
-                    m_HornsEE["EE_MongrelHorns03_F_GN"] = ResourcesLibrary.TryGetResource<EquipmentEntity>("2d79c418febe6c74d991625b8d4a153c");
-                    m_HornsEE["EE_MongrelHorns03_M_TL"] = ResourcesLibrary.TryGetResource<EquipmentEntity>("5b6da001117e08c47a4e565f2ff46895");
-                    m_HornsEE["EE_MongrelHorns03_F_TL"] = ResourcesLibrary.TryGetResource<EquipmentEntity>("bef7b1ee620abae41af0d03f81be5fc5");
-                    m_HornsEE["EE_MongrelHorns04_M_HM"] = ResourcesLibrary.TryGetResource<EquipmentEntity>("3c1269cc50173ec4bbcaca741205ccd5");
-                    m_HornsEE["EE_MongrelHorns04_F_HM"] = ResourcesLibrary.TryGetResource<EquipmentEntity>("67a781ca294d40441b5ae7a81330ca83");
-                    m_HornsEE["EE_MongrelHorns04_M_EL"] = ResourcesLibrary.TryGetResource<EquipmentEntity>("d5fba06ff684d294cadeb32d82214672");
-                    m_HornsEE["EE_MongrelHorns04_F_EL"] = ResourcesLibrary.TryGetResource<EquipmentEntity>("c1002d33ade3c024b8e7f12667e83be6");
-                    m_HornsEE["EE_MongrelHorns04_M_DW"] = ResourcesLibrary.TryGetResource<EquipmentEntity>("705d79a24744b654c8db4641ddc5d69d");
-                    m_HornsEE["EE_MongrelHorns04_F_DW"] = ResourcesLibrary.TryGetResource<EquipmentEntity>("32f51be24f611bf48993dd1a771a9f46");
-                    m_HornsEE["EE_MongrelHorns04_M_HL"] = ResourcesLibrary.TryGetResource<EquipmentEntity>("e2a56613816943840bc32865116c36ea");
-                    m_HornsEE["EE_MongrelHorns04_F_HL"] = ResourcesLibrary.TryGetResource<EquipmentEntity>("e4c14ae69bdc69a48aaafcee3905b738");
-                    m_HornsEE["EE_MongrelHorns04_M_GN"] = ResourcesLibrary.TryGetResource<EquipmentEntity>("6b34aa9d47ca6d0499bc8b8ccb75146e");
-                    m_HornsEE["EE_MongrelHorns04_F_GN"] = ResourcesLibrary.TryGetResource<EquipmentEntity>("a98a6a30183a73947812638378888591");
-                    m_HornsEE["EE_MongrelHorns04_M_TL"] = ResourcesLibrary.TryGetResource<EquipmentEntity>("2d0d40fe4ad859d4dbc77376ca0e868b");
-                    m_HornsEE["EE_MongrelHorns04_F_TL"] = ResourcesLibrary.TryGetResource<EquipmentEntity>("11f0c68e14be24847b8d78fb13c9733b");
-                    m_HornsEE["EE_HornsSkeleton_M_SN"] = ResourcesLibrary.TryGetResource<EquipmentEntity>("b88202050d9e56140b452d10ee952319");
-                    m_HornsEE["EE_Horns01_F_SU"] = ResourcesLibrary.TryGetResource<EquipmentEntity>("020cb621cebd72e40abc3f857ab377b8");
-                    m_HornsEE["EE_Horns02_F_TL"] = ResourcesLibrary.TryGetResource<EquipmentEntity>("ccd35c8508752f04582e7d3a55248afe");
-                    m_HornsEE["EE_Horns04_F_TL"] = ResourcesLibrary.TryGetResource<EquipmentEntity>("262ee4d8ababfce4ba1cd8a1bf60c999");
-                    m_HornsEE["EE_Horns02Arueshalae_F_SU"] = ResourcesLibrary.TryGetResource<EquipmentEntity>("7be5b63938c84504ea8307fc460eaadc");
-                    m_HornsEE["EE_HornsDevilExecutioner_F_HM"] = ResourcesLibrary.TryGetResource<EquipmentEntity>("9932a8b7a0b57a8429dc5a53657d7b06");
-                    m_HornsEE["EE_Horns02_M_CM"] = ResourcesLibrary.TryGetResource<EquipmentEntity>("d4f6c34e0812b0840aeb365a04032be9");
-                    m_HornsEE["EE_Horns01_M_CM"] = ResourcesLibrary.TryGetResource<EquipmentEntity>("89d5c728d197b1344bf942b4ef55f0a1");
-                    m_HornsEE["EE_Horns01_F_CM"] = ResourcesLibrary.TryGetResource<EquipmentEntity>("ab044ce99b5322a4980b1e05ec27ee4c");
-                    m_HornsEE["EE_HornsDevilExecutioner_M_HM"] = ResourcesLibrary.TryGetResource<EquipmentEntity>("12902d1b55f8a04489a78763e7b3cf7e");
-                    m_HornsEE["EE_MongrelHorns04_M_HO"] = ResourcesLibrary.TryGetResource<EquipmentEntity>("3152c7330d1798d48897d6858955b802");
-                    m_HornsEE["EE_MongrelHorns02_M_OD"] = ResourcesLibrary.TryGetResource<EquipmentEntity>("7eb1d2d08ee08424f8699b0732857951");
-                    m_HornsEE["EE_MongrelHorns03_M_HE"] = ResourcesLibrary.TryGetResource<EquipmentEntity>("c2a30d01daaed7a408bd45e04528e578");
+                    m_HornsEE["EE_Horns01_M_SU"] = "f44f0bcefb40afd4b86e241599b83660";
+                    m_HornsEE["EE_Horns02_M_TL"] = "cecad00f0d5d83f4ba37aa45c11c1bbe";
+                    m_HornsEE["EE_Horns01_F_TL"] = "665d8734bad3ce648be0786de09f5f4c";
+                    m_HornsEE["EE_Horns05_F_TL"] = "dea42645c2027524ca40d93e4265e247";
+                    m_HornsEE["EE_Horns01_M_TL"] = "a68e700e882e1b8438df4ba92d247daf";
+                    m_HornsEE["EE_Horns04Woljif_M_TL"] = "c2186f297c1bc3e4c86283495e3f1ee6";
+                    m_HornsEE["EE_Horns03_M_TL"] = "d1dde611ca8670845978721380de3bdc";
+                    m_HornsEE["EE_Horns05_M_TL"] = "16265666ad82f9d4e8a3ae1a563179b9";
+                    m_HornsEE["EE_MongrelHorns01_F_EL"] = "10cc8cd2baa38384291f7640cd7227bb";
+                    m_HornsEE["EE_Horns03_F_TL"] = "0d78bd95d563f3441bf8349bebfb48bf";
+                    m_HornsEE["EE_HornsSkeleton_M_HM"] = "fd29ef04a3577d64aaad460f6bb9d6af";
+                    m_HornsEE["EE_HornsSkeleton_F_HM"] = "61b1f8b3a96c93541a322d6c609ade56";
+                    m_HornsEE["EE_HornsSkeleton_M_EL"] = "dfd0ce83f630d3242a102aede2b3f36a";
+                    m_HornsEE["EE_HornsSkeleton_F_EL"] = "0e75fda397fa06a4481667e7281e4ea7";
+                    m_HornsEE["EE_HornsSkeleton_M_DW"] = "5d83ffbbda65cf645bcf4ed6aa871ca2";
+                    m_HornsEE["EE_HornsSkeleton_F_DW"] = "12c7ff3a92b8713428eaceb01ac9b48c";
+                    m_HornsEE["EE_HornsSkeleton_M_HL"] = "50c1a9b7e226a7340a357b55ea74a995";
+                    m_HornsEE["EE_HornsSkeleton_F_HL"] = "f599850541e79dd41b1ff42a3894e4c6";
+                    m_HornsEE["EE_HornsSkeleton_M_GN"] = "2b472c8dcaa33164d832fa9242c70670";
+                    m_HornsEE["EE_HornsSkeleton_F_GN"] = "760a1b3c204652d4d921c4e3ffce4d4c";
+                    m_HornsEE["EE_HornsSkeleton_M_TL"] = "2ce2247d7efd20c41a1493211e2a2e42";
+                    m_HornsEE["EE_HornsSkeleton_F_TL"] = "cea99d99eeabafb4f9e77bb84dcfcf3f";
+                    m_HornsEE["EE_MongrelHorns01_M_HM"] = "7ae57d4a307b8cc47acd57cf56c99b5e";
+                    m_HornsEE["EE_MongrelHorns01_F_HM"] = "784bb887aceb5a045996974a71e78875";
+                    m_HornsEE["EE_MongrelHorns01_M_EL"] = "8439da993972eca44b8c7f555e33f780";
+                    m_HornsEE["EE_MongrelHorns01_M_DW"] = "11e8c436c8c969844a3defbfca96efdc";
+                    m_HornsEE["EE_MongrelHorns01_F_DW"] = "5f9f5f3315f286a4d97918347b28eea1";
+                    m_HornsEE["EE_MongrelHorns01_M_HL"] = "9a17220e985b8404487082cb82980875";
+                    m_HornsEE["EE_MongrelHorns01_F_HL"] = "59ed3e2b1cc341046a68b55f0da80305";
+                    m_HornsEE["EE_MongrelHorns01_M_GN"] = "408401bf088b0ad4a9a9747be66bb67d";
+                    m_HornsEE["EE_MongrelHorns01_F_GN"] = "394a429941adb66489229d721c7ad61a";
+                    m_HornsEE["EE_MongrelHorns01_M_TL"] = "fcbe9a67ef4b4f14aa3aec7501eb0993";
+                    m_HornsEE["EE_MongrelHorns01_F_TL"] = "378fd4b65e9799e40adbe18b702a0dbf";
+                    m_HornsEE["EE_MongrelHorns02_M_HM"] = "fed897cada6bd7e4196260cd6543e31b";
+                    m_HornsEE["EE_MongrelHorns02_F_HM"] = "ce26bc3e359a0b84c9095b2a012bc877";
+                    m_HornsEE["EE_MongrelHorns02_M_EL"] = "01fe52a14df1d8f4dad1bd2b4d064d9b";
+                    m_HornsEE["EE_MongrelHorns02_F_EL"] = "fdf97bfe79e511943b5f4e39e87e330d";
+                    m_HornsEE["EE_MongrelHorns02_M_DW"] = "d7f72406fc0ff5c4ab463fb3932a8e41";
+                    m_HornsEE["EE_MongrelHorns02_F_DW"] = "170f88fc0bd84d84d9b0aface2307604";
+                    m_HornsEE["EE_MongrelHorns02_M_HL"] = "323ddc3b2ba0d1c49995cf755e6a0b0a";
+                    m_HornsEE["EE_MongrelHorns02_F_HL"] = "a45c52286c60a954bbe81e9ac0740795";
+                    m_HornsEE["EE_MongrelHorns02_M_GN"] = "c3f01fb66b55e354392321770961088c";
+                    m_HornsEE["EE_MongrelHorns02_F_GN"] = "da4bbee5eeadb90439229a6703ccfbdf";
+                    m_HornsEE["EE_MongrelHorns02_M_TL"] = "2e661c135188d594d81aeda28028bf3c";
+                    m_HornsEE["EE_MongrelHorns02_F_TL"] = "6131624f5969745449ab39e371d96e60";
+                    m_HornsEE["EE_MongrelHorns03_M_HM"] = "e900a1a0ecd6d754ea05b63fb38334bb";
+                    m_HornsEE["EE_MongrelHorns03_F_HM"] = "10d6c6e9b22b3a64bb8fdca64b77ed2a";
+                    m_HornsEE["EE_MongrelHorns03_M_EL"] = "7d49bbefc2d0ad94e9adf219091aac6b";
+                    m_HornsEE["EE_MongrelHorns03_F_EL"] = "3a80435506254fa4eb692d3e02b8bd8f";
+                    m_HornsEE["EE_MongrelHorns03_M_DW"] = "d0eb291feec381a43a46c49d8170ee94";
+                    m_HornsEE["EE_MongrelHorns03_F_DW"] = "cc71eae536cd1a147b8e4d5a7430dc65";
+                    m_HornsEE["EE_MongrelHorns03_M_HL"] = "dbdd1794de34186498684a56bf0b270d";
+                    m_HornsEE["EE_MongrelHorns03_F_HL"] = "ab525b1dbe2928540bd8be8d408dd45d";
+                    m_HornsEE["EE_MongrelHorns03_M_GN"] = "458655d1da1bbc74e8d5b50a589914b8";
+                    m_HornsEE["EE_MongrelHorns03_F_GN"] = "2d79c418febe6c74d991625b8d4a153c";
+                    m_HornsEE["EE_MongrelHorns03_M_TL"] = "5b6da001117e08c47a4e565f2ff46895";
+                    m_HornsEE["EE_MongrelHorns03_F_TL"] = "bef7b1ee620abae41af0d03f81be5fc5";
+                    m_HornsEE["EE_MongrelHorns04_M_HM"] = "3c1269cc50173ec4bbcaca741205ccd5";
+                    m_HornsEE["EE_MongrelHorns04_F_HM"] = "67a781ca294d40441b5ae7a81330ca83";
+                    m_HornsEE["EE_MongrelHorns04_M_EL"] = "d5fba06ff684d294cadeb32d82214672";
+                    m_HornsEE["EE_MongrelHorns04_F_EL"] = "c1002d33ade3c024b8e7f12667e83be6";
+                    m_HornsEE["EE_MongrelHorns04_M_DW"] = "705d79a24744b654c8db4641ddc5d69d";
+                    m_HornsEE["EE_MongrelHorns04_F_DW"] = "32f51be24f611bf48993dd1a771a9f46";
+                    m_HornsEE["EE_MongrelHorns04_M_HL"] = "e2a56613816943840bc32865116c36ea";
+                    m_HornsEE["EE_MongrelHorns04_F_HL"] = "e4c14ae69bdc69a48aaafcee3905b738";
+                    m_HornsEE["EE_MongrelHorns04_M_GN"] = "6b34aa9d47ca6d0499bc8b8ccb75146e";
+                    m_HornsEE["EE_MongrelHorns04_F_GN"] = "a98a6a30183a73947812638378888591";
+                    m_HornsEE["EE_MongrelHorns04_M_TL"] = "2d0d40fe4ad859d4dbc77376ca0e868b";
+                    m_HornsEE["EE_MongrelHorns04_F_TL"] = "11f0c68e14be24847b8d78fb13c9733b";
+                    m_HornsEE["EE_HornsSkeleton_M_SN"] = "b88202050d9e56140b452d10ee952319";
+                    m_HornsEE["EE_Horns01_F_SU"] = "020cb621cebd72e40abc3f857ab377b8";
+                    m_HornsEE["EE_Horns02_F_TL"] = "ccd35c8508752f04582e7d3a55248afe";
+                    m_HornsEE["EE_Horns04_F_TL"] = "262ee4d8ababfce4ba1cd8a1bf60c999";
+                    m_HornsEE["EE_Horns02Arueshalae_F_SU"] = "7be5b63938c84504ea8307fc460eaadc";
+                    m_HornsEE["EE_HornsDevilExecutioner_F_HM"] = "9932a8b7a0b57a8429dc5a53657d7b06";
+                    m_HornsEE["EE_Horns02_M_CM"] = "d4f6c34e0812b0840aeb365a04032be9";
+                    m_HornsEE["EE_Horns01_M_CM"] = "89d5c728d197b1344bf942b4ef55f0a1";
+                    m_HornsEE["EE_Horns01_F_CM"] = "ab044ce99b5322a4980b1e05ec27ee4c";
+                    m_HornsEE["EE_HornsDevilExecutioner_M_HM"] = "12902d1b55f8a04489a78763e7b3cf7e";
+                    m_HornsEE["EE_MongrelHorns04_M_HO"] = "3152c7330d1798d48897d6858955b802";
+                    m_HornsEE["EE_MongrelHorns02_M_OD"] = "7eb1d2d08ee08424f8699b0732857951";
+                    m_HornsEE["EE_MongrelHorns03_M_HE"] = "c2a30d01daaed7a408bd45e04528e578";
                 }
                 return m_HornsEE;
             }
         }
-        public static Dictionary<string, EquipmentEntity> TailsEE
+        public static Dictionary<string, string> TailsEE
         {
             get
             {
                 if (m_TailEE.Count == 0)
                 {
-                    m_TailEE["EE_Tail_SU"] = ResourcesLibrary.TryGetResource<EquipmentEntity>("31fcdf5af347f994f8fbf51fcbad7b41");
-                    m_TailEE["EE_Tail_TL"] = ResourcesLibrary.TryGetResource<EquipmentEntity>("d15dbf2912cd6f94492a9e1053aa0ebd");
-                    m_TailEE["EE_Tail_F_KT"] = ResourcesLibrary.TryGetResource<EquipmentEntity>("da5f2e4e562752d418a5de06e16183b6");
-                    m_TailEE["EE_Tail_M_KT"] = ResourcesLibrary.TryGetResource<EquipmentEntity>("fdd3c295239e4f5468b8685342bfe5dd");
-                    m_TailEE["EE_Tail_SU_Any"] = ResourcesLibrary.TryGetResource<EquipmentEntity>("e42abf4734e52ae4382410278043ae96");
-                    m_TailEE["EE_Tail_Skeleton_M_Any"] = ResourcesLibrary.TryGetResource<EquipmentEntity>("42c1b7d62bfc2b74c914569015c1e25a");
-                    m_TailEE["EE_TailWenduag_F_MM"] = ResourcesLibrary.TryGetResource<EquipmentEntity>("4c5631f45b647754d809690ca4b490a3");
+                    m_TailEE["EE_Tail_SU"] = "31fcdf5af347f994f8fbf51fcbad7b41";
+                    m_TailEE["EE_Tail_TL"] = "d15dbf2912cd6f94492a9e1053aa0ebd";
+                    m_TailEE["EE_Tail_F_KT"] = "da5f2e4e562752d418a5de06e16183b6";
+                    m_TailEE["EE_Tail_M_KT"] = "fdd3c295239e4f5468b8685342bfe5dd";
+                    m_TailEE["EE_Tail_SU_Any"] = "e42abf4734e52ae4382410278043ae96";
+                    m_TailEE["EE_Tail_Skeleton_M_Any"] = "42c1b7d62bfc2b74c914569015c1e25a";
+                    m_TailEE["EE_TailWenduag_F_MM"] = "4c5631f45b647754d809690ca4b490a3";
 
                 }
                 return m_TailEE;
             }
         }
-        public static Dictionary<string, GameObject> WingsFX
+        public static Dictionary<string, string> WingsFX
         {
             get
             {
                 if (m_WingsFX.Count == 0)
                 {
-                   // m_WingsFX["AstralDeva_DemonicWing"] = ResourcesLibrary.TryGetResource<GameObject>("5a5fe5ab1111ee249aa42c08e1956765");
-                   // m_WingsFX["BCT_TieflingMaleNaked_Demon_Wings"] = ResourcesLibrary.TryGetResource<GameObject>("fafb5a16e362af946a9e033a027b618c");
-                    //m_WingsFX["AstralDeva_OneWing"] = ResourcesLibrary.TryGetResource<GameObject>("3267cbacf2ca53d4f86cb361caa32f9a");
-                    m_WingsFX["FireWings00"] = ResourcesLibrary.TryGetResource<GameObject>("43c4887b112892e4aba3f6c3ba0069a4");
-                   /// m_WingsFX["AstralDeva_TwoWings"] = ResourcesLibrary.TryGetResource<GameObject>("09e250ff222d6894495d9389adaefb63");
-                    m_WingsFX["ST_WingsAngelic_Angelic_U_Any"] = ResourcesLibrary.TryGetResource<GameObject>("1091271ddadd4a34f8d012428252dd4d");
-                    m_WingsFX["ST_WingsAngelic_AngelicBlack_U_Any"] = ResourcesLibrary.TryGetResource<GameObject>("524e584f2cd2ff54396f65da40cb8cff");
-                    m_WingsFX["ST_WingsDiabolic_Diabolic_U_Any"] = ResourcesLibrary.TryGetResource<GameObject>("7662eda306be77a4ab8f57dbf1235cc9");
-                    m_WingsFX["ST_WingsMovanicDeva_MovanicDeva_U_Any"] = ResourcesLibrary.TryGetResource<GameObject>("d498a870119d1f84299597b1ba20a10e");
-                    m_WingsFX["ST_WingsAngelic_Angelic_U_Any"] = ResourcesLibrary.TryGetResource<GameObject>("582ffb3c97385fc4d808d829156b0a77");
-                    m_WingsFX["GhostWing00"] = ResourcesLibrary.TryGetResource<GameObject>("cb64dcc33e635a74e881f7ca6a836a2e");
-                    m_WingsFX["ST_WingsDiabolic_Diabolic_U_Any"] = ResourcesLibrary.TryGetResource<GameObject>("713e38d506a2b79499e3c42ae66a7459");
-                    m_WingsFX["ST_WingsDraconic_DraconicBlack_U_Any"] = ResourcesLibrary.TryGetResource<GameObject>("fc4edf7b354b4d34bbac755597ff9ab5");
-                    m_WingsFX["ST_WingsDraconic_DraconicBlue_U_Any"] = ResourcesLibrary.TryGetResource<GameObject>("fbc4d4318e13da644be5d5ccd248c704");
-                    m_WingsFX["ST_WingsDraconic_DraconicBrass_U_Any"] = ResourcesLibrary.TryGetResource<GameObject>("19de7a1cd8930af4bbb085c562f3f672");
-                    m_WingsFX["ST_WingsDraconic_DraconicBronze_U_Any"] = ResourcesLibrary.TryGetResource<GameObject>("8208e5cdfcfa7274c94dbbb33d02a935");
-                    m_WingsFX["ST_WingsDraconic_DraconicCopper_U_Any"] = ResourcesLibrary.TryGetResource<GameObject>("8c108b863cf485643a893db4a59c05a9");
-                    m_WingsFX["ST_WingsDraconic_DraconicGold_U_Any"] = ResourcesLibrary.TryGetResource<GameObject>("f0c4a4ea80966d141aa9317e92d4baf1");
-                    m_WingsFX["ST_WingsDraconic_DraconicGreen_U_Any"] = ResourcesLibrary.TryGetResource<GameObject>("186fc0171b2d9914aa4889d0a58e97e4");
-                    m_WingsFX["ST_WingsDraconic_DraconicRed_U_Any"] = ResourcesLibrary.TryGetResource<GameObject>("68fea147aeb839642b7bb60b60e84eb8");
-                    m_WingsFX["ST_WingsDraconic_DraconicSilver_U_Any"] = ResourcesLibrary.TryGetResource<GameObject>("395552f93c1ef5d42817af34b00ebb44");
-                    m_WingsFX["ST_WingsDraconic_DraconicWhite_U_Any"] = ResourcesLibrary.TryGetResource<GameObject>("b695621f7fb1e7345a45f6224a977d6c");
-                   // m_WingsFX["AstralDeva_DemonicWing"] = ResourcesLibrary.TryGetResource<GameObject>("5a5fe5ab1111ee249aa42c08e1956765");
-                   // m_WingsFX["BCT_TieflingMaleNaked_Demon_Wings"] = ResourcesLibrary.TryGetResource<GameObject>("fafb5a16e362af946a9e033a027b618c");
-                    //m_WingsFX["AstralDeva_OneWing"] = ResourcesLibrary.TryGetResource<GameObject>("3267cbacf2ca53d4f86cb361caa32f9a");
+                    m_WingsFX["FireWings00"] = "43c4887b112892e4aba3f6c3ba0069a4";
+                    /// m_WingsFX["AstralDeva_TwoWings"] = "09e250ff222d6894495d9389adaefb63";
+                    m_WingsFX["ST_WingsAngelic_Angelic_U_Any"] = "1091271ddadd4a34f8d012428252dd4d";
+                    m_WingsFX["ST_WingsAngelic_AngelicBlack_U_Any"] = "524e584f2cd2ff54396f65da40cb8cff";
+                    m_WingsFX["ST_WingsDiabolic_Diabolic_U_Any"] = "7662eda306be77a4ab8f57dbf1235cc9";
+                    m_WingsFX["ST_WingsMovanicDeva_MovanicDeva_U_Any"] = "d498a870119d1f84299597b1ba20a10e";
+                    m_WingsFX["ST_WingsAngelic_Angelic_U_Any"] = "582ffb3c97385fc4d808d829156b0a77";
+                    m_WingsFX["GhostWing00"] = "cb64dcc33e635a74e881f7ca6a836a2e";
+                    m_WingsFX["ST_WingsDiabolic_Diabolic_U_Any"] = "713e38d506a2b79499e3c42ae66a7459";
+                    m_WingsFX["ST_WingsDraconic_DraconicBlack_U_Any"] = "fc4edf7b354b4d34bbac755597ff9ab5";
+                    m_WingsFX["ST_WingsDraconic_DraconicBlue_U_Any"] = "fbc4d4318e13da644be5d5ccd248c704";
+                    m_WingsFX["ST_WingsDraconic_DraconicBrass_U_Any"] = "19de7a1cd8930af4bbb085c562f3f672";
+                    m_WingsFX["ST_WingsDraconic_DraconicBronze_U_Any"] = "8208e5cdfcfa7274c94dbbb33d02a935";
+                    m_WingsFX["ST_WingsDraconic_DraconicCopper_U_Any"] = "8c108b863cf485643a893db4a59c05a9";
+                    m_WingsFX["ST_WingsDraconic_DraconicGold_U_Any"] = "f0c4a4ea80966d141aa9317e92d4baf1";
+                    m_WingsFX["ST_WingsDraconic_DraconicGreen_U_Any"] = "186fc0171b2d9914aa4889d0a58e97e4";
+                    m_WingsFX["ST_WingsDraconic_DraconicRed_U_Any"] = "68fea147aeb839642b7bb60b60e84eb8";
+                    m_WingsFX["ST_WingsDraconic_DraconicSilver_U_Any"] = "395552f93c1ef5d42817af34b00ebb44";
+                    m_WingsFX["ST_WingsDraconic_DraconicWhite_U_Any"] = "b695621f7fb1e7345a45f6224a977d6c";
                 }
                 return m_WingsFX;
             }
@@ -2953,9 +2947,9 @@ namespace VisualAdjustments
         private static Dictionary<BlueprintRef, string> m_WeaponEnchantments = new Dictionary<BlueprintRef, string>();
         private static Dictionary<BlueprintRef, string> m_MythicOptions = new Dictionary<BlueprintRef, string>();
         private static Dictionary<string, string> m_WingsEE = new Dictionary<string, string>();
-        private static Dictionary<string, EquipmentEntity> m_HornsEE = new Dictionary<string, EquipmentEntity>();
-        private static Dictionary<string, EquipmentEntity> m_TailEE = new Dictionary<string, EquipmentEntity>();
-        private static Dictionary<string, GameObject> m_WingsFX = new Dictionary<string, GameObject>();
+        private static Dictionary<string, string> m_HornsEE = new Dictionary<string, string>();
+        private static Dictionary<string, string> m_TailEE = new Dictionary<string, string>();
+        private static Dictionary<string, string> m_WingsFX = new Dictionary<string, string>();
         private static Dictionary<string, Dictionary<BlueprintRef, string>> m_Weapons = new Dictionary<string, Dictionary<BlueprintRef, string>>();
         private static bool loaded = false;
         static void BuildEquipmentLookup()

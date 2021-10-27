@@ -192,6 +192,8 @@ namespace VisualAdjustments
                 {
                     Main.GenerateOutfitcolor(unitEntityData);
                 }
+                foreach (var buff in unitEntityData.Buffs)
+                    buff.ClearParticleEffect();
                 EventBus.RaiseEvent<IUnitViewAttachedHandler>(unitEntityData, delegate (IUnitViewAttachedHandler h)
                 {
                     h.HandleUnitViewAttached();
@@ -662,14 +664,17 @@ namespace VisualAdjustments
                         }
                     }
                 }
-                if (!characterSettings.overrideWingsEE.Empty() && !characterSettings.hideWings)
+                if (!characterSettings.overrideWingsEE.IsNullOrEmpty() && !characterSettings.hideWings)
                 {
                     foreach (var eetoremove in EquipmentResourcesManager.WingsEE.Values)
                     {
                         var ee = ResourcesLibrary.TryGetResource<EquipmentEntity>(eetoremove);
                        if(view.CharacterAvatar.EquipmentEntities.Contains(ee))  view.CharacterAvatar.RemoveEquipmentEntity(ee,false);
                     }
-                    view.CharacterAvatar.AddEquipmentEntity(ResourcesLibrary.TryGetResource<EquipmentEntity>(characterSettings.overrideWingsEE));
+                    //Main.logger.Log(characterSettings.overrideWingsEE);
+                    //Main.logger.Log(EquipmentResourcesManager.WingsEE[characterSettings.overrideWingsEE].ToString());
+                    //Main.logger.Log(ResourcesLibrary.TryGetResource<EquipmentEntity>(EquipmentResourcesManager.WingsEE[characterSettings.overrideWingsEE]).ToString());
+                     view.CharacterAvatar.AddEquipmentEntity(ResourcesLibrary.TryGetResource<EquipmentEntity>(EquipmentResourcesManager.WingsEE[characterSettings.overrideWingsEE]));
                 }
                 if (!characterSettings.overrideTail.Empty() && !characterSettings.hideTail)
                 {
@@ -677,7 +682,7 @@ namespace VisualAdjustments
                     {
                         if (view.CharacterAvatar.EquipmentEntities.Contains(eetoremove)) view.CharacterAvatar.RemoveEquipmentEntity(eetoremove, false);
                     }
-                    view.CharacterAvatar.AddEquipmentEntity(EquipmentResourcesManager.TailsEE[characterSettings.overrideTail]);
+                    view.CharacterAvatar.AddEquipmentEntity(ResourcesLibrary.TryGetResource<EquipmentEntity>(EquipmentResourcesManager.TailsEE[characterSettings.overrideTail]));
                 }
                 if (!characterSettings.overrideHorns.Empty() && !characterSettings.hideHorns)
                 {
@@ -685,11 +690,11 @@ namespace VisualAdjustments
                     {
                         if (view.CharacterAvatar.EquipmentEntities.Contains(eetoremove)) view.CharacterAvatar.RemoveEquipmentEntity(eetoremove, false);
                     }
-                    view.CharacterAvatar.AddEquipmentEntity(EquipmentResourcesManager.HornsEE[characterSettings.overrideHorns]);
+                    view.CharacterAvatar.AddEquipmentEntity(ResourcesLibrary.TryGetResource<EquipmentEntity>(EquipmentResourcesManager.HornsEE[characterSettings.overrideHorns]));
                 }
-                if (!characterSettings.overrideWingsFX.Empty() && !characterSettings.hideWings)
+                if (!characterSettings.overrideWingsFX.IsNullOrEmpty() && !characterSettings.hideWings)
                 {
-                    FxHelper.Destroy(wingsFxVisibilityManagers[view]);
+                    //FxHelper.Destroy(wingsFxVisibilityManagers[view]);
                    /* foreach (var fx in )
                     {
                         view.CharacterAvatar.m_AdditionalFXs;
@@ -700,11 +705,15 @@ namespace VisualAdjustments
                         if (view.CharacterAvatar.EquipmentEntities.Contains(eetoremove)) view.CharacterAvatar.RemoveEquipmentEntity(eetoremove, false);
                     }*/
                     if (wingsFxVisibilityManagers.ContainsKey(view) && wingsFxVisibilityManagers[view] != null) GameObject.Destroy(wingsFxVisibilityManagers[view]);
-                    if (!characterSettings.overrideWingsFX.Empty())
+                    //if (!characterSettings.overrideWingsFX.Empty())
                     {
-                        wingsFxVisibilityManagers[view] = FxHelper.SpawnFxOnUnit(EquipmentResourcesManager.WingsFX[characterSettings.overrideWingsFX], view);
+                       wingsFxVisibilityManagers[view] = FxHelper.SpawnFxOnUnit(ResourcesLibrary.TryGetResource<GameObject>(EquipmentResourcesManager.WingsFX[characterSettings.overrideWingsFX]), view);
                     }
                     // if (characterSettings.overrideWingsEE != null) view.CharacterAvatar.AddEquipmentEntity(EquipmentResourcesManager.WingsEE[characterSettings.overrideWingsEE]);
+                }
+                else
+                {
+                    if (wingsFxVisibilityManagers.ContainsKey(view) && wingsFxVisibilityManagers[view] != null) GameObject.Destroy(wingsFxVisibilityManagers[view]);
                 }
                 if (characterSettings.overrideHelm != null && !characterSettings.hideHelmet)
                 {
@@ -1257,9 +1266,14 @@ namespace VisualAdjustments
                 try
                 {
                     if (!Main.enabled) return;
-                    if (Main.settings.GetCharacterSettings(player).hideMythic)
+                    var settings = Main.settings.GetCharacterSettings(player);
+                    if (settings.hideMythic)
                     {
                         __instance.m_Avatar.SetAdditionalVisualSettings(null);
+                    }
+                    else if(!settings.overrideMythic.IsNullOrEmpty())
+                    {
+                        __instance.m_Avatar.SetAdditionalVisualSettings(Utilities.GetBlueprint<BlueprintClassAdditionalVisualSettings>(settings.overrideMythic));
                     }
                 }
                 catch (Exception ex)

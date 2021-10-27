@@ -95,6 +95,7 @@ namespace VisualAdjustments
                     Quaternion rotation = (!template.ForbidRotation) ? Quaternion.Euler(0f, __instance.Orientation, 0f) : Quaternion.identity;
                     __result = UnityEngine.Object.Instantiate(template, __instance.Position, rotation);
                     //Prevent halflings from running too fast
+                    __result.m_IgnoreRaceAnimationSettings = true;
                     Traverse.Create(__result).Field("m_IgnoreRaceAnimationSettings").SetValue(true);
                     return false;
                 } catch(Exception ex)
@@ -155,7 +156,7 @@ namespace VisualAdjustments
                     if (characterSettings == null) return;
                     if (!characterSettings.overrideScale || characterSettings.overrideScaleCheatMode) return;
                     if (characterSettings.overrideScaleShapeshiftOnly &&
-                        !__instance.EntityData.Body.IsPolymorphed)
+                    !__instance.EntityData.Body.IsPolymorphed)
                     {
                         return;
                     }
@@ -168,6 +169,7 @@ namespace VisualAdjustments
                     else sizeDiff = characterSettings.overrideScaleFactor - (int)__instance.EntityData.Descriptor.OriginalSize;
                     var newScaleFactor = Mathf.Pow(1 / 0.66f, sizeDiff);
                     __result /= newScaleFactor;
+                  // __result = 1;
                 }
                 catch (Exception ex)
                 {
