@@ -178,14 +178,15 @@ namespace VisualAdjustments
     public class UnitPartVAFX : UnitPart
     {
         [JsonProperty] public bool blackorwhitelist = true;
-        [JsonProperty] public Dictionary<string,FXInfo> blackwhitelist = new Dictionary<string,FXInfo>();
+        [JsonProperty] public List<FXInfo> blackwhitelistnew = new List<FXInfo>();
+        public Dictionary<string,FXInfo> blackwhitelist = new Dictionary<string, FXInfo>();
         [JsonProperty] public List<FXInfo> overrides = new List<FXInfo>();
         [NonSerialized()] public Dictionary<string,GameObject> currentoverrides = new Dictionary<string, GameObject>();
     }
     public class FXInfo
     {
-        public string AssetID;
-        public string Name;
+        [JsonProperty] public string AssetID;
+        [JsonProperty] public string Name;
         public FXInfo(string assetid,string name)
         {
             AssetID = assetid;

@@ -210,6 +210,16 @@ namespace VisualAdjustments
                     if (__instance.VisibleItem == null) return;
                     {
                         var blueprint = __instance.VisibleItem.Blueprint as BlueprintItemEquipmentHand;
+                        {
+                            //var blueprint = __instance.VisibleItem.Blueprint as BlueprintItemEquipmentHand;
+                            var animationStyle = blueprint.VisualParameters.AnimStyle.ToString();
+                            characterSettings.overrideWeapons.TryGetValue(animationStyle, out BlueprintRef blueprintId);
+                            //if (blueprintId == null || blueprintId == "") return;
+                            var newBlueprint = ResourcesLibrary.TryGetBlueprint<BlueprintItemEquipmentHand>(blueprintId);
+                            if (newBlueprint != null)
+                            __result = newBlueprint;
+                        }
+                        
                         //var tuple = new overrideinfo(blueprint.VisualParameters.AnimStyle.ToString(), __instance.Owner.View.HandsEquipment.Sets.Keys.ToList().IndexOf(__instance.Slot.HandsEquipmentSet), __instance.Slot.IsPrimaryHand);
                         //if(characterSettings.weaponOverrides.TryGetValue(tuple, out BlueprintRef Bpref))
                         {
@@ -232,16 +242,7 @@ namespace VisualAdjustments
                         }
                     }
                     // Old
-                   // if(1 == 2)
-                    {
-                        /*var blueprint = __instance.VisibleItem.Blueprint as BlueprintItemEquipmentHand;
-                        var animationStyle = blueprint.VisualParameters.AnimStyle.ToString();
-                        characterSettings.overrideWeapons.TryGetValue(animationStyle, out BlueprintRef blueprintId);
-                        if (blueprintId == null || blueprintId == "") return;
-                        var newBlueprint = ResourcesLibrary.TryGetBlueprint<BlueprintItemEquipmentHand>(blueprintId);
-                        if (newBlueprint == null) return;
-                        __result = newBlueprint;*/
-                    }
+
                 }
                 catch (Exception ex)
                 {

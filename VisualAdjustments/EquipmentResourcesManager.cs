@@ -3011,6 +3011,7 @@ namespace VisualAdjustments
                         m_Scars[bp.AssetGuidThreadSafe] = bp.name;
                 }
             }
+           // ResourcesLibrary.CleanupLoadedCache();
         }
         /* static void BuildEquipmentLookupOld()
           {
@@ -3169,6 +3170,7 @@ namespace VisualAdjustments
             BuildViewLookup();
             BuildMythicLookup();
             loaded = true;
+            ResourcesLibrary.CleanupLoadedCache();
         }
     }
 }

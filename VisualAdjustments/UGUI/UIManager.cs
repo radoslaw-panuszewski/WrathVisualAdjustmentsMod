@@ -148,7 +148,7 @@ namespace TutorialCanvas.UI
                     }
                     else if(s == "Any")
                     {
-                        newarray.Add("Unisex");
+                        newarray.Add("Any");
                     }
                     else if ((s != "EE" && s != "KEE" && s != "Buff") && s.Length > 1)
                     {
@@ -220,6 +220,7 @@ namespace TutorialCanvas.UI
             ["HO"] = "Half-Orc",
             ["ZB"] = "Zombie",
             ["CB"] = "Cambion",
+            ["CM"] = "Cambion",
             ["SN"] = "Skeleton"
 
         };
@@ -504,6 +505,7 @@ namespace TutorialCanvas.UI
                                 manager.HandleUnitChangedHideEEs();
                                 //haschanged = false;
                             }
+                            FXUIHandler.handler.HandleUnitChangedOrUpdate();
                         }
                         else
                         {
@@ -724,14 +726,20 @@ namespace TutorialCanvas.UI
 
             try
             {
-                VisualAdjustments.Main.logger.Log("createdobject");
-                if (!Game.Instance.UI.Canvas) return null;
+              //  VisualAdjustments.Main.logger.Log("createdobject");
+                //if (Game.Instance == null) return null;
+              //  VisualAdjustments.Main.logger.Log("HasInstance");
+                if (Game.Instance.UI == null) return null;
+               // VisualAdjustments.Main.logger.Log("HasUIInstance");
+                if (Game.Instance.UI.Canvas == null) return null;
+              //  VisualAdjustments.Main.logger.Log("HasUICanvas");
                 if (!BundleManger.IsLoaded(Source)) throw new NullReferenceException("NotLoaded");
-
+              //  VisualAdjustments.Main.logger.Log("IsLoaded");
                 //
                 //Attempt to get the wrath objects needed to build the UI
                 //
                 var staticCanvas = Game.Instance.UI.Canvas.RectTransform.Find("ServiceWindowsPCView/InventoryPCView/Inventory");
+               // VisualAdjustments.Main.logger.Log("Found Static Canvas");
                 //var background = staticCanvas.Find("HUDLayout/CombatLog_New/Background/Background_Image").GetComponent<Image>(); //Using the path we found earlier we get the sprite component 
 
 
@@ -741,19 +749,22 @@ namespace TutorialCanvas.UI
                 //Attempt to get the objects loaded from the AssetBundles and build the window.
                 //
                 window = Instantiate(BundleManger.LoadedPrefabs[Source].transform.Find("Canvas")); //We ditch the TutorialCanvas as talked about in the Wiki, we will attach it to a different parent
-                                                                                                   //window.localScale = new Vector3((float)0.76, (float)0.76, (float)0.76);
+                //VisualAdjustments.Main.logger.Log("Instantiated");                                             //window.localScale = new Vector3((float)0.76, (float)0.76, (float)0.76);
                 //VisualAdjustments.Main.logger.Log("createdobject2");
                 window.SetParent(staticCanvas, false); //Attaches our window to the static canvas
                 window.SetAsLastSibling(); //Our window will always be under other UI elements as not to interfere with the game. Top of the list has the lowest priority
-                                           // if(SettingsWrapper.Reuse) window.Find("Background").GetComponent<Image>().sprite = background.sprite; //Sets the background sprite to the one used in CombatLog_New
+               // VisualAdjustments.Main.logger.Log("attached");
+                // if(SettingsWrapper.Reuse) window.Find("Background").GetComponent<Image>().sprite = background.sprite; //Sets the background sprite to the one used in CombatLog_New
                 window.localPosition = new Vector3(0, 27, 0);
                 window.localScale = new Vector3((float)0.76, (float)0.76, (float)0.76);
                 window.Find("Menus").gameObject.active = false;
+             //   VisualAdjustments.Main.logger.Log("disabled");
                 //VisualAdjustments.Main.logger.Log("createdobject3");
                 // content = ;
                 var cmp = window.gameObject.EnsureComponent<UIManager>();
                 manager = cmp;
-               // cmp.Awake();
+                //VisualAdjustments.Main.logger.Log("added component");
+                // cmp.Awake();
                 return cmp; //This adds this class as a component so it can handle events, button clicks, awake, update, etc.
             }
             catch (Exception ex)
@@ -1691,6 +1702,11 @@ namespace TutorialCanvas.UI
                                 settings.overrideWingsEE = eelguid;
                                 break;
                             }
+                        case 10:
+                            {
+                                settings.weaponOverrides[new Tuple<string, int, bool>(SelectedWeaponType, slot, primorsec).ToString()] = eelguid;
+                                break;
+                            }
                         case 11:
                             {
                                 settings.weaponEnchantments[new Tuple<int, bool>(slot, primorsec).ToString()] = eelguid;
@@ -1861,7 +1877,7 @@ namespace TutorialCanvas.UI
         }
 
         public static Char[] splitchars = new Char[] { char.Parse(" ") };
-        public void HandleFilterChangedAll(string value)
+        public async void HandleFilterChangedAll(string value)
         {
             // VisualAdjustments.Main.logger.Log("filterchange");
             /*var buttonstodisable = allEELButtons.Except(a => a.Key.Contains(value));
@@ -1869,73 +1885,42 @@ namespace TutorialCanvas.UI
             {
                 button.Value.SetActive(false);
             }*/
-           // value = AllInputField.text;
+            value = AllInputField.text;
             bool hassplitter = value.Contains(" ");
-            var splitstring = value.Split(splitchars);
-            //splitstring = splitstring.Select(a => a.Trim()).Where(b => !b.IsNullOrEmpty()).ToArray();
+            var splitstring = value.Split(UIManager.splitchars);
+            bool isempty = value.IsNullOrEmpty();
             foreach (var eelbutton in allEELButtons)
             {
                 if (hassplitter)
                 {
-                    if (splitstring.All(a => eelbutton.Key.Contains(a,StringComparison.OrdinalIgnoreCase)))
+                    if (splitstring.All(a => eelbutton.Key.Contains(a, StringComparison.OrdinalIgnoreCase)))
                     {
-                        if (!eelbutton.Value.activeSelf)  eelbutton.Value.SetActive(true);
+                        eelbutton.Value.gameObject.SetActive(true);
                     }
                     else
                     {
-                        if (eelbutton.Value.activeSelf) eelbutton.Value.SetActive(false);
+                        eelbutton.Value.gameObject.SetActive(false);
                     }
-                    /*bool shoulddisable = true;
-                    foreach (var String in splitstring)
-                    {
-                        if (eelbutton.Key.Contains(String))
-                        {
-                            eelbutton.Value.SetActive(true);
-                            shoulddisable = false;
-                        }
-                    }
-                    if (shoulddisable)
-                    {
-                        eelbutton.Value.SetActive(false);
-                    }*/
                 }
-                   /* foreach (var VARIABLE in splitstring)
-                    {
-                        if (eelbutton.Key.Contains(VARIABLE, StringComparison.OrdinalIgnoreCase))
-                        {
-                            eelbutton.Value.SetActive(true);
-                            return;
-                        }
-                        eelbutton.Value.SetActive(false);
-                    }*/
-                       /* if(splitstring.Any(a => a.Contains(eelbutton.Key,StringComparison.OrdinalIgnoreCase)))
-                        {
-                            eelbutton.Value.SetActive(true);
-                        }
-                        else
-                        {
-                            eelbutton.Value.SetActive(false);
-                        }*/
-                //}
                 else
                 {
-                    if (value.IsNullOrEmpty())
+                    if (isempty)
                     {
-                        if (!eelbutton.Value.activeSelf) eelbutton.Value.SetActive(true);
+                        eelbutton.Value.gameObject.SetActive(true);
                     }
                     else if (eelbutton.Key.Contains(value, StringComparison.OrdinalIgnoreCase))
                     {
-                        if (!eelbutton.Value.activeSelf) eelbutton.Value.SetActive(true);
+                        eelbutton.Value.gameObject.SetActive(true);
                     }
                     else
                     {
-                        if (eelbutton.Value.activeSelf) eelbutton.Value.SetActive(false);
+                        eelbutton.Value.gameObject.SetActive(false);
                     }
                 }
 
             }
         }
-        public void HandleFilterChangedCurrent(string value)
+        public async void HandleFilterChangedCurrent(string value)
         {
             //VisualAdjustments.Main.logger.Log("filterchange");
             /*var buttonstodisable = allEELButtons.Except(a => a.Key.Contains(value));
@@ -1945,7 +1930,8 @@ namespace TutorialCanvas.UI
             }*/
             value = CurrentInputField.text;
             bool hassplitter = value.Contains(" ");
-            var splitstring = value.Split(splitchars);
+            var splitstring = value.Split(UIManager.splitchars);
+            bool isempty = value.IsNullOrEmpty();
             foreach (var eelbutton in currentEELButtons)
             {
                 if (hassplitter)
@@ -1958,23 +1944,10 @@ namespace TutorialCanvas.UI
                     {
                         eelbutton.Value.gameObject.SetActive(false);
                     }
-                    /*bool shoulddisable = true;
-                    foreach (var String in splitstring)
-                    {
-                        if (eelbutton.Key.Contains(String))
-                        {
-                            eelbutton.Value.SetActive(true);
-                            shoulddisable = false;
-                        }
-                    }
-                    if (shoulddisable)
-                    {
-                        eelbutton.Value.SetActive(false);
-                    }*/
                 }
                 else
                 {
-                    if (value.IsNullOrEmpty())
+                    if (isempty)
                     {
                         eelbutton.Value.gameObject.SetActive(true);
                     }
@@ -1987,6 +1960,7 @@ namespace TutorialCanvas.UI
                         eelbutton.Value.gameObject.SetActive(false);
                     }
                 }
+
             }
         }
 
@@ -2137,6 +2111,7 @@ namespace TutorialCanvas.UI
                     currentEELButtons[selectedEntity.name].gameObject.SafeDestroy();
                     //currentEELButtons[selectedEntity.name] = null;
                     currentEELButtons.Remove(selectedEntity.name);
+                    RebuildCurrentEEButtons();
                     UpdatePreview();
             }
             else
@@ -2145,7 +2120,8 @@ namespace TutorialCanvas.UI
                     removeFromRemoveEEPart(selectedEntity);
                     addToAddEEPart(selectedEntity, data.View.CharacterAvatar.GetPrimaryRampIndex(selectedEntity),
                         data.View.CharacterAvatar.GetSecondaryRampIndex(selectedEntity));
-                    UpdatePreview();
+                RebuildCurrentEEButtons();
+                UpdatePreview();
             }
             if (EELpickerUI.selectedEntity == null)
             {

@@ -113,6 +113,7 @@ namespace VisualAdjustments {
             "Wizard",g
             "None"
         };*/
+        public static bool forceload = false;
         public static float UIscale = 1;
         private static bool haspatched = false;
         static bool Load(UnityModManager.ModEntry modEntry) {
@@ -697,6 +698,10 @@ namespace VisualAdjustments {
                     }
                 }
 #endif
+              /*  if (GUILayout.Button("focreload"))
+                {
+                    forceload = !forceload;
+                }*/
                 UI.DisclosureToggle("Settings", ref showsettings, 175f);
                 if (showsettings)
                 {

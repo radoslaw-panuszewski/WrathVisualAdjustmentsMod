@@ -12,6 +12,7 @@ using ModMaker.Utility;
 using Kingmaker.Utility;
 using BlueprintExplorer;
 using Kingmaker.UI.MVVM._PCView.ServiceWindows.Inventory;
+using System.Threading;
 
 public class FXUIHandler : MonoBehaviour
 {
@@ -48,67 +49,82 @@ public class FXUIHandler : MonoBehaviour
 
     public void HandleUnitChangedOrUpdate()
     {
-        m_WhiteOrBlackList = currentUnitPart.blackorwhitelist;
-        if (listoroverride)
+        try
         {
-           // Main.logger.Log("Start");
-            foreach (var button in currentfxbuttons)//.Except(currentfxbuttons.Where(a => currentUnitPart.blackwhitelist.Select(b => b.Name).Contains(a.Key))))
+            m_WhiteOrBlackList = currentUnitPart.blackorwhitelist;
+            if (listoroverride)
             {
-                button.Value.SafeDestroy();
-            }
-            currentfxbuttons.Clear();
-          //  Main.logger.Log("DestroyedOld");
-            foreach (var FX in currentUnitPart.blackwhitelist)
-            {
-                //if (!currentfxbuttons.ContainsKey(FX.Name))
+                // Main.logger.Log("Start");
+                foreach (var button in currentfxbuttons)//.Except(currentfxbuttons.Where(a => currentUnitPart.blackwhitelist.Select(b => b.Name).Contains(a.Key))))
                 {
-                    var buttontoadd = UnityEngine.Object.Instantiate(ButtonForCloning);
-                    var buttontoaddtext = buttontoadd.Find("TextB").GetComponent<TextMeshProUGUI>();
-                    // buttontoaddtext.text = currentee.name;
-                    buttontoaddtext.text = FX.Value.Name; //UIManager.GetTextAndSetupCategory(FX.Value.Name);
-                    //buttontoaddtext.text = FX.Name;
-                    // buttontoaddtext.text = GetTextAndSetupCategory(currentee);
-                    buttontoaddtext.color = Color.white;
-                    buttontoadd.transform.SetParent(contentcurrent, false);
-                    var buttontoaddbuttoncomponent = buttontoadd.GetComponent<Button>();
-                    buttontoaddbuttoncomponent.onClick = new Button.ButtonClickedEvent();
-                    buttontoaddbuttoncomponent.onClick.AddListener(new UnityAction(() =>
+                    //UnityEngine.Object.DestroyImmediate(button.Value);
+                    button.Value.SafeDestroy();
+                    // button.Value.gameObject.DestroyImmediate(button.Value.gameObject,false);
+                }
+                currentfxbuttons.Clear();
+                //  Main.logger.Log("DestroyedOld");
+                foreach (var FX in currentUnitPart.blackwhitelistnew)
+                {
+                    if (!currentfxbuttons.ContainsKey(FX.Name))
                     {
-                        selectedfx = (buttontoaddtext.text);
-                    }));
-                    currentfxbuttons.Add(FX.Value.Name, buttontoaddbuttoncomponent);
+                        var buttontoadd = UnityEngine.Object.Instantiate(ButtonForCloning);
+                        var buttontoaddtext = buttontoadd.Find("TextB").GetComponent<TextMeshProUGUI>();
+                        // buttontoaddtext.text = currentee.name;
+                        buttontoaddtext.text = FX.Name; //UIManager.GetTextAndSetupCategory(FX.Value.Name);
+                                                        //buttontoaddtext.text = FX.Name;
+                                                        // buttontoaddtext.text = GetTextAndSetupCategory(currentee);
+                        buttontoaddtext.color = Color.white;
+                        buttontoadd.transform.SetParent(contentcurrent, false);
+                        var buttontoaddbuttoncomponent = buttontoadd.GetComponent<Button>();
+                        buttontoaddbuttoncomponent.onClick = new Button.ButtonClickedEvent();
+                        buttontoaddbuttoncomponent.onClick.AddListener(new UnityAction(() =>
+                        {
+                            selectedfx = (buttontoaddtext.text);
+                        }));
+                        currentfxbuttons.Add(FX.Name, buttontoaddbuttoncomponent);
+                    }
+                }
+            }
+            else
+            {
+                //  Main.logger.Log("Start");
+                foreach (var button in currentfxbuttons)//.Except(currentfxbuttons.Where(a => currentUnitPart.blackwhitelist.Select(b => b.Name).Contains(a.Key))))
+                {
+                   // UnityEngine.Object.DestroyImmediate(button.Value);
+                    button.Value.SafeDestroy();
+                }
+                currentfxbuttons.Clear();
+                //  Main.logger.Log("DestroyedOld");
+                foreach (var FX in currentUnitPart.overrides)
+                {
+                    if (!currentfxbuttons.ContainsKey(FX.Name))
+                    {
+                        var buttontoadd = UnityEngine.Object.Instantiate(ButtonForCloning);
+                        var buttontoaddtext = buttontoadd.Find("TextB").GetComponent<TextMeshProUGUI>();
+                        // buttontoaddtext.text = currentee.name;
+                        //buttontoaddtext.text = FX.Name;
+                        buttontoaddtext.text = UIManager.GetTextAndSetupCategory(FX.Name);
+                        // buttontoaddtext.text = GetTextAndSetupCategory(currentee);
+                        buttontoaddtext.color = Color.white;
+                        buttontoadd.transform.SetParent(contentcurrent, false);
+                        var buttontoaddbuttoncomponent = buttontoadd.GetComponent<Button>();
+                        buttontoaddbuttoncomponent.onClick = new Button.ButtonClickedEvent();
+                        buttontoaddbuttoncomponent.onClick.AddListener(new UnityAction(() =>
+                        {
+                            selectedfx = (buttontoaddtext.text);
+                        }));
+                        currentfxbuttons.Add(FX.Name, buttontoaddbuttoncomponent);
+                    }
                 }
             }
         }
-        else
+        catch (Exception e)
         {
-          //  Main.logger.Log("Start");
-            foreach (var button in currentfxbuttons)//.Except(currentfxbuttons.Where(a => currentUnitPart.blackwhitelist.Select(b => b.Name).Contains(a.Key))))
+            Main.logger.Log(e.ToString());
+            foreach (var button in currentfxbuttons)
             {
                 button.Value.SafeDestroy();
-            }
-            currentfxbuttons.Clear();
-          //  Main.logger.Log("DestroyedOld");
-            foreach (var FX in currentUnitPart.overrides)
-            {
-                //if (!currentfxbuttons.ContainsKey(FX.Name))
-                {
-                    var buttontoadd = UnityEngine.Object.Instantiate(ButtonForCloning);
-                    var buttontoaddtext = buttontoadd.Find("TextB").GetComponent<TextMeshProUGUI>();
-                    // buttontoaddtext.text = currentee.name;
-                    //buttontoaddtext.text = FX.Name;
-                    buttontoaddtext.text = UIManager.GetTextAndSetupCategory(FX.Name);
-                    // buttontoaddtext.text = GetTextAndSetupCategory(currentee);
-                    buttontoaddtext.color = Color.white;
-                    buttontoadd.transform.SetParent(contentcurrent, false);
-                    var buttontoaddbuttoncomponent = buttontoadd.GetComponent<Button>();
-                    buttontoaddbuttoncomponent.onClick = new Button.ButtonClickedEvent();
-                    buttontoaddbuttoncomponent.onClick.AddListener(new UnityAction(() =>
-                    {
-                        selectedfx = (buttontoaddtext.text);
-                    }));
-                    currentfxbuttons.Add(FX.Name, buttontoaddbuttoncomponent);
-                }
+                //UnityEngine.Object.DestroyImmediate(button.Value);
             }
         }
         this.WhiteOrBlackList = currentUnitPart.blackorwhitelist;
@@ -307,37 +323,9 @@ public class FXUIHandler : MonoBehaviour
     public void HandleFilterChangedAll(string val)
     {
         var value = AllFXInput.text;
-        // var value = val;
         bool hassplitter = value.Contains(" ");
         var splitstring = value.Split(UIManager.splitchars);
         bool isempty = value.IsNullOrEmpty();
-        /*if (!value.IsNullOrEmpty())
-        {
-            var searchresults = AllFXButtons.Keys.ToList().FuzzyMatch(bp => bp, value);
-            foreach (var todisable in AllFXButtons)
-            {
-                if (todisable.Value.gameObject.activeSelf)
-                {
-                    todisable.Value.gameObject.SetActive(false);
-                }
-            }
-            foreach (var toenable in searchresults)
-            {
-                var button = AllFXButtons[toenable].gameObject;
-                if (!button.activeSelf)
-                {
-                    button.SetActive(true);
-                }
-            }
-        }
-        else
-        {
-            foreach(var toenable in AllFXButtons)
-            {
-                if(!toenable.Value.gameObject.activeSelf)
-                toenable.Value.gameObject.SetActive(true);
-            }
-        }*/
         foreach (var eelbutton in AllFXButtons)
         {
             if (hassplitter)
@@ -417,7 +405,7 @@ public class FXUIHandler : MonoBehaviour
     {
         if(listoroverride)
         {
-            currentUnitPart.blackwhitelist.Clear();
+            currentUnitPart.blackwhitelistnew.Clear();
         }
         else
         {
@@ -444,15 +432,25 @@ public class FXUIHandler : MonoBehaviour
     }
     public void AddList()
     {
-        if (!(currentUnitPart).blackwhitelist.ContainsKey(EffectsManager.AllFX[UIManager.FilteredAndUnfilteredEEName[selectedfx]]))
+        try
         {
-            (currentUnitPart).blackwhitelist.Add(EffectsManager.AllFX[UIManager.FilteredAndUnfilteredEEName[selectedfx]], new FXInfo(EffectsManager.AllFX[UIManager.FilteredAndUnfilteredEEName[selectedfx]], selectedfx));
-            HandleUnitChangedOrUpdate();
+            //Main.logger.Log(selectedfx);
+            var fxinf = new FXInfo(EffectsManager.AllFX[UIManager.FilteredAndUnfilteredEEName[selectedfx]], selectedfx);
+           // Main.logger.Log(fxinf.ToString()+"  "+fxinf.Name+"  "+fxinf.AssetID);
+            if (!(currentUnitPart).blackwhitelistnew.Any(a => a.Name == selectedfx))
+            {
+                (currentUnitPart).blackwhitelistnew.Add(new FXInfo(EffectsManager.AllFX[UIManager.FilteredAndUnfilteredEEName[selectedfx]], selectedfx));
+                HandleUnitChangedOrUpdate();
+            }
+        }
+        catch(Exception e)
+        {
+            Main.logger.Log(e.ToString());
         }
     }
     public void RemoveList()
     {
-        (currentUnitPart).blackwhitelist.Remove(UIManager.FilteredAndUnfilteredEEName[selectedfx]);
+        (currentUnitPart).blackwhitelistnew.RemoveAll(a => a.Name == selectedfx);
         HandleUnitChangedOrUpdate();
     }
     public void SwitchMode()
