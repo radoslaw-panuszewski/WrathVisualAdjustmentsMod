@@ -3,8 +3,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using UnityEngine;
-using UnityModManagerNet;
-using VisualAdjustments;
 
 namespace TutorialCanvas.Utilities
 {
@@ -85,7 +83,9 @@ namespace TutorialCanvas.Utilities
             return _objects.ContainsKey(asset);
         }
 
-        public static Dictionary<string, GameObject> LoadedPrefabs { get { return _objects; } }
-        public static Dictionary<string, Sprite> LoadedSprites { get { return _sprites; } }
+        public static Dictionary<string, GameObject> LoadedPrefabs
+        { get { return _objects; } }
+        public static Dictionary<string, Sprite> LoadedSprites
+        { get { return _sprites; } }
     }
 }

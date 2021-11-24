@@ -11,11 +11,12 @@ using System.Linq;
 
 namespace VisualAdjustments
 {
-    static class HairUnlocker
+    internal static class HairUnlocker
     {
-        static Dictionary<string, CustomizationOptions> originalOptions = new Dictionary<string, CustomizationOptions>();
-       public static void UnlockHair()
-       {
+        private static Dictionary<string, CustomizationOptions> originalOptions = new Dictionary<string, CustomizationOptions>();
+
+        public static void UnlockHair()
+        {
             if (!Main.settings.UnlockHair) return;
             BlueprintRace[][] groups;
             if (Main.settings.UnlockHair)
@@ -24,7 +25,6 @@ namespace VisualAdjustments
                 {
                     Game.Instance.BlueprintRoot.Progression.CharacterRaces.ToArray<BlueprintRace>()
                 };
-
             }
             else
             {
@@ -52,7 +52,8 @@ namespace VisualAdjustments
                 }
             }
         }
-        static void AddHair(BlueprintRace sourceRace, BlueprintRace targetRace)
+
+        private static void AddHair(BlueprintRace sourceRace, BlueprintRace targetRace)
         {
             foreach (var gender in new Gender[] { Gender.Male, Gender.Female })
             {
@@ -60,11 +61,12 @@ namespace VisualAdjustments
                 var originalTarget = GetOriginalOptions(targetRace, gender);
                 var newSource = gender == Gender.Male ? sourceRace.MaleOptions : sourceRace.FemaleOptions;
                 var newTarget = gender == Gender.Male ? targetRace.MaleOptions : targetRace.FemaleOptions;
-                newTarget.Hair = Combine(newSource.Hair, newTarget.Hair);
+                newTarget.m_Hair = Combine(newSource.m_Hair, newTarget.m_Hair);
                 newTarget.Beards = Combine(newSource.Beards, newTarget.Beards);
             }
         }
-        static CustomizationOptions GetOriginalOptions(BlueprintRace race, Gender gender)
+
+        private static CustomizationOptions GetOriginalOptions(BlueprintRace race, Gender gender)
         {
             if (originalOptions.ContainsKey(race.name + gender))
             {
@@ -72,7 +74,8 @@ namespace VisualAdjustments
             }
             throw new KeyNotFoundException($"Couldn't find key {race.name + gender}");
         }
-        static EquipmentEntityLink[] Combine(EquipmentEntityLink[] from, EquipmentEntityLink[] to)
+
+        private static EquipmentEntityLink[] Combine(EquipmentEntityLink[] from, EquipmentEntityLink[] to)
         {
             var result = new List<EquipmentEntityLink>(to);
             foreach (var eel in from)
@@ -85,6 +88,7 @@ namespace VisualAdjustments
             }
             return result.ToArray();
         }
+
         public static void RestoreOptions()
         {
             if (originalOptions.Count == 0)
@@ -101,10 +105,11 @@ namespace VisualAdjustments
                 race.FemaleOptions = GetOriginalOptions(race, Gender.Female);
             }
         }
+
         [HarmonyPatch(typeof(BlueprintsCache), "Init")]
-        static class ResourcesLibrary_InitializeLibrary2_Patch
+        private static class ResourcesLibrary_InitializeLibrary2_Patch
         {
-            static void Postfix()
+            private static void Postfix()
             {
                 {
                     if (!Main.enabled) return;

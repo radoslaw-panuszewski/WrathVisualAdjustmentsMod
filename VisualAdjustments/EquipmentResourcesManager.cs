@@ -1,46 +1,43 @@
 ﻿using Kingmaker.Blueprints;
+using Kingmaker.Blueprints.Classes;
 using Kingmaker.Blueprints.Items.Ecnchantments;
 using Kingmaker.Blueprints.Items.Equipment;
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using Kingmaker.Blueprints.Classes;
-using static Kingmaker.UI.Common.ItemsFilter;
-using Kingmaker.BundlesLoading;
-using UnityEngine;
-using Kingmaker.Cheats;
-using Kingmaker.Visual.CharacterSystem;
-using Kingmaker.Visual.Particles;
-using Kingmaker.Blueprints.Items.Weapons;
 using Kingmaker.Blueprints.Items.Shields;
+using Kingmaker.Blueprints.Items.Weapons;
+using Kingmaker.BundlesLoading;
+using Kingmaker.Visual.CharacterSystem;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace VisualAdjustments
 {
-        // Token: 0x02000013 RID: 19
-        internal static class LibraryThing
+    // Token: 0x02000013 RID: 19
+    internal static class LibraryThing
+    {
+        public static Dictionary<string, string> resourceguidmap = new Dictionary<string, string> { };
+
+        // Token: 0x06000054 RID: 84 RVA: 0x000039D8 File Offset: 0x00001BD8
+        public static Dictionary<string, string> GetResourceGuidMap()
         {
-            public static Dictionary<string, string> resourceguidmap = new Dictionary<string,string>{};
-            // Token: 0x06000054 RID: 84 RVA: 0x000039D8 File Offset: 0x00001BD8
-            public static Dictionary<string, string> GetResourceGuidMap()
+            LocationList locationList = BundlesLoadService.Instance.m_LocationList;
+            //LocationList locationList = (LocationList)HarmonyLib.AccessTools.Field(typeof(BundlesLoadService), "m_LocationList").GetValue(BundlesLoadService.Instance);
+            if (resourceguidmap.Count == 0)
             {
-                LocationList locationList = BundlesLoadService.Instance.m_LocationList;
-                //LocationList locationList = (LocationList)HarmonyLib.AccessTools.Field(typeof(BundlesLoadService), "m_LocationList").GetValue(BundlesLoadService.Instance);
-                if (resourceguidmap.Count == 0)
-                {
-                    resourceguidmap = locationList.GuidToBundle;
-                }
-                return resourceguidmap;
+                resourceguidmap = locationList.GuidToBundle;
             }
+            return resourceguidmap;
         }
+    }
+
     internal static class BluePrintThing
     {
         // Token: 0x06000053 RID: 83 RVA: 0x000039A0 File Offset: 0x00001BA0
-       /* public static TBlueprint[] GetBlueprints<TBlueprint>() where TBlueprint : BlueprintScriptableObject
-        {
-         // return  Main.blueprints.OfType<TBlueprint>().ToArray();
-        }*/
+        /* public static TBlueprint[] GetBlueprints<TBlueprint>() where TBlueprint : BlueprintScriptableObject
+         {
+          // return  Main.blueprints.OfType<TBlueprint>().ToArray();
+         }*/
     }
+
     public class EquipmentResourcesManager
     {
         public static Dictionary<string, string> AllEEL
@@ -2649,6 +2646,7 @@ namespace VisualAdjustments
                 return m_AllEEL;
             }
         }
+
         public static Dictionary<BlueprintRef, string> Helm
         {
             get
@@ -2657,6 +2655,7 @@ namespace VisualAdjustments
                 return m_Helm;
             }
         }
+
         public static Dictionary<BlueprintRef, string> Cloak
         {
             get
@@ -2665,20 +2664,25 @@ namespace VisualAdjustments
                 return m_Cloak;
             }
         }
-        public static Dictionary<BlueprintRef, string> Glasses {
-            get {
+
+        public static Dictionary<BlueprintRef, string> Glasses
+        {
+            get
+            {
                 if (!loaded) Init();
                 return m_Glasses;
             }
         }
-        public static Dictionary<BlueprintRef, string> Shirt 
-            {
+
+        public static Dictionary<BlueprintRef, string> Shirt
+        {
             get
             {
                 if (!loaded) Init();
                 return m_Shirt;
             }
         }
+
         public static Dictionary<BlueprintRef, string> Armor
         {
             get
@@ -2687,6 +2691,7 @@ namespace VisualAdjustments
                 return m_Armor;
             }
         }
+
         public static Dictionary<BlueprintRef, string> Bracers
         {
             get
@@ -2695,6 +2700,7 @@ namespace VisualAdjustments
                 return m_Bracers;
             }
         }
+
         public static Dictionary<BlueprintRef, string> Gloves
         {
             get
@@ -2703,6 +2709,7 @@ namespace VisualAdjustments
                 return m_Gloves;
             }
         }
+
         public static Dictionary<BlueprintRef, string> Boots
         {
             get
@@ -2711,6 +2718,7 @@ namespace VisualAdjustments
                 return m_Boots;
             }
         }
+
         public static Dictionary<ResourceRef, string> Units
         {
             get
@@ -2719,6 +2727,7 @@ namespace VisualAdjustments
                 return m_Units; ;
             }
         }
+
         public static Dictionary<string, Dictionary<BlueprintRef, string>> Weapons
         {
             get
@@ -2727,6 +2736,7 @@ namespace VisualAdjustments
                 return m_Weapons;
             }
         }
+
         public static Dictionary<BlueprintRef, string> MythicOptions
         {
             get
@@ -2735,6 +2745,7 @@ namespace VisualAdjustments
                 return m_MythicOptions;
             }
         }
+
         public static Dictionary<BlueprintRef, string> WeaponEnchantments
         {
             get
@@ -2743,11 +2754,12 @@ namespace VisualAdjustments
                 return m_WeaponEnchantments;
             }
         }
+
         public static Dictionary<ResourceRef, string> Tattoos
         {
             get
             {
-                if(m_Tattoo.Count == 0)
+                if (m_Tattoo.Count == 0)
                 {
                     m_Tattoo["326c1affb2a6a26489921bf588f717b6"] = "EE_KineticistTattooWind_U";
                     m_Tattoo["23b9e367a73b5534d918675405de5aa0"] = "EE_KineticistTattooEarth_U";
@@ -2757,6 +2769,7 @@ namespace VisualAdjustments
                 return m_Tattoo;
             }
         }
+
         public static Dictionary<string, string> WingsEE
         {
             get
@@ -2764,33 +2777,34 @@ namespace VisualAdjustments
                 if (m_WingsEE.Count == 0)
                 {
                     m_WingsEE["EE_Wings_M_SU"] = "89343a8dc170abb46ae15c11775e867a";
-                    m_WingsEE["EE_Wings_F_SU"] ="96122c0bb0c483e46a53b8c9d05a1c39";
-                    m_WingsEE["EE_WingsAngelic_M"] ="632dbfaaf86513645a465598fa536892";
-                    m_WingsEE["EE_WingsAngelic_F"] ="419520afa5191ee4bb8d33fc75d2fd29";
-                    m_WingsEE["EE_WingsAzata_F"] ="225e273480af01348b7aaacf4d2f0c54";
-                    m_WingsEE["EE_WingsDemonic_M"] ="23b3eed8f78e69c40a2c6d416cac2f9e";
-                    m_WingsEE["EE_WingsAngelic_Black_F"] ="da9f766f4de989f4e865a2d019b55098";
-                    m_WingsEE["EE_WingsColoxus_F"] ="faf4e32b97ebb614fbb321e36d207c8a";
-                    m_WingsEE["EE_WingsDemonic_F"] ="317c89eb4850e0a45a5eb3e4ae0124a9";
+                    m_WingsEE["EE_Wings_F_SU"] = "96122c0bb0c483e46a53b8c9d05a1c39";
+                    m_WingsEE["EE_WingsAngelic_M"] = "632dbfaaf86513645a465598fa536892";
+                    m_WingsEE["EE_WingsAngelic_F"] = "419520afa5191ee4bb8d33fc75d2fd29";
+                    m_WingsEE["EE_WingsAzata_F"] = "225e273480af01348b7aaacf4d2f0c54";
+                    m_WingsEE["EE_WingsDemonic_M"] = "23b3eed8f78e69c40a2c6d416cac2f9e";
+                    m_WingsEE["EE_WingsAngelic_Black_F"] = "da9f766f4de989f4e865a2d019b55098";
+                    m_WingsEE["EE_WingsColoxus_F"] = "faf4e32b97ebb614fbb321e36d207c8a";
+                    m_WingsEE["EE_WingsDemonic_F"] = "317c89eb4850e0a45a5eb3e4ae0124a9";
                     //m_WingsEE["EE_WingsAngelicMythic_M"] ="e810ab7d95644cf41979f83c06576eb4";
-                    m_WingsEE["EE_WingsAngelicMythic_F"] ="f3e3e309560d1f94a8f3c7b29016ef69";
-                    m_WingsEE["EE_WingsAzataMythic_M"] ="c6d020c1203745041b449706dcacee2d";
-                    m_WingsEE["EE_WingsAzataMythic_F"] ="c6366318b30792944b31b5fccc1db3c8";
-                    m_WingsEE["EE_WingsMythicDevil_M"] ="85e618f6c710a44498148cf99ca20c83";
-                    m_WingsEE["EE_WingsMythicDevil_F"] ="214b59c14bada944c83041f18dcec3d2";
-                    m_WingsEE["EE_WingsMythicDragon_M"] ="eafa30048103d204eb5178405fa2a369";
-                    m_WingsEE["EE_WingsMythicDragon_F"] ="2a8485b6546982b449cac01acb0c9c0d";
-                    m_WingsEE["EE_WingsAngelic_Black_M"] ="876fbc0d239695a4790358a3be5d7c53";
-                    m_WingsEE["EE_WingsDiabolic_M"] ="f845b1c66b2f7804cb53d17654ad7424";
-                    m_WingsEE["EE_WingsAzata_M"] ="8c1a370599cf04343a490f71322bf167";
-                    m_WingsEE["EE_WingsHeraldCorrupted"] ="b4b185de320eca0429c60716f6501ec9";
-                    m_WingsEE["EE_WingsDraconic_M"] ="c466520b1c587c94dbefcc7e9fcf22ca";
-                    m_WingsEE["EE_FireWings_F"] ="8604b675977361043978ecf56122f389";
+                    m_WingsEE["EE_WingsAngelicMythic_F"] = "f3e3e309560d1f94a8f3c7b29016ef69";
+                    m_WingsEE["EE_WingsAzataMythic_M"] = "c6d020c1203745041b449706dcacee2d";
+                    m_WingsEE["EE_WingsAzataMythic_F"] = "c6366318b30792944b31b5fccc1db3c8";
+                    m_WingsEE["EE_WingsMythicDevil_M"] = "85e618f6c710a44498148cf99ca20c83";
+                    m_WingsEE["EE_WingsMythicDevil_F"] = "214b59c14bada944c83041f18dcec3d2";
+                    m_WingsEE["EE_WingsMythicDragon_M"] = "eafa30048103d204eb5178405fa2a369";
+                    m_WingsEE["EE_WingsMythicDragon_F"] = "2a8485b6546982b449cac01acb0c9c0d";
+                    m_WingsEE["EE_WingsAngelic_Black_M"] = "876fbc0d239695a4790358a3be5d7c53";
+                    m_WingsEE["EE_WingsDiabolic_M"] = "f845b1c66b2f7804cb53d17654ad7424";
+                    m_WingsEE["EE_WingsAzata_M"] = "8c1a370599cf04343a490f71322bf167";
+                    m_WingsEE["EE_WingsHeraldCorrupted"] = "b4b185de320eca0429c60716f6501ec9";
+                    m_WingsEE["EE_WingsDraconic_M"] = "c466520b1c587c94dbefcc7e9fcf22ca";
+                    m_WingsEE["EE_FireWings_F"] = "8604b675977361043978ecf56122f389";
                     //BuildEELookup();
                 }
                 return m_WingsEE;
             }
         }
+
         public static Dictionary<string, string> HornsEE
         {
             get
@@ -2883,6 +2897,7 @@ namespace VisualAdjustments
                 return m_HornsEE;
             }
         }
+
         public static Dictionary<string, string> TailsEE
         {
             get
@@ -2896,11 +2911,11 @@ namespace VisualAdjustments
                     m_TailEE["EE_Tail_SU_Any"] = "e42abf4734e52ae4382410278043ae96";
                     m_TailEE["EE_Tail_Skeleton_M_Any"] = "42c1b7d62bfc2b74c914569015c1e25a";
                     m_TailEE["EE_TailWenduag_F_MM"] = "4c5631f45b647754d809690ca4b490a3";
-
                 }
                 return m_TailEE;
             }
         }
+
         public static Dictionary<string, string> WingsFX
         {
             get
@@ -2930,6 +2945,7 @@ namespace VisualAdjustments
                 return m_WingsFX;
             }
         }
+
         private static Dictionary<string, string> m_AllEEL = new Dictionary<string, string>();
         private static Dictionary<BlueprintRef, string> m_Cloak = new Dictionary<BlueprintRef, string>();
         private static Dictionary<BlueprintRef, string> m_Helm = new Dictionary<BlueprintRef, string>();
@@ -2952,67 +2968,69 @@ namespace VisualAdjustments
         private static Dictionary<string, string> m_WingsFX = new Dictionary<string, string>();
         private static Dictionary<string, Dictionary<BlueprintRef, string>> m_Weapons = new Dictionary<string, Dictionary<BlueprintRef, string>>();
         private static bool loaded = false;
-        static void BuildEquipmentLookup()
+
+        private static void BuildEquipmentLookup()
         {
-            var blueprints = Main.blueprints.Entries.Where(a => a.Type == typeof(KingmakerEquipmentEntity)).Select(b => ResourcesLibrary.TryGetBlueprint<KingmakerEquipmentEntity>(b.Guid)).OrderBy((bp) => bp.name);
+            var blueprints = Main.blueprints.Entries.Where(a => a.Type == typeof(KingmakerEquipmentEntity)).OrderBy((bp) => bp.Name);
             /// var blueprints = BluePrintThing.GetBlueprints<BlueprintItemEquipment>()
             foreach (var bp in blueprints)
             {
-                if(bp.name.Contains("Goggles") || bp.name.Contains("Mask"))
+                if (bp.Name.Contains("Goggles") || bp.Name.Contains("Mask"))
                 {
-                    if (!m_Glasses.ContainsKey(bp.AssetGuidThreadSafe))
-                    m_Glasses[bp.AssetGuidThreadSafe] = bp.name;
+                    if (!m_Glasses.ContainsKey(bp.Guid))
+                        m_Glasses[bp.Guid] = bp.Name;
                 }
-                else if (bp.name.Contains("Helmet") || bp.name.Contains("Headband") || bp.name.Contains("Mask"))
+                else if (bp.Name.Contains("Helmet") || bp.Name.Contains("Headband") || bp.Name.Contains("Mask"))
                 {
-                    if (!m_Helm.ContainsKey(bp.AssetGuidThreadSafe))
-                        m_Helm[bp.AssetGuidThreadSafe] = bp.name;
+                    if (!m_Helm.ContainsKey(bp.Guid))
+                        m_Helm[bp.Guid] = bp.Name;
                 }
-                else if (bp.name.Contains("Shirt") || bp.name.Contains("Robe")||bp.name.Contains("Tabard"))
+                else if (bp.Name.Contains("Shirt") || bp.Name.Contains("Robe") || bp.Name.Contains("Tabard"))
                 {
-                    if (!m_Shirt.ContainsKey(bp.AssetGuidThreadSafe))
-                        m_Shirt[bp.AssetGuidThreadSafe] = bp.name;
+                    if (!m_Shirt.ContainsKey(bp.Guid))
+                        m_Shirt[bp.Guid] = bp.Name;
                 }
-                else if (bp.name.Contains("Armor"))
+                else if (bp.Name.Contains("Armor"))
                 {
-                    if (!m_Armor.ContainsKey(bp.AssetGuidThreadSafe))
-                        m_Armor[bp.AssetGuidThreadSafe] = bp.name;
-                    //if (!m_Glasses.ContainsKey(bp.AssetGuidThreadSafe))
-                      //  m_Glasses[bp.AssetGuidThreadSafe] = bp.name;
+                    if (!m_Armor.ContainsKey(bp.Guid))
+                        m_Armor[bp.Guid] = bp.Name;
+                    //if (!m_Glasses.ContainsKey(bp.Guid))
+                    //  m_Glasses[bp.Guid] = bp.Name;
                 }
-                else if (bp.name.Contains("Bracers"))
+                else if (bp.Name.Contains("Bracers"))
                 {
-                    if (!m_Bracers.ContainsKey(bp.AssetGuidThreadSafe))
-                        m_Bracers[bp.AssetGuidThreadSafe] = bp.name;
+                    if (!m_Bracers.ContainsKey(bp.Guid))
+                        m_Bracers[bp.Guid] = bp.Name;
                 }
-                else if (bp.name.Contains("Gloves"))
+                else if (bp.Name.Contains("Gloves"))
                 {
-                    if (!m_Gloves.ContainsKey(bp.AssetGuidThreadSafe))
-                        m_Gloves[bp.AssetGuidThreadSafe] = bp.name;
+                    if (!m_Gloves.ContainsKey(bp.Guid))
+                        m_Gloves[bp.Guid] = bp.Name;
                 }
-                else if (bp.name.Contains("Boots"))
+                else if (bp.Name.Contains("Boots"))
                 {
-                    if (!m_Boots.ContainsKey(bp.AssetGuidThreadSafe))
-                        m_Boots[bp.AssetGuidThreadSafe] = bp.name;
+                    if (!m_Boots.ContainsKey(bp.Guid))
+                        m_Boots[bp.Guid] = bp.Name;
                 }
-                else if(bp.name.Contains("Cape"))
+                else if (bp.Name.Contains("Cape"))
                 {
-                    if (!m_Cloak.ContainsKey(bp.AssetGuidThreadSafe))
-                        m_Cloak[bp.AssetGuidThreadSafe] = bp.name;
+                    if (!m_Cloak.ContainsKey(bp.Guid))
+                        m_Cloak[bp.Guid] = bp.Name;
                 }
-                else if (bp.name.Contains("Warpaint"))
+                else if (bp.Name.Contains("Warpaint"))
                 {
-                    if (!m_Warpaint.ContainsKey(bp.AssetGuidThreadSafe))
-                        m_Warpaint[bp.AssetGuidThreadSafe] = bp.name;
+                    if (!m_Warpaint.ContainsKey(bp.Guid))
+                        m_Warpaint[bp.Guid] = bp.Name;
                 }
-                else if (bp.name.Contains("Scar"))
+                else if (bp.Name.Contains("Scar"))
                 {
-                    if (!m_Scars.ContainsKey(bp.AssetGuidThreadSafe))
-                        m_Scars[bp.AssetGuidThreadSafe] = bp.name;
+                    if (!m_Scars.ContainsKey(bp.Guid))
+                        m_Scars[bp.Guid] = bp.Name;
                 }
             }
-           // ResourcesLibrary.CleanupLoadedCache();
+            // ResourcesLibrary.CleanupLoadedCache();
         }
+
         /* static void BuildEquipmentLookupOld()
           {
           var bp2 = Main.blueprints.OfType<KingmakerEquipmentEntity>().OrderBy(bp => bp.name);
@@ -3028,35 +3046,43 @@ namespace VisualAdjustments
                       if (m_Helm.ContainsKey(bp.EquipmentEntity.AssetGuidThreadSafe)) break;
                       m_Glasses[bp.EquipmentEntity.AssetGuidThreadSafe] = bp.EquipmentEntity.name;
                       break;
+
                   case ItemType.Head:
                       if (m_Helm.ContainsKey(bp.EquipmentEntity.AssetGuidThreadSafe)) break;
                       m_Helm[bp.EquipmentEntity.AssetGuidThreadSafe] = bp.EquipmentEntity.name;
                       break;
+
                   case ItemType.Shirt:
                       if (m_Shirt.ContainsKey(bp.EquipmentEntity.AssetGuidThreadSafe)) break;
                       m_Shirt[bp.EquipmentEntity.AssetGuidThreadSafe] = bp.EquipmentEntity.name;
                       break;
+
                   case ItemType.Armor:
                       if (m_Armor.ContainsKey(bp.EquipmentEntity.AssetGuidThreadSafe)) break;
                       m_Armor[bp.EquipmentEntity.AssetGuidThreadSafe] = bp.EquipmentEntity.name;
                       break;
+
                   case ItemType.Wrist:
                       if (m_Bracers.ContainsKey(bp.EquipmentEntity.AssetGuidThreadSafe)) break;
                       m_Bracers[bp.EquipmentEntity.AssetGuidThreadSafe] = bp.EquipmentEntity.name;
                       break;
+
                   case ItemType.Gloves:
                       if (m_Gloves.ContainsKey(bp.EquipmentEntity.AssetGuidThreadSafe)) break;
                       m_Gloves[bp.EquipmentEntity.AssetGuidThreadSafe] = bp.EquipmentEntity.name;
                       break;
+
                   case ItemType.Feet:
                       if (m_Boots.ContainsKey(bp.EquipmentEntity.AssetGuidThreadSafe)) break;
                       m_Boots[bp.EquipmentEntity.AssetGuidThreadSafe] = bp.EquipmentEntity.name;
                       break;
+
                   default:
                       break;
               }
           }
       }*/
+
         public static void BuildEELookup()
         {
             foreach (var kv in LibraryThing.GetResourceGuidMap())
@@ -3065,8 +3091,8 @@ namespace VisualAdjustments
                 //var go = obj as GameObject;
                 if (obj != null) //&& obj.name.Contains("Wing"))
                 {
-                    Main.logger.Log("-----[\"" + obj.name + "\"] = ResourcesLibrary.TryGetResource<GameObject>(\"" + kv.Key+ "\");");
-                   // m_WingsEE[go.name] = go;
+                    Main.logger.Log("-----[\"" + obj.name + "\"] = ResourcesLibrary.TryGetResource<GameObject>(\"" + kv.Key + "\");");
+                    // m_WingsEE[go.name] = go;
                 }
                 ResourcesLibrary.CleanupLoadedCache();
             }
@@ -3089,17 +3115,19 @@ namespace VisualAdjustments
                 }
             }*/
         }
-        static void BuildMythicLookup()
+
+        private static void BuildMythicLookup()
         {
             ///var weapons = BluePrintThing.GetBlueprints<BlueprintItemEquipmentHand>().OrderBy((bp) => bp.name);
             var weapons = Main.blueprints.Entries.Where(a => a.Type == typeof(BlueprintClassAdditionalVisualSettings)).Select(b => ResourcesLibrary.TryGetBlueprint<BlueprintClassAdditionalVisualSettings>(b.Guid)).OrderBy((bp) => bp.name);
             foreach (var bp in weapons)
             {
-               // Main.logger.Log(bp.name);
-                if(!m_MythicOptions.ContainsKey(bp.AssetGuidThreadSafe)) m_MythicOptions[bp.AssetGuidThreadSafe] = bp.name;
+                // Main.logger.Log(bp.name);
+                if (!m_MythicOptions.ContainsKey(bp.AssetGuidThreadSafe)) m_MythicOptions[bp.AssetGuidThreadSafe] = bp.name;
             }
         }
-        static void BuildWeaponLookup()
+
+        private static void BuildWeaponLookup()
         {
             ///var weapons = BluePrintThing.GetBlueprints<BlueprintItemEquipmentHand>().OrderBy((bp) => bp.name);
             var weapons = (IEnumerable<BlueprintItemEquipmentHand>)Main.blueprints.Entries.Where(a => a.Type == typeof(BlueprintItemWeapon)).Select(b => ResourcesLibrary.TryGetBlueprint<BlueprintItemWeapon>(b.Guid)).OrderBy((bp) => bp.name);
@@ -3110,7 +3138,7 @@ namespace VisualAdjustments
                 var animationStyle = visualParameters.AnimStyle.ToString();
                 if (bp.VisualParameters.Model == null) continue;
                 Dictionary<BlueprintRef, string> eeList = null;
-                if (!m_Weapons.ContainsKey(animationStyle ))
+                if (!m_Weapons.ContainsKey(animationStyle))
                 {
                     eeList = new Dictionary<BlueprintRef, string>();
                     m_Weapons[animationStyle] = eeList;
@@ -3126,7 +3154,8 @@ namespace VisualAdjustments
                 eeList[bp.AssetGuidThreadSafe] = bp.name;
             }
         }
-        static void BuildWeaponEnchantmentLookup()
+
+        private static void BuildWeaponEnchantmentLookup()
         {
             ///var enchantments = BluePrintThing.GetBlueprints<BlueprintWeaponEnchantment>()
             ///
@@ -3134,7 +3163,7 @@ namespace VisualAdjustments
                     .Where(bp => bp.WeaponFxPrefab != null)
                     .OrderBy(bp => bp.WeaponFxPrefab.name);
             HashSet<int> seen = new HashSet<int>();
-            foreach(var enchantment in enchantments)
+            foreach (var enchantment in enchantments)
             {
                 if (seen.Contains(enchantment.WeaponFxPrefab.GetInstanceID())) continue;
                 seen.Add(enchantment.WeaponFxPrefab.GetInstanceID());
@@ -3143,7 +3172,8 @@ namespace VisualAdjustments
                 m_WeaponEnchantments[enchantment.AssetGuidThreadSafe] = name;
             }
         }
-        static void BuildViewLookup()
+
+        private static void BuildViewLookup()
         {
             string getViewName(BlueprintUnit bp)
             {
@@ -3157,12 +3187,13 @@ namespace VisualAdjustments
             foreach (var bp in units)
             {
                 if (bp.Prefab.AssetId == "") continue;
-                if (!LibraryThing.GetResourceGuidMap().ContainsKey(bp.Prefab.AssetId)) continue;             
+                if (!LibraryThing.GetResourceGuidMap().ContainsKey(bp.Prefab.AssetId)) continue;
                 if (m_Units.ContainsKey(bp.Prefab.AssetId)) continue;
                 m_Units[bp.Prefab.AssetId] = getViewName(bp);
             }
         }
-        static void Init()
+
+        private static void Init()
         {
             BuildEquipmentLookup();
             BuildWeaponLookup();

@@ -1,34 +1,24 @@
-﻿using UnityEngine;
-using UnityEditor;
-
-using System.Collections;
-
-namespace imColorPicker
+﻿namespace imColorPicker
 {
+    public class IMColorPickerEditor
+    {
+        /* [MenuItem("Assets/Create/IMColorPreset")]
+         public static void CreateAsset()
+         {
+             CreateAsset<IMColorPreset>();
+         }
 
-    public class IMColorPickerEditor {
+         static void CreateAsset<Type>() where Type : ScriptableObject
+         {
+             Type item = ScriptableObject.CreateInstance<Type>();
 
-       /* [MenuItem("Assets/Create/IMColorPreset")]
-        public static void CreateAsset()
-        {
-            CreateAsset<IMColorPreset>();
-        }
+             string path = AssetDatabase.GenerateUniqueAssetPath("Assets/IMColorPicker/" + typeof(Type) + ".asset");
 
-        static void CreateAsset<Type>() where Type : ScriptableObject
-        {
-            Type item = ScriptableObject.CreateInstance<Type>();
+             AssetDatabase.CreateAsset(item, path);
+             AssetDatabase.SaveAssets();
 
-            string path = AssetDatabase.GenerateUniqueAssetPath("Assets/IMColorPicker/" + typeof(Type) + ".asset");
-
-            AssetDatabase.CreateAsset(item, path);
-            AssetDatabase.SaveAssets();
-
-            EditorUtility.FocusProjectWindow();
-            Selection.activeObject = item;
-        }*/
-
+             EditorUtility.FocusProjectWindow();
+             Selection.activeObject = item;
+         }*/
     }
-
 }
-
-

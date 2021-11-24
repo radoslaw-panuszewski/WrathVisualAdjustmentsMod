@@ -9,10 +9,12 @@ namespace TutorialCanvas
 #if (DEBUG)
     [EnableReloading]
 #endif
+
     internal static class Main
     {
-       // public static LocalizationManager<DefaultLanguage> Local;
+        // public static LocalizationManager<DefaultLanguage> Local;
         public static ModManager<Core, Settings> Mod;
+
         public static MenuManager Menu;
 
         public static bool Load(UnityModManager.ModEntry modEntry)
@@ -38,6 +40,7 @@ namespace TutorialCanvas
 #else
             return true;
         }
+
 #endif
 
         public static bool OnToggle(UnityModManager.ModEntry modEntry, bool value)

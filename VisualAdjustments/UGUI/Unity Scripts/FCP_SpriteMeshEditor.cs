@@ -2,22 +2,28 @@ using UnityEngine;
 using UnityEngine.UI;
 
 [ExecuteInEditMode]
-public class FCP_SpriteMeshEditor : MonoBehaviour {
-
+public class FCP_SpriteMeshEditor : MonoBehaviour
+{
     public int x, y;
     public MeshType meshType;
-    public enum MeshType {
+
+    public enum MeshType
+    {
         CenterPoint, forward, backward
     }
+
     public Sprite sprite;
     private int bufferedHash;
 
-    void Update() {
+    private void Update()
+    {
         int hash = GetSettingHash();
-        if(hash != 0 && hash != bufferedHash) {
+        if (hash != 0 && hash != bufferedHash)
+        {
             MakeMesh(sprite, x, y, meshType);
             Image im = GetComponent<Image>();
-            if(im) {
+            if (im)
+            {
                 im.useSpriteMesh = false;
                 im.useSpriteMesh = true;
             }
@@ -25,13 +31,15 @@ public class FCP_SpriteMeshEditor : MonoBehaviour {
         }
     }
 
-    private int GetSettingHash() {
-        if(sprite == null || x <= 0 || y <= 0)
+    private int GetSettingHash()
+    {
+        if (sprite == null || x <= 0 || y <= 0)
             return 0;
         return sprite.GetHashCode() * (x ^ 136) * (y ^ 1342) * ((int)(meshType + 1) ^ 99999);
     }
 
-    private void MakeMesh(Sprite sprite, int x, int y, MeshType meshtype) {
+    private void MakeMesh(Sprite sprite, int x, int y, MeshType meshtype)
+    {
         Vector2[] verts;
         ushort[] faces;
         bool centerPoints = meshType == MeshType.CenterPoint;
@@ -40,37 +48,44 @@ public class FCP_SpriteMeshEditor : MonoBehaviour {
         int py = y + 1;
         int t = px * py;
 
-        if(centerPoints) {
-
+        if (centerPoints)
+        {
             verts = new Vector2[t + (x * y)];
             faces = new ushort[x * y * 12];
         }
-        else {
+        else
+        {
             verts = new Vector2[t];
             faces = new ushort[x * y * 6];
         }
 
         //cardinal vertices
-        for(int i = 0; i < px; i++) {
+        for (int i = 0; i < px; i++)
+        {
             float xi = (float)i / x;
-            for(int j = 0; j < py; j++) {
+            for (int j = 0; j < py; j++)
+            {
                 float yi = (float)j / y;
                 verts[px * j + i] = new Vector2(xi, yi);
             }
         }
 
-
-        if(centerPoints) {
+        if (centerPoints)
+        {
             //center points vertices
-            for(int i = 0; i < x; i++) {
+            for (int i = 0; i < x; i++)
+            {
                 float xi = (i + .5f) / x;
-                for(int j = 0; j < y; j++) {
+                for (int j = 0; j < y; j++)
+                {
                     float yi = (j + .5f) / y;
                     verts[j * x + i + t] = new Vector2(xi, yi);
                 }
             }
-            for(int i = 0; i < x; i++) {
-                for(int j = 0; j < y; j++) {
+            for (int i = 0; i < x; i++)
+            {
+                for (int j = 0; j < y; j++)
+                {
                     int f = 12 * (j * x + i);
                     int s = (j * px + i);
                     ushort ns = (ushort)(j * x + i + t);
@@ -82,10 +97,14 @@ public class FCP_SpriteMeshEditor : MonoBehaviour {
                 }
             }
         }
-        else {
-            if(meshtype == MeshType.forward) {
-                for(int i = 0; i < x; i++) {
-                    for(int j = 0; j < y; j++) {
+        else
+        {
+            if (meshtype == MeshType.forward)
+            {
+                for (int i = 0; i < x; i++)
+                {
+                    for (int j = 0; j < y; j++)
+                    {
                         int f = 6 * (j * x + i);
                         int s = (j * px + i);
                         faces[f + 5] = faces[f + 1] = (ushort)s;
@@ -95,9 +114,12 @@ public class FCP_SpriteMeshEditor : MonoBehaviour {
                     }
                 }
             }
-            else if(meshType == MeshType.backward) {
-                for(int i = 0; i < x; i++) {
-                    for(int j = 0; j < y; j++) {
+            else if (meshType == MeshType.backward)
+            {
+                for (int i = 0; i < x; i++)
+                {
+                    for (int j = 0; j < y; j++)
+                    {
                         int f = 6 * (j * x + i);
                         int s = (j * px + i);
                         faces[f] = (ushort)s;

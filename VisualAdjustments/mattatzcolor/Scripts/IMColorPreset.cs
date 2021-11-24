@@ -1,13 +1,10 @@
-﻿using UnityEngine;
-
-using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
+using UnityEngine;
 
 namespace imColorPicker
 {
-
-    public class IMColorPreset : ScriptableObject {
-
+    public class IMColorPreset : ScriptableObject
+    {
         public List<Color> Colors
         {
             get
@@ -16,7 +13,7 @@ namespace imColorPicker
             }
         }
 
-        [SerializeField] List<Color> colors;
+        [SerializeField] private List<Color> colors;
 
         public void Save(Color color)
         {
@@ -27,8 +24,5 @@ namespace imColorPicker
         {
             colors.RemoveAt(index);
         }
-
     }
-
 }
-

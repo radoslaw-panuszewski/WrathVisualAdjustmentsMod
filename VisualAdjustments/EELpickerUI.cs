@@ -1,23 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using JetBrains.Annotations;
-using Kingmaker;
-using Kingmaker.Blueprints;
-using Kingmaker.Cheats;
+﻿using Kingmaker.Blueprints;
 using Kingmaker.EntitySystem.Entities;
-using Kingmaker.Globalmap.View;
 using Kingmaker.ResourceLinks;
-using Kingmaker.UnitLogic.Class.LevelUp;
-using Kingmaker.UnitLogic.Parts;
 using Kingmaker.Utility;
 using Kingmaker.Visual.CharacterSystem;
-using ModKit.Utility;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
-using UnityEngine.SceneManagement;
-using UnityModManagerNet;
 
 namespace VisualAdjustments
 {
@@ -28,6 +17,7 @@ namespace VisualAdjustments
             return source?.IndexOf(toCheck, comp) >= 0;
         }
     }
+
     public class EELpickerUI
     {
         public static EquipmentEntity selectedEntity = null;
@@ -44,6 +34,7 @@ namespace VisualAdjustments
             else if (ee.name.Contains("_F_")) return "Female";
             else return "N/A";
         }
+
         public static string getRace(EquipmentEntity ee)
         {
             if (ee.name.Contains("_HM")) return "Human";
@@ -62,14 +53,17 @@ namespace VisualAdjustments
             if (ee.name.Contains("_HO")) return "Half-Orc";
             return "N/A";
         }
-        static void ChooseRamp(UnitEntityData unitEntityData, string label, List<Texture2D> textures, int currentRamp, Action<int> setter)
+
+        private static void ChooseRamp(UnitEntityData unitEntityData, string label, List<Texture2D> textures, int currentRamp, Action<int> setter)
         {
-            Main.ChooseFromListforee(label, textures, ref currentRamp, () => {
+            Main.ChooseFromListforee(label, textures, ref currentRamp, () =>
+            {
                 setter(currentRamp);
                 //CharacterManager.RebuildCharacter(unitEntityData);
             });
         }
-        public static string getRampIndex(bool primorsec, EquipmentEntity ee,UnitEntityData data)
+
+        public static string getRampIndex(bool primorsec, EquipmentEntity ee, UnitEntityData data)
         {
             if (primorsec)
             {
@@ -95,46 +89,49 @@ namespace VisualAdjustments
                 }
             }
         }
+
         public static void OnGUI(UnitEntityData data)
         {
             try
             {
                 void removeFromRemoveEEPart(EquipmentEntity ee)
                 {
-                    var component = data.Parts.Get<UnitPartVAEELs>();
-                    if (component == null)
-                    {
-                        component = data.Parts.Add<UnitPartVAEELs>();
-                    }
+                    var VisualInfo = VisualAdjustments.GlobalVisualInfo.Instance.ForCharacter(data);
+                    var component = VisualInfo.EEPart;
+                    /* if (component == null)
+                     {
+                         component = data.Parts.Add<UnitPartVAEELs>();
+                     }*/
 
                     if (component.EEToRemove.Contains(EquipmentResourcesManager.AllEEL[ee.name]))
                     {
                         component.EEToRemove.Remove(EquipmentResourcesManager.AllEEL[ee.name]);
                     }
-                    
                 }
                 void addToRemoveEEPart(EquipmentEntity ee)
                 {
-                    var component = data.Parts.Get<UnitPartVAEELs>();
-                    if (component == null)
-                    {
-                        component = data.Parts.Add<UnitPartVAEELs>();
-                    }
-
+                    /* var component = data.Parts.Get<UnitPartVAEELs>();
+                     if (component == null)
+                     {
+                         component = data.Parts.Add<UnitPartVAEELs>();
+                     }*/
+                    var VisualInfo = VisualAdjustments.GlobalVisualInfo.Instance.ForCharacter(data);
+                    var component = VisualInfo.EEPart;
                     if (!component.EEToRemove.Contains(EquipmentResourcesManager.AllEEL[ee.name]))
                     {
                         component.EEToRemove.Add(EquipmentResourcesManager.AllEEL[ee.name]);
                     }
                 }
-                void addToAddEEPart(EquipmentEntity ee,int primary ,int secondary)
+                void addToAddEEPart(EquipmentEntity ee, int primary, int secondary)
                 {
-                    var component = data.Parts.Get<UnitPartVAEELs>();
+                    /*var component = data.Parts.Get<UnitPartVAEELs>();
                     if (component == null)
                     {
                         component = data.Parts.Add<UnitPartVAEELs>();
-                    }
-
-                    if (!component.EEToAdd.Contains( a => a.AssetID == EquipmentResourcesManager.AllEEL[ee.name]))
+                    }*/
+                    var VisualInfo = VisualAdjustments.GlobalVisualInfo.Instance.ForCharacter(data);
+                    var component = VisualInfo.EEPart;
+                    if (!component.EEToAdd.Contains(a => a.AssetID == EquipmentResourcesManager.AllEEL[ee.name]))
                     {
                         component.EEToAdd.Add(new EEStorage(EquipmentResourcesManager.AllEEL[ee.name], primary,
                             secondary));
@@ -143,25 +140,27 @@ namespace VisualAdjustments
                 }
                 void removeFromAddEEpart(EquipmentEntity ee)
                 {
-                    var component = data.Parts.Get<UnitPartVAEELs>();
+                    /*var component = data.Parts.Get<UnitPartVAEELs>();
                     if (component == null)
                     {
                         component = data.Parts.Add<UnitPartVAEELs>();
-                    }
-
+                    }*/
+                    var VisualInfo = VisualAdjustments.GlobalVisualInfo.Instance.ForCharacter(data);
+                    var component = VisualInfo.EEPart;
                     if (component.EEToAdd.Contains(a => a.AssetID == EquipmentResourcesManager.AllEEL[ee.name]))
                     {
                         component.EEToAdd.Remove(a => a.AssetID == EquipmentResourcesManager.AllEEL[ee.name]);
                     }
                 }
-                void setColorAddEEPart(EquipmentEntity ee,int primaryIndex, int secondaryIndex)
+                void setColorAddEEPart(EquipmentEntity ee, int primaryIndex, int secondaryIndex)
                 {
-                    var component = data.Parts.Get<UnitPartVAEELs>();
-                    if (component == null)
+                    //var component = data.Parts.Get<UnitPartVAEELs>();
+                    /*if (component == null)
                     {
                         component = data.Parts.Add<UnitPartVAEELs>();
-                    }
-
+                    }*/
+                    var VisualInfo = VisualAdjustments.GlobalVisualInfo.Instance.ForCharacter(data);
+                    var component = VisualInfo.EEPart;
                     if (component.EEToAdd.Contains(a => a.AssetID == EquipmentResourcesManager.AllEEL[ee.name]))
                     {
                         var eewithcolor = component.EEToAdd.First(a => a.AssetID == EquipmentResourcesManager.AllEEL[ee.name]);
@@ -170,69 +169,67 @@ namespace VisualAdjustments
                     }
                     else
                     {
-                       // Main.logger.Log("coloradd" + ee.name + EquipmentResourcesManager.AllEEL[ee.name]);
+                        // Main.logger.Log("coloradd" + ee.name + EquipmentResourcesManager.AllEEL[ee.name]);
                         component.EEToAdd.Add(new EEStorage(EquipmentResourcesManager.AllEEL[ee.name], primaryIndex, secondaryIndex));
                     }
-                    
                 }
                 if (!Main.enabled) return;
-             
-            GUILayout.Space(50f);
-            
-            //EEL selection
-            //Main.logger.Log(scroll1.ToString());
 
-            double rangestart = 0;
-            if (scroll1.y != 0)
-            {
-                if (scroll1.y > 30)
-                {
-                    rangestart = (scroll1.y-30);
-                }
-                else
-                {
-                    rangestart = (scroll1.y);
-                }
-            }
+                GUILayout.Space(50f);
 
-            if (list1 == null)
-            {
-                list1 = EquipmentResourcesManager.AllEEL.Keys.ToList();
-            }
+                //EEL selection
+                //Main.logger.Log(scroll1.ToString());
 
-            if (list2 == null)
-            {
-                list2 = data.View.CharacterAvatar.EquipmentEntities.Select(a => a.name).ToList();
-            }
-            var rangeCount = 30;
-            if (rangestart+30 > list1.Count) rangeCount = list1.Count - (int)rangestart;
-            GUILayout.BeginHorizontal(GUILayout.ExpandWidth(false));
-            scroll1.y =  GUILayout.VerticalScrollbar(scroll1.y, (int)(list1.Count * 0.05),0,(int)(list1.Count + (list1.Count * 0.05)),new GUILayoutOption[]{GUILayout.Height(400f*Main.UIscale),GUILayout.Width(30f*Main.UIscale)});
-            GUILayout.BeginVertical(GUILayout.Width(380f));
-            string txt1 = GUILayout.TextField(filter, GUILayout.Width(280f * Main.UIscale));
-            GUILayout.BeginScrollView(scroll1, horizontalScrollbar: GUIStyle.none, verticalScrollbar: GUIStyle.none, new GUILayoutOption[] { GUILayout.Height(400f * Main.UIscale), GUILayout.Width(380f * Main.UIscale) });
-            rangeCount = Math.Min(rangeCount,list1.Count);
-            rangestart = Math.Max(rangestart, 0);
-            //Main.logger.Log("rangecount "+ rangeCount + "rangestart " + rangestart + "list1count " + list1.Count);
-            foreach (var VARIABLE in list1.GetRange((int)rangestart, rangeCount))
-            {
+                double rangestart = 0;
+                if (scroll1.y != 0)
                 {
-                    if (GUILayout.Button(VARIABLE /*+ "   " + list1.IndexOf(VARIABLE)*/, GUILayout.Width(280f * Main.UIscale)))
+                    if (scroll1.y > 30)
                     {
-                        selectedEntity =
-                            ResourcesLibrary.TryGetResource<EquipmentEntity>(
-                                EquipmentResourcesManager.AllEEL[VARIABLE]);
+                        rangestart = (scroll1.y - 30);
                     }
-
+                    else
+                    {
+                        rangestart = (scroll1.y);
+                    }
                 }
-            }
-            GUILayout.EndScrollView();
-            GUILayout.EndVertical();
-            if (list1 == null || txt1 != filter)
-            {
-                list1 = EquipmentResourcesManager.AllEEL.Keys.Where(a => a.Contains(txt1, StringComparison.OrdinalIgnoreCase)).ToList();
-                filter = txt1;
-            }
+
+                if (list1 == null)
+                {
+                    list1 = EquipmentResourcesManager.AllEEL.Keys.ToList();
+                }
+
+                if (list2 == null)
+                {
+                    list2 = data.View.CharacterAvatar.EquipmentEntities.Select(a => a.name).ToList();
+                }
+                var rangeCount = 30;
+                if (rangestart + 30 > list1.Count) rangeCount = list1.Count - (int)rangestart;
+                GUILayout.BeginHorizontal(GUILayout.ExpandWidth(false));
+                scroll1.y = GUILayout.VerticalScrollbar(scroll1.y, (int)(list1.Count * 0.05), 0, (int)(list1.Count + (list1.Count * 0.05)), new GUILayoutOption[] { GUILayout.Height(400f * Main.UIscale), GUILayout.Width(30f * Main.UIscale) });
+                GUILayout.BeginVertical(GUILayout.Width(380f));
+                string txt1 = GUILayout.TextField(filter, GUILayout.Width(280f * Main.UIscale));
+                GUILayout.BeginScrollView(scroll1, horizontalScrollbar: GUIStyle.none, verticalScrollbar: GUIStyle.none, new GUILayoutOption[] { GUILayout.Height(400f * Main.UIscale), GUILayout.Width(380f * Main.UIscale) });
+                rangeCount = Math.Min(rangeCount, list1.Count);
+                rangestart = Math.Max(rangestart, 0);
+                //Main.logger.Log("rangecount "+ rangeCount + "rangestart " + rangestart + "list1count " + list1.Count);
+                foreach (var VARIABLE in list1.GetRange((int)rangestart, rangeCount))
+                {
+                    {
+                        if (GUILayout.Button(VARIABLE /*+ "   " + list1.IndexOf(VARIABLE)*/, GUILayout.Width(280f * Main.UIscale)))
+                        {
+                            selectedEntity =
+                                ResourcesLibrary.TryGetResource<EquipmentEntity>(
+                                    EquipmentResourcesManager.AllEEL[VARIABLE]);
+                        }
+                    }
+                }
+                GUILayout.EndScrollView();
+                GUILayout.EndVertical();
+                if (list1 == null || txt1 != filter)
+                {
+                    list1 = EquipmentResourcesManager.AllEEL.Keys.Where(a => a.Contains(txt1, StringComparison.OrdinalIgnoreCase)).ToList();
+                    filter = txt1;
+                }
 
                 // labels
                 //GUILayout.BeginHorizontal(GUILayout.ExpandWidth(false));
@@ -256,30 +253,30 @@ namespace VisualAdjustments
                     GUILayout.Label("Null", GUILayout.ExpandWidth(false));
                     GUILayout.Label("Null", GUILayout.ExpandWidth(false));
                     GUILayout.Label("Null", GUILayout.ExpandWidth(false));
-                  //  GUILayout.EndVertical();
+                    //  GUILayout.EndVertical();
                 }
 
                 //GUILayout.Space(5f);
                 // values
                 //GUILayout.BeginHorizontal(GUILayout.ExpandWidth(false));
-            //GUILayout.BeginVertical(GUILayout.Width(260f * Main.UIscale));
-            /*if (selectedEntity == null)
-            {
-                GUILayout.Label("Null", GUILayout.ExpandWidth(false));
-                GUILayout.Label("Null", GUILayout.ExpandWidth(false));
-                GUILayout.Label("Null", GUILayout.ExpandWidth(false));
-                GUILayout.Label("Null", GUILayout.ExpandWidth(false));
-                GUILayout.Label("Null", GUILayout.ExpandWidth(false));
-            }
-            else
-            {
-                GUILayout.Label(selectedEntity.name, GUILayout.ExpandWidth(false));
-                GUILayout.Label(getGender(selectedEntity), GUILayout.ExpandWidth(false));
-                GUILayout.Label(getRace(selectedEntity), GUILayout.ExpandWidth(false));
-                GUILayout.Label(getRampIndex(true,selectedEntity,data), GUILayout.ExpandWidth(false));
-                GUILayout.Label(getRampIndex(false, selectedEntity, data), GUILayout.ExpandWidth(false));
-            }*/
-            if (selectedEntity != null)
+                //GUILayout.BeginVertical(GUILayout.Width(260f * Main.UIscale));
+                /*if (selectedEntity == null)
+                {
+                    GUILayout.Label("Null", GUILayout.ExpandWidth(false));
+                    GUILayout.Label("Null", GUILayout.ExpandWidth(false));
+                    GUILayout.Label("Null", GUILayout.ExpandWidth(false));
+                    GUILayout.Label("Null", GUILayout.ExpandWidth(false));
+                    GUILayout.Label("Null", GUILayout.ExpandWidth(false));
+                }
+                else
+                {
+                    GUILayout.Label(selectedEntity.name, GUILayout.ExpandWidth(false));
+                    GUILayout.Label(getGender(selectedEntity), GUILayout.ExpandWidth(false));
+                    GUILayout.Label(getRace(selectedEntity), GUILayout.ExpandWidth(false));
+                    GUILayout.Label(getRampIndex(true,selectedEntity,data), GUILayout.ExpandWidth(false));
+                    GUILayout.Label(getRampIndex(false, selectedEntity, data), GUILayout.ExpandWidth(false));
+                }*/
+                if (selectedEntity != null)
                 {
                     if (data.View.CharacterAvatar.EquipmentEntities.Contains(selectedEntity))
                     {
@@ -340,40 +337,40 @@ namespace VisualAdjustments
                     }
                 }
                 GUILayout.EndVertical();
-            GUILayout.EndHorizontal();
-
-
+                GUILayout.EndHorizontal();
 
                 //GUILayout.Button("")
                 //current eels
                 GUILayout.BeginVertical();
                 string txt2 = GUILayout.TextField(filter2, GUILayout.Width(280f * Main.UIscale));
                 scroll2 = GUILayout.BeginScrollView(scroll2, new GUILayoutOption[] { GUILayout.Height(400f * Main.UIscale), GUILayout.Width(380f * Main.UIscale) });
-            foreach (var VARIABLE in list2)
-            {
-                   if (GUILayout.Button(VARIABLE, GUILayout.Width(280f * Main.UIscale)))
-                   {
-                    selectedEntity =
-                        ResourcesLibrary.TryGetResource<EquipmentEntity>(
-                            EquipmentResourcesManager.AllEEL[VARIABLE]);
-                   }
-            }
-            GUILayout.EndScrollView();
-            if (GUILayout.Button("Reset",GUILayout.Width(280f)))
-            {
-                var part = data.Parts.Get<UnitPartVAEELs>();
-                part.EEToAdd.Clear();
-                part.EEToRemove.Clear();
-                CharacterManager.RebuildCharacter(data);
-                //greytest
-                CharacterManager.UpdateModel(data.View);
+                foreach (var VARIABLE in list2)
+                {
+                    if (GUILayout.Button(VARIABLE, GUILayout.Width(280f * Main.UIscale)))
+                    {
+                        selectedEntity =
+                            ResourcesLibrary.TryGetResource<EquipmentEntity>(
+                                EquipmentResourcesManager.AllEEL[VARIABLE]);
+                    }
                 }
-            GUILayout.EndVertical();
-            if (list2 == null || txt2 != filter2)
-            {
-                list2 = data.View.CharacterAvatar.EquipmentEntities.Where(a => a.name.Contains(txt2, StringComparison.OrdinalIgnoreCase)).Select(a => a.name).ToList();
-                filter2 = txt2;
-            }
+                GUILayout.EndScrollView();
+                if (GUILayout.Button("Reset", GUILayout.Width(280f)))
+                {
+                    //var part = data.Parts.Get<UnitPartVAEELs>();
+                    var VisualInfo = VisualAdjustments.GlobalVisualInfo.Instance.ForCharacter(data);
+                    var part = VisualInfo.EEPart;
+                    part.EEToAdd.Clear();
+                    part.EEToRemove.Clear();
+                    CharacterManager.RebuildCharacter(data);
+                    //greytest
+                    CharacterManager.UpdateModel(data.View);
+                }
+                GUILayout.EndVertical();
+                if (list2 == null || txt2 != filter2)
+                {
+                    list2 = data.View.CharacterAvatar.EquipmentEntities.Where(a => a.name.Contains(txt2, StringComparison.OrdinalIgnoreCase)).Select(a => a.name).ToList();
+                    filter2 = txt2;
+                }
                 // GUILayout.EndHorizontal();
                 // GUILayout.EndHorizontal();
                 GUILayout.EndHorizontal();

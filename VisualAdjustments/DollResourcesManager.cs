@@ -1,26 +1,23 @@
-﻿using HarmonyLib;
-using Kingmaker.Blueprints;
+﻿using Kingmaker.Blueprints;
 using Kingmaker.Blueprints.CharGen;
 using Kingmaker.Blueprints.Classes;
 using Kingmaker.Blueprints.Root;
-using Kingmaker.Cheats;
 using Kingmaker.EntitySystem.Entities;
 using Kingmaker.ResourceLinks;
 using Kingmaker.UnitLogic;
 using Kingmaker.UnitLogic.Class.LevelUp;
 using Kingmaker.UnitLogic.Parts;
+using Kingmaker.Utility;
+using Kingmaker.Visual.CharacterSystem;
 using Kingmaker.Visual.Sound;
 using System.Collections.Generic;
 using System.Linq;
-using Kingmaker.Visual.CharacterSystem;
-using Kingmaker.Utility;
 
 namespace VisualAdjustments
 {
-
-    static class dollstateextension
+    internal static class dollstateextension
     {
-        public static void SetupFromUnitLocal(this DollState state ,UnitEntityData unit, SpecialDollType specialDollType = SpecialDollType.None)
+        public static void SetupFromUnitLocal(this DollState state, UnitEntityData unit, SpecialDollType specialDollType = SpecialDollType.None)
         {
             DollData dollData;
             if (specialDollType == SpecialDollType.None)
@@ -93,7 +90,7 @@ namespace VisualAdjustments
                         var NewEEAdapter = new DollState.EEAdapter(ee);
                         NewEEAdapter.m_Link = state.Warpaints.FirstOrDefault((EquipmentEntityLink link2) => link2.Load(false) == ee);
                         state.Warpaint = NewEEAdapter;
-                       // state.Warpaint = new DollState.EEAdapter(ee);
+                        // state.Warpaint = new DollState.EEAdapter(ee);
                     }
                 }
             }
@@ -137,21 +134,23 @@ namespace VisualAdjustments
             state.Updated();
         }
     }
-    class DollResourcesManager
+
+    internal class DollResourcesManager
     {
-        static private SortedList<string, EquipmentEntityLink> head = new SortedList<string, EquipmentEntityLink>();
-        static public SortedList<string, EquipmentEntityLink> hair = new SortedList<string, EquipmentEntityLink>();
-        static private SortedList<string, EquipmentEntityLink> beard = new SortedList<string, EquipmentEntityLink>();
-        static private SortedList<string, EquipmentEntityLink> eyebrows = new SortedList<string, EquipmentEntityLink>();
-        static private SortedList<string, EquipmentEntityLink> skin = new SortedList<string, EquipmentEntityLink>();
-        static private SortedList<string, EquipmentEntityLink> tails = new SortedList<string, EquipmentEntityLink>();
-        static private SortedList<string, EquipmentEntityLink> horns = new SortedList<string, EquipmentEntityLink>();
-        static private SortedList<string, EquipmentEntityLink> classOutfits = new SortedList<string, EquipmentEntityLink>();
-        static private SortedList<string, BlueprintPortrait> portraits = new SortedList<string, BlueprintPortrait>();
-        static private SortedList<string, BlueprintUnitAsksList> asks = new SortedList<string, BlueprintUnitAsksList>();
-        static private Dictionary<string, DollState> characterDolls = new Dictionary<string, DollState>();
-        static private List<string> customPortraits = new List<string>();
-        static public List<string> CustomPortraits
+        private static SortedList<string, EquipmentEntityLink> head = new SortedList<string, EquipmentEntityLink>();
+        public static SortedList<string, EquipmentEntityLink> hair = new SortedList<string, EquipmentEntityLink>();
+        private static SortedList<string, EquipmentEntityLink> beard = new SortedList<string, EquipmentEntityLink>();
+        private static SortedList<string, EquipmentEntityLink> eyebrows = new SortedList<string, EquipmentEntityLink>();
+        private static SortedList<string, EquipmentEntityLink> skin = new SortedList<string, EquipmentEntityLink>();
+        private static SortedList<string, EquipmentEntityLink> tails = new SortedList<string, EquipmentEntityLink>();
+        private static SortedList<string, EquipmentEntityLink> horns = new SortedList<string, EquipmentEntityLink>();
+        private static SortedList<string, EquipmentEntityLink> classOutfits = new SortedList<string, EquipmentEntityLink>();
+        private static SortedList<string, BlueprintPortrait> portraits = new SortedList<string, BlueprintPortrait>();
+        private static SortedList<string, BlueprintUnitAsksList> asks = new SortedList<string, BlueprintUnitAsksList>();
+        private static Dictionary<string, DollState> characterDolls = new Dictionary<string, DollState>();
+        private static List<string> customPortraits = new List<string>();
+
+        public static List<string> CustomPortraits
         {
             get
             {
@@ -159,7 +158,8 @@ namespace VisualAdjustments
                 return customPortraits;
             }
         }
-        static public SortedList<string, BlueprintPortrait> Portrait
+
+        public static SortedList<string, BlueprintPortrait> Portrait
         {
             get
             {
@@ -167,15 +167,17 @@ namespace VisualAdjustments
                 return portraits;
             }
         }
-        static public SortedList<string, BlueprintUnitAsksList> Asks
+
+        public static SortedList<string, BlueprintUnitAsksList> Asks
         {
             get
             {
-                if(!loaded) Init();
+                if (!loaded) Init();
                 return asks;
             }
         }
-        static public SortedList<string, EquipmentEntityLink> ClassOutfits
+
+        public static SortedList<string, EquipmentEntityLink> ClassOutfits
         {
             get
             {
@@ -183,20 +185,24 @@ namespace VisualAdjustments
                 return classOutfits;
             }
         }
-        static private bool loaded = false;
-        static private void AddLinks(SortedList<string, EquipmentEntityLink> dict, EquipmentEntityLink[] links)
+
+        private static bool loaded = false;
+
+        private static void AddLinks(SortedList<string, EquipmentEntityLink> dict, EquipmentEntityLink[] links)
         {
             foreach (var eel in links)
             {
                 dict[eel.AssetId] = eel;
             }
         }
+
         public static List<BlueprintRaceVisualPreset> racePresets;
-        public static List<BlueprintCharacterClass> classes 
-        { 
+
+        public static List<BlueprintCharacterClass> classes
+        {
             get
             {
-                if(m_classes == null) m_classes = Main.blueprints.Entries.Where(a => a.Type == typeof(BlueprintCharacterClass)).Select(b => ResourcesLibrary.TryGetBlueprint<BlueprintCharacterClass>(b.Guid)).ToList();
+                if (m_classes == null) m_classes = Main.blueprints.Entries.Where(a => a.Type == typeof(BlueprintCharacterClass)).Select(b => ResourcesLibrary.TryGetBlueprint<BlueprintCharacterClass>(b.Guid)).ToList();
                 return m_classes;
             }
             set
@@ -204,8 +210,10 @@ namespace VisualAdjustments
                 m_classes = value;
             }
         }
+
         public static List<BlueprintCharacterClass> m_classes;
-        static private void Init()
+
+        private static void Init()
         {
             var races = Main.blueprints.Entries.Where(a => a.Type == typeof(BlueprintRace)).Select(b => ResourcesLibrary.TryGetBlueprint<BlueprintRace>(b.Guid));
             racePresets = Main.blueprints.Entries.Where(a => a.Type == typeof(BlueprintRaceVisualPreset)).Select(b => ResourcesLibrary.TryGetBlueprint<BlueprintRaceVisualPreset>(b.Guid)).ToList();
@@ -246,7 +254,7 @@ namespace VisualAdjustments
                 }
             }
             ///foreach(var bp in BluePrintThing.GetBlueprints<BlueprintPortrait>())
-            foreach(var bp in Main.blueprints.Entries.Where(a => a.Type == typeof(BlueprintPortrait)).Select(a => ResourcesLibrary.TryGetBlueprint<BlueprintPortrait>(a.Guid)))
+            foreach (var bp in Main.blueprints.Entries.Where(a => a.Type == typeof(BlueprintPortrait)).Select(a => ResourcesLibrary.TryGetBlueprint<BlueprintPortrait>(a.Guid)))
             {
                 //Note there are two wolf portraits
                 if (bp == BlueprintRoot.Instance.CharGen.CustomPortrait || bp.Data.IsCustom)
@@ -257,7 +265,7 @@ namespace VisualAdjustments
             }
             customPortraits.AddRange(CustomPortraitsManager.Instance.GetExistingCustomPortraitIds());
             ///foreach (var bp in BluePrintThing.GetBlueprints<BlueprintUnitAsksList>())
-            foreach(var bp in Main.blueprints.Entries.Where(a => a.Type == typeof(BlueprintUnitAsksList)).Select(a => ResourcesLibrary.TryGetBlueprint<BlueprintUnitAsksList>(a.Guid)))
+            foreach (var bp in Main.blueprints.Entries.Where(a => a.Type == typeof(BlueprintUnitAsksList)).Select(a => ResourcesLibrary.TryGetBlueprint<BlueprintUnitAsksList>(a.Guid)))
             {
                 var component = bp.GetComponent<UnitAsksComponent>();
                 if (component == null) continue;
@@ -266,7 +274,8 @@ namespace VisualAdjustments
             }
             loaded = true;
         }
-        static public DollState GetDoll(UnitEntityData unitEntityData)
+
+        public static DollState GetDoll(UnitEntityData unitEntityData)
         {
             if (!loaded) Init();
             if (unitEntityData.Parts.Get<UnitPartDollData>() == null) return null;
@@ -278,7 +287,8 @@ namespace VisualAdjustments
             }
             return characterDolls[unitEntityData.CharacterName];
         }
-        static public string GetType(string assetID)
+
+        public static string GetType(string assetID)
         {
             if (!loaded) Init();
             if (head.ContainsKey(assetID)) return "Head";
@@ -291,7 +301,8 @@ namespace VisualAdjustments
             if (classOutfits.ContainsKey(assetID)) return "ClassOutfit";
             return "Unknown";
         }
-        static public DollState CreateDollState(UnitEntityData unitEntityData)
+
+        public static DollState CreateDollState(UnitEntityData unitEntityData)
         {
             var asd = DollResourcesManager.racePresets.FirstOrDefault(a => a.RaceId == unitEntityData.Progression.Race.RaceId);
             //var asd = Main.blueprints.OfType<BlueprintRaceVisualPreset>().ToArray().FirstOrDefault(a => a.RaceId == unitEntityData.Progression.Race.RaceId);
@@ -302,7 +313,7 @@ namespace VisualAdjustments
             dollState.SetupFromUnitLocal(unitEntityData);
             //dollState.SetRace(unitEntityData.Progression.Race); //Race must be set before class
             //This is a hack to work around harmony not allowing calls to the unpatched method
-            CharacterManager.disableEquipmentClassPatch = true; 
+            CharacterManager.disableEquipmentClassPatch = true;
             dollState.SetClass(unitEntityData.Descriptor.Progression.GetEquipmentClass());
             CharacterManager.disableEquipmentClassPatch = false;
             dollState.SetGender(dollData.Gender);
@@ -310,7 +321,7 @@ namespace VisualAdjustments
             unitEntityData.Descriptor.LeftHandedOverride = true;
 
             dollState.SetEquipColors(dollData.ClothesPrimaryIndex, dollData.ClothesSecondaryIndex);
-            foreach(var assetID in dollData.EquipmentEntityIds)
+            foreach (var assetID in dollData.EquipmentEntityIds)
             {
                 if (head.ContainsKey(assetID))
                 {
@@ -322,11 +333,11 @@ namespace VisualAdjustments
                 }
                 if (hair.ContainsKey(assetID) && !hair[assetID].Load().name.Contains("EMPTY"))
                 {
-                   // Main.logger.Log(hair[assetID].Load().name);
+                    // Main.logger.Log(hair[assetID].Load().name);
                     dollState.SetHair(hair[assetID]);
                     if (dollData.EntityRampIdices.ContainsKey(assetID))
                     {
-                       dollState.SetHairColor(dollData.EntityRampIdices[assetID]);
+                        dollState.SetHairColor(dollData.EntityRampIdices[assetID]);
                     }
                 }
                 if (beard.ContainsKey(assetID))
@@ -367,11 +378,9 @@ namespace VisualAdjustments
                         dollState.SetEquipColors(dollData.EntityRampIdices[assetID], dollData.EntitySecondaryRampIdices[assetID]);
                     }
                 }
-
             }
             dollState.Validate();
             return dollState;
         }
     }
-
 }

@@ -1,13 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using UnityEngine;
+﻿using UnityEngine;
 
 namespace VisualAdjustments.UGUI.Unity_Scripts
 {
-    class SelectedWeaponSlotHandler : MonoBehaviour
+    internal class SelectedWeaponSlotHandler : MonoBehaviour
     {
         public GameObject zero;
         public GameObject zerosec;
@@ -17,10 +12,11 @@ namespace VisualAdjustments.UGUI.Unity_Scripts
         public GameObject twosec;
         public GameObject three;
         public GameObject threesec;
+
         public void Button(int indx)
         {
-            VisualAdjustments.Main.logger.Log("ind"+indx.ToString());
-            switch(indx)
+            VisualAdjustments.Main.logger.Log("ind" + indx.ToString());
+            switch (indx)
             {
                 case 0:
                     {
@@ -34,7 +30,7 @@ namespace VisualAdjustments.UGUI.Unity_Scripts
                         threesec.SetActive(false);
                         TutorialCanvas.UI.UIManager.slot = 0;
                         TutorialCanvas.UI.UIManager.primorsec = true;
-                        Main.logger.Log(TutorialCanvas.UI.UIManager.slot.ToString()+ TutorialCanvas.UI.UIManager.primorsec);
+                        Main.logger.Log(TutorialCanvas.UI.UIManager.slot.ToString() + TutorialCanvas.UI.UIManager.primorsec);
                         break;
                     }
                 case 1:

@@ -1,8 +1,5 @@
-﻿using Kingmaker;
-using Kingmaker.PubSubSystem;
-using ModMaker;
+﻿using Kingmaker.PubSubSystem;
 using ModMaker.Utility;
-using UnityEngine;
 using static TutorialCanvas.Main;
 
 namespace TutorialCanvas.UI
@@ -11,7 +8,7 @@ namespace TutorialCanvas.UI
     {
         public int Priority => 400; //ignore, ModMaker stuff.
 
-        public UIManager TutorialUI { get; private set; } 
+        public UIManager TutorialUI { get; private set; }
 
         public void Attach()
         {

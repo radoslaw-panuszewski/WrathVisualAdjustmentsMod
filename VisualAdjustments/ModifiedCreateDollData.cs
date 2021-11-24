@@ -1,13 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using JetBrains.Annotations;
+﻿using JetBrains.Annotations;
 using Kingmaker.ResourceLinks;
 using Kingmaker.UnitLogic;
 using Kingmaker.UnitLogic.Class.LevelUp;
 using Kingmaker.Utility;
+using System;
+using System.Linq;
 
 namespace VisualAdjustments
 {
@@ -18,18 +15,16 @@ namespace VisualAdjustments
         {
             try
             {
-                 if (doll == null)
-                 {
-                     Main.logger.Error("nulldoll");
-                     throw new Exception("null doll");
-                 }
- 
- 
+                if (doll == null)
+                {
+                    Main.logger.Error("nulldoll");
+                    throw new Exception("null doll");
+                }
+
                 /* DollData dollData = new DollData
                  {
                      Gender = doll.Gender,
                      RacePreset = doll.RacePreset
-                     
                  };*/
                 DollData dollData = new DollData();
                 dollData.Gender = doll.Gender;
@@ -100,20 +95,19 @@ namespace VisualAdjustments
                 if (doll.Warpaint.m_Link != null && doll.Warpaint.m_Link.AssetId != null && doll.Warpaint.Load() != null)
                 {
                     dollData.EquipmentEntityIds.Add(EquipmentResourcesManager.AllEEL[doll.Warpaint.m_Entity.name]);
-                   // Main.logger.Log(EquipmentResourcesManager.AllEEL[doll.Warpaint.m_Entity.name]);
+                    // Main.logger.Log(EquipmentResourcesManager.AllEEL[doll.Warpaint.m_Entity.name]);
                     //dollData.EquipmentEntityIds.Add(doll.Warpaint.AssetId);
                 }
                 if (doll.Scar.m_Link != null && doll.Scar.m_Link.AssetId != null && doll.Scar.Load() != null)
                 {
                     dollData.EquipmentEntityIds.Add(EquipmentResourcesManager.AllEEL[doll.Scar.m_Entity.name]);
-                   // Main.logger.Log(EquipmentResourcesManager.AllEEL[doll.Scar.m_Entity.name]);
+                    // Main.logger.Log(EquipmentResourcesManager.AllEEL[doll.Scar.m_Entity.name]);
                     //dollData.EquipmentEntityIds.Add(doll.Scar.AssetId);
                 }
 
                 dollData.ClothesPrimaryIndex = doll.EquipmentRampIndex;
                 dollData.ClothesSecondaryIndex = doll.EquipmentRampIndexSecondary;
                 return dollData;
-
             }
             catch (Exception e)
             {

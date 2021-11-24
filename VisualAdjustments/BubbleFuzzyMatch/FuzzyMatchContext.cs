@@ -14,6 +14,7 @@ namespace BlueprintExplorer
             From = (ushort)start;
             Length = 1;
         }
+
         public void End(int end)
         {
             Length = (UInt16)(end - From);
@@ -46,8 +47,8 @@ namespace BlueprintExplorer
             Haystack = haystack;
             Handle = handle;
         }
-
     }
+
     public class FuzzyMatchContext<T>
     {
         private static FuzzyMatchResult<T> FuzzyMatch(FuzzyMatchResult<T> result)
@@ -80,7 +81,6 @@ namespace BlueprintExplorer
             //Continue to match the next eye(needle) greedily to haystack
             while (eye < needle.Length)
             {
-
                 //find the next point in haystack that matches our eye:
                 //n:bOb h:helloworldBob
                 //    ^             ^
@@ -124,10 +124,7 @@ namespace BlueprintExplorer
             return FuzzyMatch(new FuzzyMatchResult<T>(this, haystack, handle));
         }
 
-
         public string Needle;
-
-
     }
 
     public static class FuzzyMatcher
@@ -137,6 +134,7 @@ namespace BlueprintExplorer
             var result = new FuzzyMatchContext<T>(needle.ToLower());
             return input.Select(i => result.Match(i.Item2, i.Item1)).Where(match => match.Score > scoreThreshold).OrderByDescending(match => match.Score).Select(m => m.Handle);
         }
+
         /// <summary>
         /// Fuzzy Match all items in input against the needle
         /// </summary>
@@ -151,11 +149,10 @@ namespace BlueprintExplorer
             return input.Select(i => (i, haystack(i))).FuzzyMatch(needle, scoreThreshold);
         }
 
-
         public class ExampleType
         {
-            int Foo;
-            string Bar;
+            private int Foo;
+            private string Bar;
 
             public string Name => $"{Bar}.{Foo}";
         }
@@ -171,7 +168,5 @@ namespace BlueprintExplorer
             //Get top 20 results
             var top20 = matches.Take(20).ToList();
         }
-
     }
-
 }

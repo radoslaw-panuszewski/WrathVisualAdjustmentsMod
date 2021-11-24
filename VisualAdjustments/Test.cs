@@ -1,42 +1,25 @@
-﻿using System;
-using System.Collections.Generic;
-using HarmonyLib;
-using Kingmaker;
-using Kingmaker.Settings;
-using Kingmaker.Utility;
-using Kingmaker.View.Equipment;
-using Kingmaker.Visual.CharacterSystem;
-using Owlcat.Runtime.Core.Utils.Locator;
-using Owlcat.Runtime.Visual.Dxt;
-using UnityEngine;
-using System;
-using System.Collections.Generic;
-using Owlcat.Runtime.Visual.Dxt;
-using UnityEngine;
-
-namespace VisualAdjustments
+﻿namespace VisualAdjustments
 {
-
-	[HarmonyPatch(typeof(SteamManager), "Awake")]
+    /*[HarmonyPatch(typeof(SteamManager), "Awake")]
 	public static class checkneedrepaint
     {
 		public static bool Prefix()
         {
 			return false;
         }
+    }*/
+
+    //[HarmonyPatch(typeof(Character), "EEHasSameTexture")]
+    public static class eehassametex
+    {
+        public static bool Prefix(ref bool __result)
+        {
+            __result = false;
+            return false;
+        }
     }
 
-	//[HarmonyPatch(typeof(Character), "EEHasSameTexture")]
-	public static class eehassametex
-	{
-		public static bool Prefix(ref bool __result)
-		{
-			__result = false;
-			return false;
-		}
-	}
-
-	/*[HarmonyPatch(typeof(Kingmaker.Visual.CharacterSystem.Character), "OnRenderObject")]
+    /*[HarmonyPatch(typeof(Kingmaker.Visual.CharacterSystem.Character), "OnRenderObject")]
 	public static class xfddfg
     {
 		public static bool Prefix(Character __instance)
@@ -78,8 +61,6 @@ namespace VisualAdjustments
 			return false;
 		}
 	}
-
-
 
 	//[HarmonyPatch(typeof(CharacterAtlas), "Build")]
 	//[HarmonyPatch(new Type[] { typeof(EquipmentEntity.PaintedTextures), typeof(int), typeof(int), typeof(int), typeof(int) })]
@@ -226,7 +207,6 @@ namespace VisualAdjustments
 				RenderTexture.active = active;
 				if (dxtCompressorService != null)
 				{
-					
 					dxtCompressorService.CompressTexture(renderTexture, __instance.AtlasTexture.Texture,  (Owlcat.Runtime.Visual.Dxt.DxtCompressorService.Compression)1, delegate (Texture rt, Texture2D atlas, string error)
 					{
 						if (atlas == null || __instance.AtlasTexture.Destroyed)

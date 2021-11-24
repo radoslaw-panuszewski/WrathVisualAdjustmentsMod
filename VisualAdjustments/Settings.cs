@@ -1,74 +1,65 @@
-﻿using Kingmaker.Blueprints.Classes;
-using Kingmaker.EntitySystem.Entities;
-using Kingmaker.Enums;
+﻿using Kingmaker.EntitySystem.Entities;
+using ModMaker.Utility;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.IO;
-using Kingmaker.Items.Slots;
-using Kingmaker.UI.GenericSlot;
-using ModMaker.Utility;
-using UnityEngine;
 using UnityModManagerNet;
 using static UnityModManagerNet.UnityModManager;
-using System.ComponentModel;
-using System.Text.RegularExpressions;
-using System.Linq;
-using Kingmaker.Utility;
-using Kingmaker.UnitLogic;
 
 namespace VisualAdjustments
 {
-   /* public class TupleConverter : JsonConverter
-    {
-        public override bool CanConvert(Type objectType)
-        {
-            var match = Regex.Match(objectType.Name, "Tuple`([0-9])", RegexOptions.IgnoreCase);
-            return match.Success;
-        }
+    /* public class TupleConverter : JsonConverter
+     {
+         public override bool CanConvert(Type objectType)
+         {
+             var match = Regex.Match(objectType.Name, "Tuple`([0-9])", RegexOptions.IgnoreCase);
+             return match.Success;
+         }
 
-        public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
-        {
-            if (reader.TokenType == JsonToken.Null)
-                return null;
+         public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
+         {
+             if (reader.TokenType == JsonToken.Null)
+                 return null;
 
-            try
-            {
-                var asd = new Type[] {typeof(string),typeof(int),typeof(bool) };
-                var tupleTypes = objectType.GetProperties().ToList().Select(p => p.PropertyType).ToArray();
-                var jObject = Newtonsoft.Json.Linq.JObject.Load(reader);
-                Main.logger.Log(tupleTypes.ToString()) ;
+             try
+             {
+                 var asd = new Type[] {typeof(string),typeof(int),typeof(bool) };
+                 var tupleTypes = objectType.GetProperties().ToList().Select(p => p.PropertyType).ToArray();
+                 var jObject = Newtonsoft.Json.Linq.JObject.Load(reader);
+                 Main.logger.Log(tupleTypes.ToString()) ;
 
-                var valueItems = new List<object>();
-                Main.logger.Log(asd[0].ToString());
-                 for (var i = 1; i <= tupleTypes.Length; i++)
-                    valueItems.Add(jObject.[$"m_Item{i}"].ToObject(asd[i - 1]));
+                 var valueItems = new List<object>();
+                 Main.logger.Log(asd[0].ToString());
+                  for (var i = 1; i <= tupleTypes.Length; i++)
+                     valueItems.Add(jObject.[$"m_Item{i}"].ToObject(asd[i - 1]));
 
-                 var convertedObject = objectType.GetConstructor(tupleTypes)?.Invoke(valueItems.ToArray());
+                  var convertedObject = objectType.GetConstructor(tupleTypes)?.Invoke(valueItems.ToArray());
 
-                 return convertedObject;
-                throw new Exception("Mal");
-            }
-            catch (Exception ex)
-            {
-                throw new Exception("Something went wrong in this implementation", ex);
-            }
-        }
+                  return convertedObject;
+                 throw new Exception("Mal");
+             }
+             catch (Exception ex)
+             {
+                 throw new Exception("Something went wrong in this implementation", ex);
+             }
+         }
 
-        public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
-        {
-            serializer.Serialize(writer, value);
-        }
-    }*/
+         public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
+         {
+             serializer.Serialize(writer, value);
+         }
+     }*/
+
     public class Settings : UnityModManager.ModSettings
     {
-        public static Tuple<string,int,bool> ParseOverrideTuple(string rawtuple)
+        public static Tuple<string, int, bool> ParseOverrideTuple(string rawtuple)
         {
             var splitstring = rawtuple.Split(',');
-           /* foreach(var asdasda in splitstring)
-            {
-                Main.logger.Log("su " + asdasda);
-            }*/
+            /* foreach(var asdasda in splitstring)
+             {
+                 Main.logger.Log("su " + asdasda);
+             }*/
             var trimarray = new char[] { ' ', '(', ')' };
             var style = splitstring[0].Trim(trimarray);
             var slot = int.Parse(splitstring[1].Trim(trimarray));
@@ -78,6 +69,7 @@ namespace VisualAdjustments
             //Main.logger.Log(newtuple.ToString());
             return newtuple;
         }
+
         public static Tuple<int, bool> ParseOverrideEnchant(string rawtuple)
         {
             var splitstring = rawtuple.Split(',');
@@ -93,10 +85,12 @@ namespace VisualAdjustments
             //Main.logger.Log(newtuple.ToString());
             return newtuple;
         }
+
         public bool rebuildCharacters = true;
         public bool AllPortraits = false;
         public bool UnlockHair = false;
         public bool enableHotKey = true;
+
         public class CharacterSettings
         {
             public string characterName = "";
@@ -166,14 +160,16 @@ namespace VisualAdjustments
             public bool overrideScaleFloatMode = false;
             public float overrideScaleFactor = 4;
             public float additiveScaleFactor = 0;
+
             //public List<KeyValuePair<Tuple<string, int, bool>, BlueprintRef>> overrideswpn = new List<KeyValuePair<Tuple<string, int, bool>, BlueprintRef>>();
             //public Dictionary<OverrideInfo, BlueprintRef> weaponOverrides = new Dictionary<OverrideInfo, BlueprintRef>();
             public Dictionary<string, BlueprintRef> weaponOverrides = new Dictionary<string, BlueprintRef>();
+
             public Dictionary<string, BlueprintRef> weaponEnchantments = new Dictionary<string, BlueprintRef>();
+
             //public Dictionary<string, Dictionary<int,Dictionary<bool,BlueprintRef>>> weaponOverrides = new Dictionary<string, Dictionary<int, Dictionary<bool, BlueprintRef>>>();
             //[JsonConverter(typeof(TupleConverter))] public Dictionary<Tuple<string,int,bool>, BlueprintRef> weaponOverrides = new Dictionary<Tuple<string, int, bool>, BlueprintRef>();//new // Animstyle/Slot/Hand (prim or offhand)
             public Dictionary<string, BlueprintRef> overrideWeapons = new Dictionary<string, BlueprintRef>();//old
-
 
 #if (DEBUG)
             public bool showInfo = false;
@@ -181,7 +177,7 @@ namespace VisualAdjustments
             public CharInfo classOutfit;
             public int companionPrimary = -1;
             public int companionSecondary = -1;
-            public float[] hairColor = new float[] { 0, 0, 0};
+            public float[] hairColor = new float[] { 0, 0, 0 };
             public float[] skinColor = new float[] { 0, 0, 0 };
             public bool customHairColor;
             public bool customSkinColor;
@@ -201,14 +197,15 @@ namespace VisualAdjustments
             public bool hideSheaths;
             public bool hideMythic;
         }
+
         [JsonProperty]
         public Dictionary<string, CharacterSettings> characterSettings = new Dictionary<string, CharacterSettings>();
+
         public override void Save(UnityModManager.ModEntry modEntry)
         {
             var filepath = Path.Combine(modEntry.Path, "Settings.json");
             try
             {
-
                 JsonSerializer serializer = new JsonSerializer();
                 // serializer.Converters.Add(new overrideconverter());
                 //serializer.Converters.Add(new TupleConverter());
@@ -227,20 +224,23 @@ namespace VisualAdjustments
                 modEntry.Logger.Error(ex.ToString());
             }
         }
+
         public CharacterSettings GetCharacterSettings(UnitEntityData unitEntityData)
         {
             characterSettings.TryGetValue(unitEntityData.UniqueId, out CharacterSettings result);
-                return result;
+            return result;
         }
+
         public void AddCharacterSettings(UnitEntityData unitEntityData, CharacterSettings newSettings)
         {
             characterSettings[unitEntityData.UniqueId] = newSettings;
         }
+
         public static Settings Load(ModEntry modEntry)
         {
             try
             {
-               // modEntry.Logger.Log("triedloadsettings");
+                // modEntry.Logger.Log("triedloadsettings");
                 var filepath = Path.Combine(modEntry.Path, "Settings.json");
                 if (File.Exists(filepath))
                 {
@@ -264,7 +264,7 @@ namespace VisualAdjustments
                 }
                 return new Settings();
             }
-            catch(Exception e)
+            catch (Exception e)
             {
                 Main.logger.Log("errorsettings");
                 throw;

@@ -1,32 +1,22 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Reflection;
-using imColorPicker;
-using Kingmaker;
-using Kingmaker.Blueprints;
-using Kingmaker.Blueprints.Classes;
+﻿using imColorPicker;
 using Kingmaker.EntitySystem.Entities;
-using Kingmaker.ResourceLinks;
-using Kingmaker.Visual.CharacterSystem;
+using System;
+using System.IO;
 using UnityEngine;
-using UnityEngine.SceneManagement;
-using UnityModManagerNet;
 
 namespace VisualAdjustments
 {
-    public  class ColorPicker
+    public class ColorPicker
     {
         /// public Texture2D colorPicker;'
-        public  IMColorPicker colorPicker;
-        public  int ImageWidth = 400;
-        public  int ImageHeight = 400;
-        public  Color col;
+        public IMColorPicker colorPicker;
 
-        public void OnGUI(Settings.CharacterSettings charsettings, UnitEntityData data, Color initcolor, ref float[] floatsetting,Action<UnitEntityData> func)
+        public int ImageWidth = 400;
+        public int ImageHeight = 400;
+        public Color col;
+
+        public void OnGUI(Settings.CharacterSettings charsettings, UnitEntityData data, Color initcolor, ref float[] floatsetting, Action<UnitEntityData> func)
         {
-
             /*if(col == null)
             {
                 col = new Color(charsettings.color[0], charsettings.color[1], charsettings.color[2]);
@@ -39,7 +29,7 @@ namespace VisualAdjustments
             }*/
             ///GUILayout.BeginHorizontal();
             //Color col;
-            
+
             if (colorPicker == null)
             {
                 colorPicker = new IMColorPicker();
@@ -48,13 +38,13 @@ namespace VisualAdjustments
             colorPicker.DrawWindow(); // draw color picker UI with GUI.Window
             colorPicker.DrawColorPicker(); // or draw color picker UI only
 
-                ///colorPicker._color.r = charsettings.color[0];
-               /// colorPicker._color.g = charsettings.color[1];
-               /// colorPicker._color.b = charsettings.color[2];
+            ///colorPicker._color.r = charsettings.color[0];
+            /// colorPicker._color.g = charsettings.color[1];
+            /// colorPicker._color.b = charsettings.color[2];
 
-           /// charsettings.color = new float[] { colorPicker.color.r, colorPicker.color.g, colorPicker.color.b };
+            /// charsettings.color = new float[] { colorPicker.color.r, colorPicker.color.g, colorPicker.color.b };
             //colorPicker._color = new Color(charsettings.color[0],charsettings.color[1],charsettings.color[2]);
-             col = colorPicker.color;
+            col = colorPicker.color;
             ///Color.RGBToHSV(col,out float H,out float S,out float V);
             /// colorPicker.DrawSVHandler(colorPicker.lastrect, ref colorPicker._color);
             //col = colorPicker.color;
@@ -83,9 +73,9 @@ namespace VisualAdjustments
             /// col = colorPicker._color;
             Color.RGBToHSV(col, out float H, out float S, out float V);
             colorPicker.h = H;
-            colorPicker.ColorSlider("R",0,ref col.r,H,S,V);
-            colorPicker.ColorSlider("G",1,ref col.g,H,S,V);
-            colorPicker.ColorSlider("B",2,ref col.b,H,S,V);
+            colorPicker.ColorSlider("R", 0, ref col.r, H, S, V);
+            colorPicker.ColorSlider("G", 1, ref col.g, H, S, V);
+            colorPicker.ColorSlider("B", 2, ref col.b, H, S, V);
             /// charsettings.color = new float[] { col.r, col.g, col.b };
             // colorPicker._color = col;
             /*  GUILayout.BeginHorizontal();
@@ -140,10 +130,10 @@ namespace VisualAdjustments
                 colorPicker._color = col;//Color.HSVToRGB(hhh, sss, vvv);
             }*/
             Color.RGBToHSV(col, out float h, out float s, out float v);
-             if (colorPicker.h != h || colorPicker.s != s || colorPicker.v != v)
-             {
-               colorPicker.changeActiveColor(colorPicker._color,h,s,v);
-             }
+            if (colorPicker.h != h || colorPicker.s != s || colorPicker.v != v)
+            {
+                colorPicker.changeActiveColor(colorPicker._color, h, s, v);
+            }
             /*  if(skinorhair)
               {
                   charsettings.hairColor = new float[] { col.r, col.g, col.b };
@@ -156,9 +146,9 @@ namespace VisualAdjustments
             floatsetting[0] = col.r;
             floatsetting[1] = col.g;
             floatsetting[2] = col.b;
-            if (GUILayout.Button("Rebuild Character (Apply)",GUILayout.ExpandWidth(false)))
+            if (GUILayout.Button("Rebuild Character (Apply)", GUILayout.ExpandWidth(false)))
             {
-              //  floatsetting = new float[] { col.r, col.g, col.b };
+                //  floatsetting = new float[] { col.r, col.g, col.b };
                 func(data);
                 //Greytest
                 CharacterManager.UpdateModel(data.View);
@@ -167,15 +157,16 @@ namespace VisualAdjustments
                 func(data);
             }
 
-           /// GUILayout.EndHorizontal();
+            /// GUILayout.EndHorizontal();
         }
     }
+
     public static class ColorPickerLoad
     {
         public static Texture2D GetTexture(String filePath)
         {
             Byte[] data = File.ReadAllBytes(filePath);
-            
+
             var tex = new Texture2D(2, 2);
             tex.LoadImage(data);
             return tex;

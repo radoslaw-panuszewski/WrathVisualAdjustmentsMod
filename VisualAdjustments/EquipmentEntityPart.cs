@@ -1,19 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using JetBrains.Annotations;
-using Kingmaker;
-using Kingmaker.Blueprints;
-using Kingmaker.Blueprints.Facts;
-using Kingmaker.Blueprints.JsonSystem;
-using Kingmaker.EntitySystem;
-using Kingmaker.EntitySystem.Entities;
-using Kingmaker.UnitLogic;
-using Kingmaker.UnitLogic.Buffs;
-using Kingmaker.UnitLogic.Parts;
+﻿using Kingmaker.UnitLogic;
 using Kingmaker.Utility;
 using Kingmaker.Visual.CharacterSystem;
 using Newtonsoft.Json;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 namespace VisualAdjustments
@@ -27,14 +18,15 @@ namespace VisualAdjustments
             SecondaryIndex = secondaryIndex;
             //Main.logger.Log(assetId + primaryIndex + secondaryIndex);
         }
+
         [JsonConstructor]
-        public EEStorage(string assetId, int primaryIndex, int secondaryIndex, bool hascustom = false, float[] CustomColorPrimin = null,float[] CustomColorSecin = null)
+        public EEStorage(string assetId, int primaryIndex, int secondaryIndex, bool hascustom = false, float[] CustomColorPrimin = null, float[] CustomColorSecin = null)
         {
             AssetID = assetId;
             PrimaryIndex = primaryIndex;
             SecondaryIndex = secondaryIndex;
             //hasCustomColor = true;
-            if(CustomColorPrimin != null)
+            if (CustomColorPrimin != null)
             {
                 CustomColorPrim = CustomColorPrimin;
             }
@@ -47,14 +39,18 @@ namespace VisualAdjustments
             //CustomColorPrim = new float[] { CustomColorPrimin.r, CustomColorPrimin.g, CustomColorPrimin.b };
             //Main.logger.Log(assetId + primaryIndex + secondaryIndex);
         }
+
         [JsonProperty] public string AssetID = "";
         [JsonProperty] public int PrimaryIndex = -1;
         [JsonProperty] public int SecondaryIndex = -1;
         [JsonProperty] public bool hasCustomColor = false;
-       // [JsonProperty] public EEStorage parent;
+
+        // [JsonProperty] public EEStorage parent;
         [JsonProperty] public float[] CustomColorPrim = new float[] { 0, 0, 0 };
+
         [JsonProperty] public float[] CustomColorSec = new float[] { 0, 0, 0 };
-        public void Apply(EquipmentEntity ee,Character Avatar)
+
+        public void Apply(EquipmentEntity ee, Character Avatar)
         {
             bool CheckIfNoColor(float[] col)
             {
@@ -66,7 +62,7 @@ namespace VisualAdjustments
             {
                 if (hasCustomColor)
                 {
-                    if(!CheckIfNoColor(this.CustomColorPrim) && ee.PrimaryColorsProfile != null)
+                    if (!CheckIfNoColor(this.CustomColorPrim) && ee.PrimaryColorsProfile != null)
                     {
                         {
                             var colornum = this.CustomColorPrim;
@@ -93,19 +89,18 @@ namespace VisualAdjustments
                                     ee.PrimaryColorsProfile.Ramps.Add(texture);
                                 }
                             }
-                          //  Main.logger.Log(settingcol.ToString() + "   Setting");
+                            //  Main.logger.Log(settingcol.ToString() + "   Setting");
                             foreach (var asd in ee.PrimaryColorsProfile.Ramps.Where(a => a.isReadable))
                             {
-                            //    Main.logger.Log(asd.GetPixel(1, 1).ToString() + "   ExistingTexture");
+                                //    Main.logger.Log(asd.GetPixel(1, 1).ToString() + "   ExistingTexture");
                             }
                             if (ee.PrimaryColorsProfile.Ramps.Where(b => b.isReadable).Any(a => a.name == settingcol.ToString()))
                             {
-                               // Main.logger.Log("setindex");
+                                // Main.logger.Log("setindex");
                                 var index = ee.PrimaryColorsProfile.Ramps.Where(b => b.isReadable).First(a => a.name == settingcol.ToString());
 
                                 Avatar.SetPrimaryRampIndex(ee, ee.PrimaryColorsProfile.Ramps.IndexOf(index));
                             }
-
                         }
                     }
                     if (!CheckIfNoColor(this.CustomColorSec) && ee.SecondaryColorsProfile != null)
@@ -143,16 +138,15 @@ namespace VisualAdjustments
                             //Main.logger.Log(settingcol.ToString() + "   Setting");
                             foreach (var asd in ee.SecondaryColorsProfile.Ramps.Where(a => a.isReadable))
                             {
-                               // Main.logger.Log(asd.GetPixel(1, 1).ToString() + "   ExistingTexture");
+                                // Main.logger.Log(asd.GetPixel(1, 1).ToString() + "   ExistingTexture");
                             }
                             if (ee.SecondaryColorsProfile.Ramps.Where(b => b.isReadable).Any(a => a.name == settingcol.ToString()))
                             {
-                               // Main.logger.Log("setindex");
+                                // Main.logger.Log("setindex");
                                 var index = ee.SecondaryColorsProfile.Ramps.Where(b => b.isReadable).First(a => a.name == settingcol.ToString());
 
                                 Avatar.SetSecondaryRampIndex(ee, ee.SecondaryColorsProfile.Ramps.IndexOf(index));
                             }
-
                         }
                     }
                 }
@@ -168,30 +162,89 @@ namespace VisualAdjustments
             }
         }
     }
-	public class UnitPartVAEELs : UnitPart
+
+    public class SaveHookerVAEEs
+    {
+        public SaveHookerVAEEs(List<EEStorage> eeadd, List<string> eeremove)
+        {
+            EEToAdd = eeadd;
+            EEToRemove = eeremove;
+        }
+
+        public SaveHookerVAEEs()
+        {
+        }
+
+        [JsonProperty] public List<EEStorage> EEToAdd = new List<EEStorage>();
+        [JsonProperty] public List<string> EEToRemove = new List<string>();
+    }
+
+    public class SaveHookerSettings
+    {
+        public SaveHookerSettings()
+        {
+        }
+
+        public int overridebarding;
+        public bool hidebarding;
+    }
+
+    public class SaveHookerVAFX
+    {
+        public SaveHookerVAFX(bool bwlist, List<FXInfo> blackwhitelist, List<FXInfo> overridesin)
+        {
+            blackorwhitelist = bwlist;
+            blackwhitelistnew = blackwhitelist;
+            overrides = overridesin;
+        }
+
+        public SaveHookerVAFX()
+        {
+        }
+
+        [JsonProperty] public bool blackorwhitelist = true;
+        [JsonProperty] public List<FXInfo> blackwhitelistnew = new List<FXInfo>();
+        [JsonProperty] public Dictionary<string, FXInfo> blackwhitelist = new Dictionary<string, FXInfo>();
+        [JsonProperty] public List<FXInfo> overrides = new List<FXInfo>();
+        [JsonIgnore] public Dictionary<string, GameObject> currentoverrides = new Dictionary<string, GameObject>();
+    }
+
+    public class UnitPartVAEELs : UnitPart
     {
         [JsonProperty] public List<EEStorage> EEToAdd = new List<EEStorage>();
         [JsonProperty] public List<string> EEToRemove = new List<string>();
 
-
+        public SaveHookerVAEEs ToSaveHooker()
+        {
+            var VAEE = new SaveHookerVAEEs(this.EEToAdd, this.EEToRemove);
+            return VAEE;
+        }
     }
+
     public class UnitPartVAFX : UnitPart
     {
         [JsonProperty] public bool blackorwhitelist = true;
         [JsonProperty] public List<FXInfo> blackwhitelistnew = new List<FXInfo>();
-        public Dictionary<string,FXInfo> blackwhitelist = new Dictionary<string, FXInfo>();
+        [JsonProperty] public Dictionary<string, FXInfo> blackwhitelist = new Dictionary<string, FXInfo>();
         [JsonProperty] public List<FXInfo> overrides = new List<FXInfo>();
-        [NonSerialized()] public Dictionary<string,GameObject> currentoverrides = new Dictionary<string, GameObject>();
+        [JsonIgnore] public Dictionary<string, GameObject> currentoverrides = new Dictionary<string, GameObject>();
+
+        public SaveHookerVAFX ToSaveHooker()
+        {
+            var VAFX = new SaveHookerVAFX(this.blackorwhitelist, this.blackwhitelistnew, this.overrides);
+            return VAFX;
+        }
     }
+
     public class FXInfo
     {
         [JsonProperty] public string AssetID;
         [JsonProperty] public string Name;
-        public FXInfo(string assetid,string name)
+
+        public FXInfo(string assetid, string name)
         {
             AssetID = assetid;
             Name = name;
         }
     }
-
 }

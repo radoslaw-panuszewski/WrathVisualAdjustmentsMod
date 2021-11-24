@@ -1,32 +1,30 @@
-﻿
-using HarmonyLib;
+﻿using HarmonyLib;
 using Kingmaker;
 using Kingmaker.Blueprints;
-using Kingmaker.Blueprints.Facts;
 using Kingmaker.EntitySystem.Entities;
 using Kingmaker.Enums;
-using Kingmaker.UI.Selection;
 using Kingmaker.UnitLogic.Buffs;
 using Kingmaker.UnitLogic.Commands;
 using Kingmaker.UnitLogic.Commands.Base;
-using Kingmaker.UnitLogic.FactLogic;
 using Kingmaker.View;
 using System;
 using UnityEngine;
 
 namespace VisualAdjustments
 {
-    class ViewManager
+    internal class ViewManager
     {
-        static UnitEntityView GetView(string id)
+        private static UnitEntityView GetView(string id)
         {
             if (string.IsNullOrEmpty(id)) return null;
             return ResourcesLibrary.TryGetResource<UnitEntityView>(id);
-         }
+        }
+
         /*
          * Based on Polymorph.TryReplaceView. Replaces view, only used when changing view through UI
          * When id is null or "", rebuilds original view
-         */ 
+         */
+
         public static void ReplaceView(UnitEntityData unit, string id)
         {
             var original = unit.View;
@@ -58,13 +56,15 @@ namespace VisualAdjustments
             UnityEngine.Object.Destroy(original.gameObject);
             if (string.IsNullOrEmpty(id)) CharacterManager.RebuildCharacter(unit);
         }
+
         /*
          * Used for overriding view, when view is first created
-         */ 
+         */
+
         [HarmonyPatch(typeof(UnitEntityData), "CreateView")]
-        static class UnitEntityData_CreateView_Patch
+        private static class UnitEntityData_CreateView_Patch
         {
-            static bool Prefix(UnitEntityData __instance, ref UnitEntityView __result)
+            private static bool Prefix(UnitEntityData __instance, ref UnitEntityView __result)
             {
                 try
                 {
@@ -98,17 +98,19 @@ namespace VisualAdjustments
                     __result.m_IgnoreRaceAnimationSettings = true;
                     Traverse.Create(__result).Field("m_IgnoreRaceAnimationSettings").SetValue(true);
                     return false;
-                } catch(Exception ex)
+                }
+                catch (Exception ex)
                 {
                     Main.Error(ex);
                     return true;
                 }
             }
         }
+
         [HarmonyPatch(typeof(UnitEntityView), "GetSizeScale")]
-        static class UnitEntityView_GetSizeScale_Patch
+        private static class UnitEntityView_GetSizeScale_Patch
         {
-            static void Postfix(UnitEntityView __instance, ref float __result)
+            private static void Postfix(UnitEntityView __instance, ref float __result)
             {
                 try
                 {
@@ -132,7 +134,7 @@ namespace VisualAdjustments
                     float sizeDiff = characterSettings.overrideScaleAdditive ?
                         ((int)size + characterSettings.additiveScaleFactor - (int)originalSize) :
                        (characterSettings.overrideScaleFactor - (int)originalSize);
-                   float sizeScale = Mathf.Pow(1 / 0.66f, sizeDiff);
+                    float sizeScale = Mathf.Pow(1 / 0.66f, sizeDiff);
                     __result = sizeScale;
                 }
                 catch (Exception ex)
@@ -141,15 +143,15 @@ namespace VisualAdjustments
                 }
             }
         }
-        
+
         [HarmonyPatch(typeof(UnitEntityView), "GetSpeedAnimationCoeff")]
-        static class UnitEntityView_GetSpeedAnimationCoeff_Patch
+        private static class UnitEntityView_GetSpeedAnimationCoeff_Patch
         {
-            static void Postfix(UnitEntityView __instance, ref float __result)
+            private static void Postfix(UnitEntityView __instance, ref float __result)
             {
                 try
                 {
-                   /// Main.logger.Log("GetSpeedAnimationCoeff");
+                    /// Main.logger.Log("GetSpeedAnimationCoeff");
                     if (!Main.enabled) return;
                     if (!__instance.EntityData.IsPlayerFaction) return;
                     var characterSettings = Main.settings.GetCharacterSettings(__instance.EntityData);
@@ -169,7 +171,7 @@ namespace VisualAdjustments
                     else sizeDiff = characterSettings.overrideScaleFactor - (int)__instance.EntityData.Descriptor.OriginalSize;
                     var newScaleFactor = Mathf.Pow(1 / 0.66f, sizeDiff);
                     __result /= newScaleFactor;
-                  // __result = 1;
+                    // __result = 1;
                 }
                 catch (Exception ex)
                 {
@@ -177,6 +179,7 @@ namespace VisualAdjustments
                 }
             }
         }
+
         public static float GetRealSizeScale(UnitEntityView __instance, Settings.CharacterSettings characterSettings)
         {
             var originalScale = __instance.GetSizeScale();
@@ -186,8 +189,8 @@ namespace VisualAdjustments
             if (characterSettings.overrideScaleAdditive) sizeScale = originalScale * Mathf.Pow(1 / 0.66f, characterSettings.additiveScaleFactor);
             else sizeScale = Mathf.Pow(1 / 0.66f, characterSettings.overrideScaleFactor - originalSize);
             return sizeScale;
-
         }
+
         /*
          * The unitEntityView stores the current scale in m_Scale, and smoothly adjusts to until it is equal to
          * sizeScale from unitEntityView.GetSizeScale()
@@ -196,7 +199,8 @@ namespace VisualAdjustments
          * The actual size is change defined as
          * base.transform.localScale = UnitEntityView.m_OriginalScale * sizeScale;
          */
-        static void OverrideSize(UnitEntityView __instance, Settings.CharacterSettings characterSettings)
+
+        private static void OverrideSize(UnitEntityView __instance, Settings.CharacterSettings characterSettings)
         {
             var sizeScale = GetRealSizeScale(__instance, characterSettings);
             var m_OriginalScale = m_OriginalScaleRef;
@@ -217,12 +221,14 @@ namespace VisualAdjustments
                 __instance.ParticlesSnapMap.AdditionalScale = __instance.transform.localScale.x / m_OriginalScale.x;
             }
             //Prevent fighting m_Scale to set transform scale
-             m_ScaleRef = __instance.GetSizeScale();
+            m_ScaleRef = __instance.GetSizeScale();
         }
-        static Vector3 m_OriginalScaleRef;
-        static float m_ScaleRef;
+
+        private static Vector3 m_OriginalScaleRef;
+        private static float m_ScaleRef;
+
         [HarmonyPatch(typeof(UnitEntityView), "LateUpdate")]
-        static class UnitEntityView_LateUpdate_Patch
+        private static class UnitEntityView_LateUpdate_Patch
         {
             /*static bool Prepare(UnitEntityView __instance)
             {
@@ -231,12 +237,11 @@ namespace VisualAdjustments
                 //m_ScaleRef = Accessors.CreateFieldRef<UnitEntityView, float>("m_Scale");
                 return true;
             }*/
-            static void Postfix(UnitEntityView __instance)
+
+            private static void Postfix(UnitEntityView __instance)
             {
                 try
                 {
-                    m_OriginalScaleRef = __instance.m_OriginalScale;
-                    m_ScaleRef = __instance.m_Scale;
                     if (!Main.enabled) return;
                     if (__instance.EntityData == null) return;
                     if (!__instance.EntityData.IsPlayerFaction) return;
@@ -244,13 +249,14 @@ namespace VisualAdjustments
                     if (characterSettings == null) return;
                     if (!characterSettings.overrideScale || characterSettings.overrideScaleCheatMode) return;
                     if (__instance.EntityData.Body == null) return;
+                    m_OriginalScaleRef = __instance.m_OriginalScale;
+                    m_ScaleRef = __instance.m_Scale;
                     if (characterSettings.overrideScaleShapeshiftOnly &&
                     !__instance.EntityData.Body.IsPolymorphed)
                     {
                         return;
                     }
                     OverrideSize(__instance, characterSettings);
-
                 }
                 catch (Exception ex)
                 {

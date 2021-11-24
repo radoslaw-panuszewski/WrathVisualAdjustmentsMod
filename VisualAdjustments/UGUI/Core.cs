@@ -1,6 +1,5 @@
 ﻿using ModMaker;
-using System;
-using static TutorialCanvas.Main;
+
 //using static TutorialCanvas.Utilities.SettingsWrapper;
 
 namespace TutorialCanvas

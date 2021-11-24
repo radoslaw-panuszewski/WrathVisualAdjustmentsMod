@@ -61,7 +61,9 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="Accessors.cs" />
+    <Compile Include="AnimalEquipment.cs" />
     <Compile Include="BubbleFuzzyMatch\FuzzyMatchContext.cs" />
+    <Compile Include="BubblesSaveHooker.cs" />
     <Compile Include="BuffHandler.cs" />
     <Compile Include="CabariusModKitUII\GUIHelper.cs" />
     <Compile Include="CabariusModKitUII\Private\Toggle.cs" />
@@ -129,7 +131,8 @@
       <HintPath>$(WrathPath)\Wrath_Data\Managed\Assembly-CSharp-firstpass.dll</HintPath>
       <Private>False</Private>
     </Reference>
-    <Reference Include="Assembly-CSharp_public">
+    <Reference Include="Assembly-CSharp_public, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
       <HintPath>..\lib\Assembly-CSharp_public.dll</HintPath>
     </Reference>
     <Reference Include="DXTCompressor">

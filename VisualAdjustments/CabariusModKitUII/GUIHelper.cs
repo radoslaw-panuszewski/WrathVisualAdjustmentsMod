@@ -1,8 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
-using RGBA = ModKit.RGBA;
+
 namespace ModKit.Utility
 {
     public static class GUIHelper
@@ -16,7 +15,8 @@ namespace ModKit.Utility
 
         public static string GetToggleText(ToggleState toggleState, string text)
         {
-            switch (toggleState) {
+            switch (toggleState)
+            {
                 case ToggleState.Off: return string.Format(FormatOff, text);
                 case ToggleState.On: return string.Format(FormatOn, text);
                 case ToggleState.None: return string.Format(FormatNone, text);
@@ -85,25 +85,29 @@ namespace ModKit.Utility
             }
         }
 
-        static bool CheckboxPrivate(
+        private static bool CheckboxPrivate(
             ref bool value,
             String title,
             GUIStyle style = null,
             params GUILayoutOption[] options
-    ) {
+    )
+        {
             bool changed = false;
             title = value ? title.bold() : title.color(RGBA.lightgrey);
             if (UI.Toggle(title, ref value, 0, options)) changed = true;
             //if (GUILayout.Button("" + (value ? onMark : offMark) + " " + title, style, options)) { value = !value; }
             return changed;
         }
+
         public static bool Checkbox(
                 ref bool value,
                 String title,
                 GUIStyle style = null,
-                params GUILayoutOption[] options) {
+                params GUILayoutOption[] options)
+        {
             return CheckboxPrivate(ref value, title, style, options);
         }
+
         public static ToggleState ToggleButton(ToggleState toggle, string text, GUIStyle style = null, params GUILayoutOption[] options)
         {
             UI.ToggleButton(ref toggle, text, style, options);
@@ -229,7 +233,8 @@ namespace ModKit.Utility
         private static Color fillColor = new Color(1f, 1f, 1f, 0.65f);
         private static Color fillColor2 = new Color(1f, 1f, 1f, 0.35f);
 
-        public static GUIStyle FillStyle(Color color) {
+        public static GUIStyle FillStyle(Color color)
+        {
             if (fillTexture == null)
                 fillTexture = new Texture2D(1, 1);
             if (fillStyle == null)
@@ -239,12 +244,15 @@ namespace ModKit.Utility
             fillStyle.normal.background = fillTexture;
             return fillStyle;
         }
-        public static void GUIDrawRect(Rect position, Color color) {
 
+        public static void GUIDrawRect(Rect position, Color color)
+        {
             GUI.Box(position, GUIContent.none, FillStyle(color));
         }
+
         //private static GUIStyle divStyle;
-        public static void Div(Color color, float indent = 0, float height = 0, float width = 0) {
+        public static void Div(Color color, float indent = 0, float height = 0, float width = 0)
+        {
             if (fillTexture == null)
                 fillTexture = new Texture2D(1, 1);
             var divStyle = new GUIStyle();
@@ -257,14 +265,14 @@ namespace ModKit.Utility
                 divStyle.fixedWidth = width;
             else
                 divStyle.fixedWidth = 0;
-            GUILayout.Space((1f* height) / 2f);
+            GUILayout.Space((1f * height) / 2f);
             GUILayout.Box(GUIContent.none, divStyle);
             GUILayout.Space(height / 2f);
         }
 
-        public static void Div(float indent = 0, float height = 25, float width = 0) {
+        public static void Div(float indent = 0, float height = 25, float width = 0)
+        {
             Div(fillColor, indent, height, width);
         }
-
     }
 }

@@ -12,8 +12,9 @@ namespace VisualAdjustments
 {
     public static class Util
     {
-        const float DefaultLabelWidth = 200f;
-        const float DefaultSliderWidth = 300f;
+        private const float DefaultLabelWidth = 200f;
+        private const float DefaultSliderWidth = 300f;
+
         public static void ChooseSlider<T>(string name, Dictionary<T, string> items, ref T currentItem, Action onChoose)
         {
             var currentIndex = currentItem == null ? -1 : Array.IndexOf(items.Keys.ToArray(), currentItem);
@@ -37,6 +38,7 @@ namespace VisualAdjustments
                 onChoose();
             }
         }
+
         public static void ChooseSlider<T>(string name, Dictionary<string, T> items, ref string currentItem, Action onChoose)
         {
             var currentIndex = currentItem == null ? -1 : Array.IndexOf(items.Keys.ToArray(), currentItem);
@@ -60,6 +62,7 @@ namespace VisualAdjustments
                 onChoose();
             }
         }
+
         public static void ChooseSliderInvert<T>(string name, Dictionary<string, string> items, ref string currentItem, Action onChoose)
         {
             var currentIndex = currentItem == null ? -1 : Array.IndexOf(items.Keys.ToArray(), currentItem);
@@ -83,6 +86,7 @@ namespace VisualAdjustments
                 onChoose();
             }
         }
+
         public static void ChooseSliderM<T>(string name, Dictionary<T, string> items, ref string currentItem, Action onChoose)
         {
             var currentIndex = currentItem == null ? -1 : Array.IndexOf(items.Values.ToArray(), currentItem);
@@ -107,6 +111,7 @@ namespace VisualAdjustments
                 onChoose();
             }
         }
+
         public static void ChooseSliderList<T>(string name, Dictionary<T, string> items, List<T> saved, int savedIndex, Action onChoose)
         {
             var currentItem = saved[savedIndex];
@@ -138,14 +143,15 @@ namespace VisualAdjustments
                 onChoose();
             }
         }
+
         public static void AddEquipmentEntities(this Character character, IEnumerable<EquipmentEntityLink> links, bool saved = false)
         {
             foreach (var eel in links) character.AddEquipmentEntity(eel);
         }
+
         /// thx to Vek17
         public static SimpleBlueprint[] GetBlueprints()
         {
-
             var blueprints = (Dictionary<BlueprintGuid, BlueprintsCache.BlueprintCacheEntry>)AccessTools
             .Field(typeof(BlueprintsCache), "m_LoadedBlueprints")
             .GetValue(ResourcesLibrary.BlueprintsCache);

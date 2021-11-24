@@ -1,6 +1,5 @@
 ﻿using HarmonyLib;
 using Kingmaker.Blueprints;
-using Kingmaker.Blueprints.Facts;
 using Kingmaker.Blueprints.Items.Ecnchantments;
 using Kingmaker.EntitySystem.Entities;
 using Kingmaker.Items;
@@ -17,13 +16,13 @@ using UnityEngine;
 
 namespace VisualAdjustments
 {
-    static class EffectsManager
+    internal static class EffectsManager
     {
-        public static Dictionary<string,string> AllFX
+        public static Dictionary<string, string> AllFX
         {
             get
             {
-                if(m_AllFX == null)
+                if (m_AllFX == null)
                 {
                     m_AllFX = new Dictionary<string, string>();
                     m_AllFX["Buff Damage bonus"] = "32dd45727d8f7f84ba9e650dd8ed5da7";
@@ -4713,7 +4712,9 @@ namespace VisualAdjustments
                 return m_AllFX;
             }
         }
+
         private static Dictionary<string, string> m_AllFX;
+
         public static Dictionary<string, string> WingsLookup = new Dictionary<string, string>()
         {
             {"d596694ff285f3f429528547f441b1c0", "BuffWingsAngel"},
@@ -4730,33 +4731,34 @@ namespace VisualAdjustments
             {"5a791c1b0bacee3459d7f5137fa0bd5f", "BuffWingsDraconicSilver"},
             {"381a168acd79cd54baf87a17ca861d9b", "BuffWingsDraconicWhite"},
         };
+
         [HarmonyPatch(typeof(Buff), "TrySpawnParticleEffect")]
-        static class Buff_SpawnParticleEffect_Patch
+        private static class Buff_SpawnParticleEffect_Patch
         {
-            static bool Prefix(Buff __instance)
+            private static bool Prefix(Buff __instance)
             {
                 try
                 {
-                   /// Main.logger.Log("TrySpawnParticleEffect");
+                    /// Main.logger.Log("TrySpawnParticleEffect");
                     if (!Main.enabled) return true;
                     if (!__instance.Owner.IsPlayerFaction) return true;
                     var characterSettings = Main.settings.GetCharacterSettings(__instance.Owner.Unit);
                     if (characterSettings == null) return true;
                     // if((characterSettings.hideWings || (!characterSettings.overrideWingsEE.IsNullOrEmpty()) || (characterSettings.overrideWingsFX.IsNullOrEmpty()))&& __instance.Blueprint.FxOnStart.Load() && EquipmentResourcesManager.WingsFX.ContainsKey(__instance.Blueprint.FxOnStart.Load().name))
-                  /*  Main.logger.Log(characterSettings.hideWings.ToString());
-                    Main.logger.Log(characterSettings.overrideWingsEE.IsNullOrEmpty().ToString());
-                    Main.logger.Log(characterSettings.overrideWingsFX.IsNullOrEmpty().ToString());
-                    if(characterSettings.hideWings)
-                    {
-                        Main.logger.Log("hidewing");
-                    }
-                    if(!characterSettings.overrideWingsEE.IsNullOrEmpty() || !characterSettings.overrideWingsFX.IsNullOrEmpty())
-                    {
-                        Main.logger.Log("override");
-                    }*/
+                    /*  Main.logger.Log(characterSettings.hideWings.ToString());
+                      Main.logger.Log(characterSettings.overrideWingsEE.IsNullOrEmpty().ToString());
+                      Main.logger.Log(characterSettings.overrideWingsFX.IsNullOrEmpty().ToString());
+                      if(characterSettings.hideWings)
+                      {
+                          Main.logger.Log("hidewing");
+                      }
+                      if(!characterSettings.overrideWingsEE.IsNullOrEmpty() || !characterSettings.overrideWingsFX.IsNullOrEmpty())
+                      {
+                          Main.logger.Log("override");
+                      }*/
                     if ((characterSettings.hideWings || (!characterSettings.overrideWingsEE.IsNullOrEmpty() || !characterSettings.overrideWingsFX.IsNullOrEmpty())) && WingsLookup.ContainsKey(__instance.Blueprint.AssetGuidThreadSafe))
                     {
-                       // __instance.Owner.Unit.RefreshBuffs();
+                        // __instance.Owner.Unit.RefreshBuffs();
                         return false;
                     }
                     return true;
@@ -4768,14 +4770,16 @@ namespace VisualAdjustments
                 }
             }
         }
-        static GameObject RespawnFx(GameObject prefab, ItemEntity item)
+
+        private static GameObject RespawnFx(GameObject prefab, ItemEntity item)
         {
             WeaponSlot weaponSlot = item.HoldingSlot as WeaponSlot;
             var weaponSnap = weaponSlot?.FxSnapMap;
             var unit = item.Wielder.Unit?.View;
             return FxHelper.SpawnFxOnWeapon(prefab, unit, weaponSnap);
         }
-        static void DestroyFx(GameObject FxObject)
+
+        private static void DestroyFx(GameObject FxObject)
         {
             if (FxObject)
             {
@@ -4783,8 +4787,9 @@ namespace VisualAdjustments
                 FxObject = null;
             }
         }
+
         [HarmonyPatch(typeof(DollRoom), "UpdateAvatarRenderers")]
-        static class DollRoom_UpdateAvatarRenderers_Patch
+        private static class DollRoom_UpdateAvatarRenderers_Patch
         {
             //static FastInvoker<DollRoom, GameObject, object> UnscaleFxTimes;
             /*static bool Prepare()
@@ -4792,7 +4797,8 @@ namespace VisualAdjustments
                // UnscaleFxTimes = Accessors.CreateInvoker<DollRoom, GameObject, object>("UnscaleFxTimes");
                 return true;
             }*/
-            static void Postfix(DollRoom __instance, UnitViewHandsEquipment ___m_AvatarHands, UnitEntityData ___m_Unit)
+
+            private static void Postfix(DollRoom __instance, UnitViewHandsEquipment ___m_AvatarHands, UnitEntityData ___m_Unit)
             {
                 try
                 {
@@ -4820,25 +4826,28 @@ namespace VisualAdjustments
                                     {
                                         DollRoom.UnscaleFxTimes(fxObject);
                                         //__instance.UnscaleFxTimes(fxObject);
-                                       // UnscaleFxTimes(__instance, fxObject);
+                                        // UnscaleFxTimes(__instance, fxObject);
                                     }
                                 }
                             }
                         }
                     }
-                } catch (Exception ex)
+                }
+                catch (Exception ex)
                 {
                     Main.Error(ex);
                 }
             }
         }
+
         public static Dictionary<ItemEntity, List<GameObject>> WeaponEnchantments = new Dictionary<ItemEntity, List<GameObject>>();
+
         [HarmonyPatch(typeof(UnitViewHandSlotData), "UpdateWeaponEnchantmentFx")]
-        static class UnitViewHandSlotData_UpdateWeaponEnchantmentFx_Patch
+        private static class UnitViewHandSlotData_UpdateWeaponEnchantmentFx_Patch
         {
-            static void Postfix(UnitViewHandSlotData __instance, bool isVisible)
+            private static void Postfix(UnitViewHandSlotData __instance, bool isVisible)
             {
-                try 
+                try
                 {
                     if (!Main.enabled) return;
                     if (!__instance.Owner.IsPlayerFaction) return;
@@ -4859,7 +4868,8 @@ namespace VisualAdjustments
                         var enchantments = __instance.IsOff ?
                             characterSettings.overrideOffhandWeaponEnchantments :
                             characterSettings.overrideMainWeaponEnchantments;
-                        foreach (var enchantmentId in enchantments) {
+                        foreach (var enchantmentId in enchantments)
+                        {
                             var blueprint = ResourcesLibrary.TryGetBlueprint<BlueprintWeaponEnchantment>(enchantmentId);
                             if (blueprint == null || blueprint.WeaponFxPrefab == null) continue;
                             var fxObject = RespawnFx(blueprint.WeaponFxPrefab, __instance.Slot.MaybeItem);
@@ -4867,7 +4877,7 @@ namespace VisualAdjustments
                         }
                         foreach (var asd in characterSettings.weaponEnchantments)
                         {
-                          //  Main.logger.Log(asd.Key);
+                            //  Main.logger.Log(asd.Key);
                             var parsedtuple = Settings.ParseOverrideEnchant(asd.Key);
                             //Main.logger.Log(parsedtuple.ToString() + "  parsed : new  " + new Tuple<string, int, bool>(blueprint.VisualParameters.AnimStyle.ToString(), __instance.Owner.View.HandsEquipment.Sets.Keys.ToList().IndexOf(__instance.Slot.HandsEquipmentSet), __instance.Slot.IsPrimaryHand));
                             if (new Tuple<int, bool>(__instance.Owner.View.HandsEquipment.Sets.Keys.ToList().IndexOf(__instance.Slot.HandsEquipmentSet), __instance.Slot.IsPrimaryHand).ToString() == parsedtuple.ToString())
@@ -4883,16 +4893,18 @@ namespace VisualAdjustments
                             }
                         }
                     }
-                } catch (Exception ex)
+                }
+                catch (Exception ex)
                 {
                     Main.Error(ex);
                 }
             }
         }
+
         [HarmonyPatch(typeof(UnitViewHandSlotData), "DestroyModel")]
-        static class UnitViewHandSlotData_DestroyModel_Patch
+        private static class UnitViewHandSlotData_DestroyModel_Patch
         {
-            static void Postfix(UnitViewHandSlotData __instance)
+            private static void Postfix(UnitViewHandSlotData __instance)
             {
                 try
                 {
@@ -4908,16 +4920,18 @@ namespace VisualAdjustments
                     }
                     WeaponEnchantments[__instance.Slot.MaybeItem].Clear();
                     WeaponEnchantments.Remove(__instance.Slot.MaybeItem);
-                } catch (Exception ex)
+                }
+                catch (Exception ex)
                 {
                     Main.Error(ex);
                 }
             }
         }
+
         [HarmonyPatch(typeof(UnitViewHandSlotData), "UpdateWeaponEnchantmentFx")]
-        static class UpdateWeaponEnchantmentFx_Patch
+        private static class UpdateWeaponEnchantmentFx_Patch
         {
-            static bool Prefix(UnitViewHandSlotData __instance, ref bool isVisible)
+            private static bool Prefix(UnitViewHandSlotData __instance, ref bool isVisible)
             {
                 try
                 {
@@ -4933,12 +4947,10 @@ namespace VisualAdjustments
                                     __instance.Slot.FxSnapMap = null;
                                     foreach (ItemEnchantment e in __instance.VisibleItem.Enchantments)
                                     {
-
                                         e.DestroyFx();
                                     }
                                     return false;
                                 }
-
                                 else return true;
                             }
                             else return true;
@@ -4954,6 +4966,7 @@ namespace VisualAdjustments
                 }
             }
         }
+
         /*static class UnitViewHandSlotData_RecreateModel_Patch
         {
             static void Postfix(UnitViewHandSlotData __instance)
@@ -4967,7 +4980,6 @@ namespace VisualAdjustments
                     if (__instance.Slot.MaybeItem == null) return;
                      if (characterSettings.hideWeaponEnchantments)
                      {
-
                      }
                 }
                 catch (Exception ex)
@@ -4976,17 +4988,16 @@ namespace VisualAdjustments
                 }
             }
         }*/
-      /*  [HarmonyPatch(typeof(UnitViewHandSlotData), "UpdateWeaponEnchantmentFx")]
-        static class UnitViewHandSlotData_UpdateWeaponEnchantmentFx_Patch
-        {
-            static void Postfix(UnitViewHandSlotData __instance, ref List<ItemEnchantment> ___m_VisibleEnchantments)
-            {
-                try
-                {
-
-                }
-                catch(Exception e) { Main.logger.Log(e.ToString()); }
-            }
-        }*/
+        /*  [HarmonyPatch(typeof(UnitViewHandSlotData), "UpdateWeaponEnchantmentFx")]
+          static class UnitViewHandSlotData_UpdateWeaponEnchantmentFx_Patch
+          {
+              static void Postfix(UnitViewHandSlotData __instance, ref List<ItemEnchantment> ___m_VisibleEnchantments)
+              {
+                  try
+                  {
+                  }
+                  catch(Exception e) { Main.logger.Log(e.ToString()); }
+              }
+          }*/
     }
 }

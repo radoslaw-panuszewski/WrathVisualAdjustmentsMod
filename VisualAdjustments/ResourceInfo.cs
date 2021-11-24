@@ -1,17 +1,3 @@
-
-using HarmonyLib;
-using Kingmaker;
-using Kingmaker.Blueprints;
-using Kingmaker.Blueprints.CharGen;
-using Kingmaker.Blueprints.Classes;
-using Kingmaker.Blueprints.Root;
-using Kingmaker.Designers;
-using Kingmaker.EntitySystem.Entities;
-using Kingmaker.Visual.CharacterSystem;
-using System;
-using System.Collections;
-using System.Collections.Generic;
-
 namespace VisualAdjustments
 {
 #if DEBUG

@@ -1,19 +1,14 @@
 ﻿// Copyright < 2021 > Narria (github user Cabarius) - License: MIT
-using UnityEngine;
-using UnityModManagerNet;
-using UnityEngine.UI;
-using HarmonyLib;
 using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Linq;
+using UnityEngine;
 using GL = UnityEngine.GUILayout;
 
-namespace ModKit {
-    public static partial class UI {
-
-
-        public static void Label(String title, params GUILayoutOption[] options) {
+namespace ModKit
+{
+    public static partial class UI
+    {
+        public static void Label(String title, params GUILayoutOption[] options)
+        {
             // var content = tooltip == null ? new GUIContent(title) : new GUIContent(title, tooltip);
             //  if (options.Length == 0) { options = new GUILayoutOption[] { GL.Width(150f) }; }
             GL.Label(title, options);
@@ -32,53 +27,67 @@ namespace ModKit {
             }
             return Mathf.Clamp(value, min, max);
         }
-        public static String TextField(ref String text, String name = null, params GUILayoutOption[] options) {
+
+        public static String TextField(ref String text, String name = null, params GUILayoutOption[] options)
+        {
             if (name != null) { GUI.SetNextControlName(name); }
             text = GL.TextField(text, options);
             return text;
         }
-        public static int IntTextField(ref int value, String name = null, params GUILayoutOption[] options) {
+
+        public static int IntTextField(ref int value, String name = null, params GUILayoutOption[] options)
+        {
             String text = $"{value}";
             UI.TextField(ref text, name, options);
             Int32.TryParse(text, out value);
             return value;
         }
-        public static float FloatTextField(ref float value, String name = null, params GUILayoutOption[] options) {
+
+        public static float FloatTextField(ref float value, String name = null, params GUILayoutOption[] options)
+        {
             String text = $"{value}";
             UI.TextField(ref text, name, options);
             var val = value;
-            if (float.TryParse(text, out val)) {
+            if (float.TryParse(text, out val))
+            {
                 value = val;
             }
             return value;
         }
 
-        public static void ActionButton(String title, Action action, params GUILayoutOption[] options) {
+        public static void ActionButton(String title, Action action, params GUILayoutOption[] options)
+        {
             if (options.Length == 0) { options = new GUILayoutOption[] { GL.Width(300f) }; }
             if (GL.Button(title, options)) { action(); }
         }
+
         public static void ActionTextField(ref string text,
                 String name,
                 Action<String> action,
                 Action enterAction,
                 params GUILayoutOption[] options
-            ) {
+            )
+        {
             GUI.SetNextControlName(name);
             String newText = GL.TextField(text, options);
-            if (newText != text) {
+            if (newText != text)
+            {
                 text = newText;
                 if (action != null) action(text);
             }
-            if (enterAction != null && UI.userHasHitReturn && UI.focusedControlName == name) {
+            if (enterAction != null && UI.userHasHitReturn && UI.focusedControlName == name)
+            {
                 enterAction();
             }
         }
+
         public static void ActionIntTextField(ref int value,
                 String name,
                 Action<int> action,
                 Action enterAction,
                 params GUILayoutOption[] options
-            ) {
+            )
+        {
             bool changed = false;
             bool hitEnter = false;
             String str = $"{value}";
@@ -91,7 +100,9 @@ namespace ModKit {
             if (changed) { action(value); }
             if (hitEnter) { enterAction(); }
         }
-        public static void ValueEditor(String title, ref int increment, Func<int> get, Action<long> set, int min = 0, int max = int.MaxValue, float titleWidth = 500) {
+
+        public static void ValueEditor(String title, ref int increment, Func<int> get, Action<long> set, int min = 0, int max = int.MaxValue, float titleWidth = 500)
+        {
             var value = get();
             var inc = increment;
             UI.Label(title.cyan(), UI.Width(titleWidth));
@@ -106,7 +117,9 @@ namespace ModKit {
             UI.ActionIntTextField(ref inc, title, (v) => { }, null, UI.Width(fieldWidth + 25));
             increment = inc;
         }
-        public static bool Slider(String title, ref float value, float min, float max, float defaultValue = 1.0f, int decimals = 0, String units = "", params GUILayoutOption[] options) {
+
+        public static bool Slider(String title, ref float value, float min, float max, float defaultValue = 1.0f, int decimals = 0, String units = "", params GUILayoutOption[] options)
+        {
             value = Math.Max(min, Math.Min(max, value));    // clamp it
             UI.BeginHorizontal(options);
             UI.Label(title.cyan(), UI.Width(300));
@@ -123,13 +136,17 @@ namespace ModKit {
             value = newValue;
             return changed;
         }
-        public static bool Slider(String title, ref int value, int min, int max, int defaultValue = 1, String units = "", params GUILayoutOption[] options) {
+
+        public static bool Slider(String title, ref int value, int min, int max, int defaultValue = 1, String units = "", params GUILayoutOption[] options)
+        {
             float fvalue = value;
             bool changed = UI.Slider(title, ref fvalue, min, max, (float)defaultValue, 0, "", options);
             value = (int)fvalue;
             return changed;
         }
-        public static bool LogSlider(String title, ref float value, float min, float max, float defaultValue = 1.0f, int decimals = 0, String units = "", params GUILayoutOption[] options) {
+
+        public static bool LogSlider(String title, ref float value, float min, float max, float defaultValue = 1.0f, int decimals = 0, String units = "", params GUILayoutOption[] options)
+        {
             if (min < 0) throw new Exception("LogSlider - min value: {min} must be >= 0");
             UI.BeginHorizontal(options);
             UI.Label(title.cyan(), UI.Width(300));

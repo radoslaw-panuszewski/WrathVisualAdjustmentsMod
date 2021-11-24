@@ -9,27 +9,18 @@ using Kingmaker.EntitySystem.Entities;
 using Kingmaker.Items.Slots;
 using Kingmaker.PubSubSystem;
 using Kingmaker.ResourceLinks;
+using Kingmaker.UI.MVVM._PCView.CharGen.Phases.Common;
+using Kingmaker.UI.MVVM._VM.Common;
 using Kingmaker.UnitLogic;
-using Kingmaker.UnitLogic.Parts;
+using Kingmaker.Utility;
 using Kingmaker.View;
 using Kingmaker.Visual.CharacterSystem;
+using Kingmaker.Visual.Particles;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
-using Kingmaker.Designers.EventConditionActionSystem.Actions;
-using Kingmaker.Items;
-using Kingmaker.UI.MVVM._VM.Common;
 using UnityEngine;
 using static VisualAdjustments.Settings;
-using Kingmaker.UnitLogic.Class.LevelUp;
-using Kingmaker.Utility;
-using Kingmaker.Visual;
-using Kingmaker.Visual.Particles;
-using Owlcat.Runtime.Visual.Dxt;
-using Owlcat.Runtime.Core.Utils.Locator;
-using Kingmaker.UI.MVVM._PCView.CharGen.Phases.Common;
 
 namespace VisualAdjustments
 {
@@ -65,9 +56,10 @@ namespace VisualAdjustments
         private static Dictionary<UnitEntityView, GameObject> wingsFxVisibilityManagers = new Dictionary<UnitEntityView, GameObject>();
         public static bool disableEquipmentClassPatch;
         /*
-         * Based on DollData.CreateUnitView, DollRoom.CreateAvatar and 
+         * Based on DollData.CreateUnitView, DollRoom.CreateAvatar and
          * UnitEntityData.CreateView
          */
+
         public static void RebuildCharacter(UnitEntityData unitEntityData)
         {
             try
@@ -158,14 +150,14 @@ namespace VisualAdjustments
                     //   Main.logger.Log("dollnull " + unitEntityData.CharacterName);
                     character.RemoveAllEquipmentEntities(false);
                     character.RestoreSavedEquipment();
-                  //  IEnumerable<EquipmentEntity> bodyEquipment = unitEntityData.Body.AllSlots.SelectMany(
+                    //  IEnumerable<EquipmentEntity> bodyEquipment = unitEntityData.Body.AllSlots.SelectMany(
                     //    new Func<ItemSlot, IEnumerable<EquipmentEntity>>(unitEntityData.View.ExtractEquipmentEntities));
                     var bruh = unitEntityData.Body.AllSlots.SelectMany(a => unitEntityData.View.ExtractEquipmentEntities(a));
                     if (bruh != null && !bruh.Empty())
                         character.AddEquipmentEntities(bruh, true);
-                   //     character.RebuildOutfit();
-                   // character.UpdateCharacter();
-                   // character.UpdateMesh();
+                    //     character.RebuildOutfit();
+                    // character.UpdateCharacter();
+                    // character.UpdateMesh();
                     unitEntityData.View.HandsEquipment.UpdateAll();                                                                                                   //Adds Armor
                     unitEntityData.View.UpdateClassEquipment();
                     if (Settings.customOutfitColors)
@@ -178,7 +170,9 @@ namespace VisualAdjustments
                 //Add Kineticist Tattoos
                 //Main.SetEELs(unitEntityData, DollResourcesManager.GetDoll(unitEntityData), false);
                 //unitEntityData.View.CharacterAvatar.OnRenderObject();
-                var component = unitEntityData.View.Data.Parts.Get<UnitPartVAEELs>();
+                // var component = unitEntityData.View.Data.Parts.Get<UnitPartVAEELs>();
+                var VisualInfo = VisualAdjustments.GlobalVisualInfo.Instance.ForCharacter(unitEntityData);
+                var component = VisualInfo.EEPart;
                 if (component != null)
                 {
                     foreach (var eetoremove in component.EEToRemove)
@@ -195,7 +189,6 @@ namespace VisualAdjustments
                         unitEntityData.View.CharacterAvatar.AddEquipmentEntity(ee);
                         eetoadd.Apply(ee, unitEntityData.View.CharacterAvatar);
                     }
-
                 }
                 if (Settings.customOutfitColors)
                 {
@@ -213,10 +206,10 @@ namespace VisualAdjustments
             }
             catch (Exception e)
             {
-
                 Main.logger.Log(e.ToString() + " " + unitEntityData.CharacterName);
             }
         }
+
         /* public static void RebuildCharacterNew(UnitEntityData unitEntityData)
          {
              try
@@ -251,11 +244,9 @@ namespace VisualAdjustments
                      {
                          /*  if()
                            {
-
                            }
                            else
                            {
-
                            }
                            character.Skeleton = (doll.Gender != Gender.Male) ? doll.RacePreset.FemaleSkeleton : doll.RacePreset.MaleSkeleton;*//*
                          character.AddEquipmentEntities(doll.RacePreset.Skin.Load(doll.Gender, doll.RacePreset.RaceId), savedEquipment);
@@ -298,7 +289,8 @@ namespace VisualAdjustments
                  Main.logger.Log(e.ToString());
              }
          }*/
-        static void ChangeCompanionOutfit(UnitEntityView __instance, CharacterSettings characterSettings)
+
+        private static void ChangeCompanionOutfit(UnitEntityView __instance, CharacterSettings characterSettings)
         {
             /*
              * Note UpdateClassEquipment() works by removing the clothes of the old class, and loading the clothes of the new class
@@ -336,78 +328,91 @@ namespace VisualAdjustments
                      primaryIndex = 13;
                      secondaryIndex = 17;
                      break;
+
                  case "5455cd3cd375d7a459ca47ea9ff2de78": //"Tartuccio",
                      FilterOutfit("Sorcerer");
                      //Class 22, 3, EE 4, 32 (BlueLighter, BlackMedium)
                      primaryIndex = 4;
                      secondaryIndex = 32;
                      break;
+
                  case "54be53f0b35bf3c4592a97ae335fe765": //"Valerie",
                      FilterOutfit("Fighter");
                      //Class 3, 23, EE 31, 17 (BlackDark, OrangeMedium)
                      primaryIndex = 31;
                      secondaryIndex = 17;
                      break;
+
                  case "b3f29faef0a82b941af04f08ceb47fa2": //"Amiri",
                      FilterOutfit("Barbarian");
                      //Class 22, 2, EE 15, 3 (OrangeDarker, BlueLight)
                      primaryIndex = 15;
                      secondaryIndex = 3;
                      break;
+
                  case "aab03d0ab5262da498b32daa6a99b507": //"Harrim",
                      FilterOutfit("Cleric");
                      //Class 34, 22, EE 30, 34 (BlackDarker, BlackLighter)
                      primaryIndex = 30;
                      secondaryIndex = 34;
                      break;
+
                  case "32d2801eddf236b499d42e4a7d34de23": //"Jaethal",
                      FilterOutfit("Inquisitor");
                      //CLass 23, 3, EE None, Visually 22, 3
                      primaryIndex = 22;
                      secondaryIndex = 3;
                      break;
+
                  case "b090918d7e9010a45b96465de7a104c3": //"Regongar",
                      FilterOutfit("Magus");
                      //Class 2, 22, EE 2, 22 (BlueMedium, RedMedium)
                      primaryIndex = 2;
                      secondaryIndex = 22;
                      break;
+
                  case "f9161aa0b3f519c47acbce01f53ee217": //"Octavia",
                      FilterOutfit("Wizard");
                      //Class 27, 2, EE 3, 24 (BlueLight, RedLighter)
                      primaryIndex = 3;
                      secondaryIndex = 24;
                      break;
+
                  case "f6c23e93512e1b54dba11560446a9e02": //"Tristian",
                      FilterOutfit("Cleric");
                      //Class 34, 22, EE 34, 13 (BlackLighter, YellowLight)
                      primaryIndex = 34;
                      secondaryIndex = 13;
                      break;
+
                  case "d5bc1d94cd3e5be4bbc03f3366f67afc": //"Ekundayo",
                      FilterOutfit("Ranger");
                      //Class 23, 7, EE 23, 33 (RedLight, Black Light)
                      primaryIndex = 23;
                      secondaryIndex = 33;
                      break;
+
                  case "3f5777b51d301524c9b912812955ee1e": //"Jubilost",
                      FilterOutfit("Alchemist");
                      //Class 17, 31, EE 17, 31 (OrangeMedium, BlackDark)
                      primaryIndex = 17;
                      secondaryIndex = 31;
                      break;
+
                  case "f9417988783876044b76f918f8636455": //"Nok-Nok",
                      FilterOutfit("Rogue");
                      //Class 31, 22, EE NULL, Visual 32, 23
                      primaryIndex = 32;
                      secondaryIndex = 23;
                      break;
+
                  case "c807d18a89f96c74f8bb48b31b616323": //"Kalikke",
                      FilterOutfit("Kineticist");
                      //Class 23, 18, EE 23, 17 (RedLight, OrangeMedium)
                      primaryIndex = 23;
                      secondaryIndex = 17;
                      break;
+
                  case "f1c0b181a534f4940ae17f243a5968ec": //"Kanerah",
                      FilterOutfit("Kineticist");
                      //Class 23, 18, EE 23, 17 (RedLight, OrangeMedium)
@@ -431,9 +436,9 @@ namespace VisualAdjustments
                 __instance.CharacterAvatar.SetPrimaryRampIndex(ee, primaryIndex);
                 __instance.CharacterAvatar.SetSecondaryRampIndex(ee, secondaryIndex);
             }
-
         }
-        static void HideSlot(UnitEntityView __instance, ItemSlot slot, ref bool dirty)
+
+        private static void HideSlot(UnitEntityView __instance, ItemSlot slot, ref bool dirty)
         {
             var ee = __instance.ExtractEquipmentEntities(slot).ToList();
             if (ee.Count > 0)
@@ -442,7 +447,8 @@ namespace VisualAdjustments
                 dirty = true;
             }
         }
-        static bool OverrideEquipment(UnitEntityView __instance, ItemSlot slot, string assetId, ref bool dirty)
+
+        private static bool OverrideEquipment(UnitEntityView __instance, ItemSlot slot, string assetId, ref bool dirty)
         {
             var kee = ResourcesLibrary.TryGetBlueprint<KingmakerEquipmentEntity>(assetId);
             if (kee == null) return false;
@@ -463,10 +469,12 @@ namespace VisualAdjustments
             dirty = true;
             return true;
         }
+
         /*
-         * Fix "bug" where Male Ranger Cape would hide hair and ears         * 
+         * Fix "bug" where Male Ranger Cape would hide hair and ears         *
          */
-        static void FixRangerCloak(UnitEntityView view)
+
+        private static void FixRangerCloak(UnitEntityView view)
         {
             foreach (var ee in view.CharacterAvatar.EquipmentEntities)
             {
@@ -476,6 +484,7 @@ namespace VisualAdjustments
                 }
             }
         }
+
         public static void NoClassOutfit(UnitEntityView view)
         {
             var classOutfit = view.EntityData.Descriptor.Progression.GetEquipmentClass();
@@ -486,6 +495,7 @@ namespace VisualAdjustments
             var newClothes = BlueprintRoot.Instance.CharGen.LoadClothes(view.EntityData.Descriptor.Gender);
             view.CharacterAvatar.AddEquipmentEntities(newClothes);
         }
+
         public static void UpdateModel(UnitEntityView view)
         {
             try
@@ -594,7 +604,7 @@ namespace VisualAdjustments
                     }
                 }
 
-                /*else 
+                /*else
                 if(equipmentClass.NameForAcronym.Contains("Ranger") || equipmentClass.NameForAcronym.Contains("Rogue") || equipmentClass.NameForAcronym.Contains("Inquisitor"))
                 {
                   if(!view.CharacterAvatar.EquipmentEntities.Any(a => a.OutfitParts.Any(b => b.ToString().Contains("Cloak") || b.ToString().Contains("Cape"))))
@@ -712,7 +722,6 @@ namespace VisualAdjustments
                          view.CharacterAvatar.m_AdditionalFXs;
                          if (view.)
                          {
-
                          }
                          if (view.CharacterAvatar.EquipmentEntities.Contains(eetoremove)) view.CharacterAvatar.RemoveEquipmentEntity(eetoremove, false);
                      }*/
@@ -856,7 +865,6 @@ namespace VisualAdjustments
                          view.CharacterAvatar.AddEquipmentEntity(ee);
                          eetoadd.Apply(ee, view.CharacterAvatar);
                      }
-
                  }
                  if (characterSettings.customOutfitColors)
                  {
@@ -877,15 +885,17 @@ namespace VisualAdjustments
                 Main.logger.Error(e.ToString());
             }
         }
+
         /*
          * Called by CheatsSilly.UpdatePartyNoArmor and OnDataAttached
          * Applies all EquipmentEntities from item Slots for NonBaked avatars
          * Does nothing if SCCCanSeeTheirClassSpecificClothes is enabled
          * */
+
         [HarmonyPatch(typeof(UnitEntityView), "UpdateBodyEquipmentModel")]
-        static class UnitEntityView_UpdateBodyEquipmentModel_Patch
+        private static class UnitEntityView_UpdateBodyEquipmentModel_Patch
         {
-            static void Postfix(UnitEntityView __instance)
+            private static void Postfix(UnitEntityView __instance)
             {
                 try
                 {
@@ -901,19 +911,20 @@ namespace VisualAdjustments
                 }
             }
         }
+
         /*
          * Unclear when called
          * Handles changed hand slots, usable slots
          * When item slot is changed, removes old equipment and adds new slot
          * */
+
         [HarmonyPatch(typeof(UnitEntityView), "HandleEquipmentSlotUpdated")]
-        static class UnitEntityView_HandleEquipmentSlotUpdated_Patch
+        private static class UnitEntityView_HandleEquipmentSlotUpdated_Patch
         {
-            static void Postfix(UnitEntityView __instance, ref ItemSlot slot)
+            private static void Postfix(UnitEntityView __instance, ref ItemSlot slot)
             {
                 try
                 {
-
                     /*Settings.CharacterSettings characterSettings = Main.settings.GetCharacterSettings(__instance.EntityData);
                     var b = ResourcesLibrary.TryGetBlueprint<KingmakerEquipmentEntity>(characterSettings.overrideArmor.assetId).Load(__instance.Data.Gender, __instance.Data.Progression.Race.RaceId);
                     var c = __instance.EntityData.View.CharacterAvatar.m_EquipmentEntities.Intersect(b);/// != characterSettings.overrideArmor.assetId;*/
@@ -955,6 +966,7 @@ namespace VisualAdjustments
                 }
             }
         }
+
         /*
          * Called when a character levels up, or on UnitEntityView.OnDataAttached
          * Removes all equipment of current class, CheatSillyShirt.
@@ -962,10 +974,11 @@ namespace VisualAdjustments
          * Adds CheatSillyShirt back
          * Applies doll colors and saves class
          * */
+
         [HarmonyPatch(typeof(UnitEntityView), "UpdateClassEquipment")]
-        static class UnitEntityView_UpdateClassEquipment_Patch
+        private static class UnitEntityView_UpdateClassEquipment_Patch
         {
-            static void Postfix(UnitEntityView __instance)
+            private static void Postfix(UnitEntityView __instance)
             {
                 try
                 {
@@ -980,10 +993,11 @@ namespace VisualAdjustments
                 }
             }
         }
+
         [HarmonyPatch(typeof(UnitProgressionData), "GetEquipmentClass")]
-        static class UnitProgressionData_GetEquipmentClass_Patch
+        private static class UnitProgressionData_GetEquipmentClass_Patch
         {
-            static bool Prefix(UnitProgressionData __instance, ref BlueprintCharacterClass __result)
+            private static bool Prefix(UnitProgressionData __instance, ref BlueprintCharacterClass __result)
             {
                 try
                 {
@@ -1000,63 +1014,83 @@ namespace VisualAdjustments
                         case "Alchemist":
                             __result = (BlueprintCharacterClass)ResourcesLibrary.TryGetBlueprint<BlueprintCharacterClass>("0937bec61c0dabc468428f496580c721");
                             break;
+
                         case "Barbarian":
                             __result = (BlueprintCharacterClass)ResourcesLibrary.TryGetBlueprint<BlueprintCharacterClass>("f7d7eb166b3dd594fb330d085df41853");
                             break;
+
                         case "Bard":
                             __result = (BlueprintCharacterClass)ResourcesLibrary.TryGetBlueprint<BlueprintCharacterClass>("772c83a25e2268e448e841dcd548235f");
                             break;
+
                         case "Cavalier":
                             __result = (BlueprintCharacterClass)ResourcesLibrary.TryGetBlueprint<BlueprintCharacterClass>("3adc3439f98cb534ba98df59838f02c7");
                             break;
+
                         case "Cleric":
                             __result = (BlueprintCharacterClass)ResourcesLibrary.TryGetBlueprint<BlueprintCharacterClass>("67819271767a9dd4fbfd4ae700befea0");
                             break;
+
                         case "Druid":
                             __result = (BlueprintCharacterClass)ResourcesLibrary.TryGetBlueprint<BlueprintCharacterClass>("610d836f3a3a9ed42a4349b62f002e96");
                             break;
+
                         case "Fighter":
                             __result = (BlueprintCharacterClass)ResourcesLibrary.TryGetBlueprint<BlueprintCharacterClass>("48ac8db94d5de7645906c7d0ad3bcfbd");
                             break;
+
                         case "Inquisitor":
                             __result = (BlueprintCharacterClass)ResourcesLibrary.TryGetBlueprint<BlueprintCharacterClass>("f1a70d9e1b0b41e49874e1fa9052a1ce");
                             break;
+
                         case "Kineticist":
                             __result = (BlueprintCharacterClass)ResourcesLibrary.TryGetBlueprint<BlueprintCharacterClass>("42a455d9ec1ad924d889272429eb8391");
                             break;
+
                         case "Magus":
                             __result = (BlueprintCharacterClass)ResourcesLibrary.TryGetBlueprint<BlueprintCharacterClass>("45a4607686d96a1498891b3286121780");
                             break;
+
                         case "Monk":
                             __result = (BlueprintCharacterClass)ResourcesLibrary.TryGetBlueprint<BlueprintCharacterClass>("e8f21e5b58e0569468e420ebea456124");
                             break;
+
                         case "Oracle":
                             __result = (BlueprintCharacterClass)ResourcesLibrary.TryGetBlueprint<BlueprintCharacterClass>("20ce9bf8af32bee4c8557a045ab499b1");
                             break;
+
                         case "Paladin":
                             __result = (BlueprintCharacterClass)ResourcesLibrary.TryGetBlueprint<BlueprintCharacterClass>("bfa11238e7ae3544bbeb4d0b92e897ec");
                             break;
+
                         case "Ranger":
                             __result = (BlueprintCharacterClass)ResourcesLibrary.TryGetBlueprint<BlueprintCharacterClass>("cda0615668a6df14eb36ba19ee881af6");
                             break;
+
                         case "Rogue":
                             __result = (BlueprintCharacterClass)ResourcesLibrary.TryGetBlueprint<BlueprintCharacterClass>("299aa766dee3cbf4790da4efb8c72484");
                             break;
+
                         case "Shaman":
                             __result = (BlueprintCharacterClass)ResourcesLibrary.TryGetBlueprint<BlueprintCharacterClass>("145f1d3d360a7ad48bd95d392c81b38e");
                             break;
+
                         case "Skald":
                             __result = (BlueprintCharacterClass)ResourcesLibrary.TryGetBlueprint<BlueprintCharacterClass>("6afa347d804838b48bda16acb0573dc0");
                             break;
+
                         case "Slayer":
                             __result = (BlueprintCharacterClass)ResourcesLibrary.TryGetBlueprint<BlueprintCharacterClass>("c75e0971973957d4dbad24bc7957e4fb");
                             break;
+
                         case "Sorcerer":
                             __result = (BlueprintCharacterClass)ResourcesLibrary.TryGetBlueprint<BlueprintCharacterClass>("b3a505fb61437dc4097f43c3f8f9a4cf");
                             break;
+
                         case "Wizard":
                             __result = (BlueprintCharacterClass)ResourcesLibrary.TryGetBlueprint<BlueprintCharacterClass>("ba34257984f4c41408ce1dc2004e342e");
                             break;
+
                         default:
                             return true;
                     }*/
@@ -1070,28 +1104,33 @@ namespace VisualAdjustments
                 }
             }
         }
-        static void TryPreloadKEE(BlueprintRef assetId, Gender gender, Race race)
+
+        private static void TryPreloadKEE(BlueprintRef assetId, Gender gender, Race race)
         {
             if (string.IsNullOrEmpty(assetId)) return;
             var link = ResourcesLibrary.TryGetBlueprint<KingmakerEquipmentEntity>(assetId);
             if (link != null) link.Preload(gender, race);
         }
-        static void TryPreloadEE(ResourceRef assetId, Gender gender, Race race)
+
+        private static void TryPreloadEE(ResourceRef assetId, Gender gender, Race race)
         {
             if (string.IsNullOrEmpty(assetId)) return;
             ResourcesLibrary.PreloadResource<EquipmentEntity>(assetId);
         }
-        static void TryPreloadUnitView(ResourceRef assetId, Gender gender, Race race)
+
+        private static void TryPreloadUnitView(ResourceRef assetId, Gender gender, Race race)
         {
             if (string.IsNullOrEmpty(assetId)) return;
             ResourcesLibrary.PreloadResource<UnitEntityView>(assetId);
         }
-        static void TryPreloadWeapon(BlueprintRef assetId, Gender gender, Race race)
+
+        private static void TryPreloadWeapon(BlueprintRef assetId, Gender gender, Race race)
         {
             if (string.IsNullOrEmpty(assetId)) return;
             var item = ResourcesLibrary.TryGetBlueprint<BlueprintItemEquipment>(assetId);
             item?.EquipmentEntity?.Preload(gender, race);
         }
+
         public static void PreloadUnit(UnitEntityView __instance)
         {
             if (__instance == null) return;
@@ -1126,10 +1165,11 @@ namespace VisualAdjustments
                 foreach (var clothing in clothes) clothing.Preload();
             }
         }
+
         [HarmonyPatch(typeof(ResourcesPreload), "PreloadUnitResources")]
-        static class ResourcesPreload_PreloadUnitResources_Patch
+        private static class ResourcesPreload_PreloadUnitResources_Patch
         {
-            static void Postfix()
+            private static void Postfix()
             {
                 try
                 {
@@ -1144,6 +1184,7 @@ namespace VisualAdjustments
                 }
             }
         }
+
         /*[HarmonyPatch(typeof(Game), "OnAreaLoaded
          * ")]
         static class Game_OnAreaLoaded_Patch
@@ -1197,9 +1238,9 @@ namespace VisualAdjustments
          }*/
 
         [HarmonyPatch(typeof(CommonVM), "HideLoadingScreen")]
-        static class Game_loadcomplete_Patch
+        private static class Game_loadcomplete_Patch
         {
-            static void Postfix()
+            private static void Postfix()
             {
                 try
                 {
@@ -1216,6 +1257,21 @@ namespace VisualAdjustments
                     TutorialCanvas.UI.UIManager.haschanged = true;
                     foreach (var character in Game.Instance.Player.AllCharacters)
                     {
+                        var fxpart = character.Parts.Get<UnitPartVAFX>();
+                        var eepart = character.Parts.Get<UnitPartVAEELs>();
+                        var VisualInfo = GlobalVisualInfo.Instance.ForCharacter(character);
+                        if (fxpart != null)
+                        {
+                            Main.logger.Log("Removed FX Part & Migrated settings for " + character.CharacterName);
+                            VisualInfo.FXpart = fxpart.ToSaveHooker();
+                            character.Remove<UnitPartVAFX>();
+                        }
+                        if (eepart != null)
+                        {
+                            Main.logger.Log("Removed EE Part & Migrated settings for " + character.CharacterName);
+                            VisualInfo.EEPart = eepart.ToSaveHooker();
+                            character.Remove<UnitPartVAEELs>();
+                        }
                         /* foreach (var ee in character.View.CharacterAvatar.SavedEquipmentEntities)
                          {
                              Main.logger.Log(ee.Load(true) + character.CharacterName);
@@ -1237,10 +1293,11 @@ namespace VisualAdjustments
                 }
             }
         }
+
         // [HarmonyPatch(typeof(Game), "OnAreaLoaded")]
-        static class Game_OnAreaLoaded_Patch
+        private static class Game_OnAreaLoaded_Patch
         {
-            static void Postfix()
+            private static void Postfix()
             {
                 try
                 {
@@ -1270,10 +1327,11 @@ namespace VisualAdjustments
                 }
             }
         }
+
         [HarmonyPatch(typeof(Kingmaker.UI.ServiceWindow.DollRoom), "SetupInfo")]
-        static class SetupInfoDollRoom_Patch
+        private static class SetupInfoDollRoom_Patch
         {
-            static void Postfix(Kingmaker.UI.ServiceWindow.DollRoom __instance, UnitEntityData player, bool force = false, BlueprintClassAdditionalVisualSettings additionalVisualSettings = null)
+            private static void Postfix(Kingmaker.UI.ServiceWindow.DollRoom __instance, UnitEntityData player, bool force = false, BlueprintClassAdditionalVisualSettings additionalVisualSettings = null)
             {
                 try
                 {
@@ -1294,26 +1352,28 @@ namespace VisualAdjustments
                 }
             }
         }
+
         [HarmonyPatch(typeof(DollCharacterController), "UpdateDollRoomLevel")]
-        static class DollCharacterController_Patch
+        private static class DollCharacterController_Patch
         {
             public static void Postfix()
             {
                 var dollroom = Game.Instance.UI.Common.DollRoom;
                 var settings = Main.settings.GetCharacterSettings(dollroom.Unit);
-                if(settings != null)
+                if (settings != null)
                 {
-                    if(settings.hideMythic)
+                    if (settings.hideMythic)
                     {
                         dollroom.GetAvatar().SetAdditionalVisualSettings(null);
                     }
-                    else if(!settings.overrideMythic.IsNullOrEmpty())
+                    else if (!settings.overrideMythic.IsNullOrEmpty())
                     {
                         dollroom.GetAvatar().SetAdditionalVisualSettings(Utilities.GetBlueprint<BlueprintClassAdditionalVisualSettings>(settings.overrideMythic));
                     }
                 }
             }
         }
+
         [HarmonyPatch(typeof(Character), "ApplyAdditionalVisualSettings")]
         public static class ApplyVisualSettings_Patch
         {
@@ -1334,11 +1394,10 @@ namespace VisualAdjustments
                         __instance.m_AdditionalVisualSettings = Utilities.GetBlueprint<BlueprintClassAdditionalVisualSettings>(settings.overrideMythic);
                     }
                 }
-                catch(Exception e)
+                catch (Exception e)
                 {
                     Main.logger.Error(e.ToString());
                 }
-               
             }
         }
     }

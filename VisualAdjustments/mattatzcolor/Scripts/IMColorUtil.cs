@@ -1,11 +1,9 @@
 ﻿using UnityEngine;
-using System.Collections;
 
 namespace imColorPicker
 {
-
-    public class IMColorUtil {
-
+    public class IMColorUtil
+    {
         public static Color HSVToRGB(float H, float S, float V, bool hdr = false)
         {
             Color white = Color.white;
@@ -39,36 +37,43 @@ namespace imColorPicker
                         white.g = num4;
                         white.b = num5;
                         break;
+
                     case 1:
                         white.r = V;
                         white.g = num6;
                         white.b = num4;
                         break;
+
                     case 2:
                         white.r = num5;
                         white.g = V;
                         white.b = num4;
                         break;
+
                     case 3:
                         white.r = num4;
                         white.g = V;
                         white.b = num6;
                         break;
+
                     case 4:
                         white.r = num4;
                         white.g = num5;
                         white.b = V;
                         break;
+
                     case 5:
                         white.r = num6;
                         white.g = num4;
                         white.b = V;
                         break;
+
                     case 6:
                         white.r = V;
                         white.g = num4;
                         white.b = num5;
                         break;
+
                     case 7:
                         white.r = V;
                         white.g = num6;
@@ -138,9 +143,5 @@ namespace imColorPicker
                 H = 0f;
             }
         }
-
     }
-
 }
-
-
