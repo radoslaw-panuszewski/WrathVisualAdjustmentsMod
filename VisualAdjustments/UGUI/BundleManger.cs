@@ -69,7 +69,6 @@ namespace TutorialCanvas.Utilities
                             VisualAdjustments.Main.logger.Log($"Asset {b} already loaded.");
                     }
                 }
-
                 RemoveBundle(loadAss);
             }
             catch (Exception ex)

@@ -1,6 +1,9 @@
-﻿using Kingmaker.PubSubSystem;
+﻿#if false
+using Kingmaker;
+using Kingmaker.PubSubSystem;
 using ModMaker.Utility;
-using static TutorialCanvas.Main;
+using UnityEngine;
+//using static TutorialCanvas.Main;
 
 namespace TutorialCanvas.UI
 {
@@ -44,7 +47,7 @@ namespace TutorialCanvas.UI
 
         public void HandleModEnable() //ModMaker event from IModEventHandler
         {
-            Mod.Core.UI = this;
+          //  Mod.Core.UI = this;
             Attach();
 
             EventBus.Subscribe(this); //IMPORTANT: this subscribes to the WotR eventbus, will not work if not subscribed.
@@ -54,7 +57,7 @@ namespace TutorialCanvas.UI
         {
             EventBus.Unsubscribe(this);
             Detach();
-            Mod.Core.UI = null;
+            //Mod.Core.UI = null;
         }
 
         public void OnAreaBeginUnloading()
@@ -67,3 +70,4 @@ namespace TutorialCanvas.UI
         }
     }
 }
+#endif

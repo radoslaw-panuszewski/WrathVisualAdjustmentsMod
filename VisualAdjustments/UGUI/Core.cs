@@ -1,4 +1,5 @@
-﻿using ModMaker;
+﻿#if false
+using ModMaker;
 
 //using static TutorialCanvas.Utilities.SettingsWrapper;
 
@@ -38,3 +39,4 @@ namespace TutorialCanvas
         }
     }
 }
+#endif

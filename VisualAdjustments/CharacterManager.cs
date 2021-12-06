@@ -19,6 +19,7 @@ using Kingmaker.Visual.Particles;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using TutorialCanvas.UI;
 using UnityEngine;
 using static VisualAdjustments.Settings;
 
@@ -1185,8 +1186,7 @@ namespace VisualAdjustments
             }
         }
 
-        /*[HarmonyPatch(typeof(Game), "OnAreaLoaded
-         * ")]
+        [HarmonyPatch(typeof(Game), "OnAreaLoaded")]
         static class Game_OnAreaLoaded_Patch
         {
             static void Postfix(Game __instance)
@@ -1194,34 +1194,16 @@ namespace VisualAdjustments
                 try
                 {
                     if (!Main.enabled) return;
-                    if (!Main.settings.rebuildCharacters) return;
-                     Main.Asd();
-                     Main.Log("Rebuilding characters");
-                     foreach (UnitEntityData character in __instance.Player.PartyAndPets)
-                     {
-                         character.CreateView();
-                         character.CreateViewForData();
-                         Main.logger.Log(character.CharacterName);
-                         var Settings = Main.settings.GetCharacterSettings(character);
-                         var races = BlueprintRoot.Instance.Progression.CharacterRaces.ToArray<BlueprintRace>();
-                         DollResourcesManager.GetDoll(character).SetRace(races[Settings.RaceIndex]);
-                         Main.logger.Log(races[Settings.RaceIndex].name);
-                         Main.SetEELs();
-                        RebuildCharacter(character);
-                       /// UpdateModel(character.View);
-                        /*Main.SetEELs(character, DollResourcesManager.GetDoll(character));
-                        var doll = DollResourcesManager.GetDoll(character);
-                         doll.SetEquipColors(doll.EquipmentRampIndex,doll.EquipmentRampIndexSecondary);
-                        character.View.HandsEquipment.UpdateAll();
-                         DollResourcesManager.GetDoll(character).SetRace(races[Settings.RaceIndex]);
-                         Main.logger.Log(races[Settings.RaceIndex].ToString());*/
-        /* }
-    } catch(Exception ex)
-    {
-        Main.Error(ex);
-    }
-}
-}*/
+                    if (Main.TutorialUI == null)
+                        Main.TutorialUI = UIManager.CreateObject();
+                    TutorialCanvas.UI.UIManager.CreateObject();
+                }
+                catch (Exception ex)
+                {
+                    Main.Error(ex);
+                }
+            }
+        }
         /* [HarmonyPatch(typeof(DollState), "Updated")]
          static class DollStateUpdated
          {
@@ -1295,7 +1277,7 @@ namespace VisualAdjustments
         }
 
         // [HarmonyPatch(typeof(Game), "OnAreaLoaded")]
-        private static class Game_OnAreaLoaded_Patch
+        /*private static class Game_OnAreaLoaded_Patch
         {
             private static void Postfix()
             {
@@ -1326,7 +1308,7 @@ namespace VisualAdjustments
                     Main.Error(ex);
                 }
             }
-        }
+        }*/
 
         [HarmonyPatch(typeof(Kingmaker.UI.ServiceWindow.DollRoom), "SetupInfo")]
         private static class SetupInfoDollRoom_Patch

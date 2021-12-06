@@ -222,6 +222,8 @@ namespace TutorialCanvas.UI
             if (ee.name.Contains("_HO")) return "Half-Orc";
             if (ee.name.Contains("_ZB")) return "Zombie";
             if (ee.name.Contains("_CB")) return "Cambion";
+            if (ee.name.Contains("_GL")) return "Ghoul";
+            if (ee.name.Contains("_DE")) return "Drow";
             return "N/A";
         }
 
@@ -525,9 +527,9 @@ namespace TutorialCanvas.UI
                 try
                 {
                     // fix this
-                    if (FXUIHandler.dollPcView == null && window != null)
+                    if (FXUIHandler.dollPcView == null && window != null && this?.gameObject?.activeInHierarchy == false)
                     {
-                        FXUIHandler.dollPcView = window.parent.Find("Doll")?.GetComponent<InventoryDollPCView>();
+                        FXUIHandler.dollPcView = window?.parent?.Find("Doll")?.GetComponent<InventoryDollPCView>();
                     }
                     else if (FXUIHandler.dollPcView != null)
                     {
@@ -542,9 +544,9 @@ namespace TutorialCanvas.UI
                         {
                             // VisualAdjustments.Main.logger.Log("UpdatedPreview");
                             // CharacterManager.RebuildCharacter(data);
-                            FXUIHandler.dollPcView.OnHide();
-                            FXUIHandler.dollPcView.RefreshView();
-                            FXUIHandler.dollPcView.OnShow();
+                            FXUIHandler.dollPcView?.OnHide();
+                            FXUIHandler.dollPcView?.RefreshView();
+                            FXUIHandler.dollPcView?.OnShow();
 
                             //  FXUIHandlerHandler.dollPcView.RefreshView();
                         }
@@ -677,7 +679,7 @@ namespace TutorialCanvas.UI
         public Dictionary<string, Button> currentEELButtons = new Dictionary<string, Button>();
         public Dictionary<string, GameObject> allEELButtons = new Dictionary<string, GameObject>();
         public Dictionary<int, string> weaponIndices = new Dictionary<int, string>();
-        public static Dictionary<Toggle, TextMeshProUGUI> hidebuttons = new Dictionary<Toggle, TextMeshProUGUI>();
+        public Dictionary<Toggle, TextMeshProUGUI> hidebuttons = new Dictionary<Toggle, TextMeshProUGUI>();
 
         public static VisualAdjustments.Settings.CharacterSettings settings
         {
@@ -1897,6 +1899,7 @@ namespace TutorialCanvas.UI
 
         public void handleHideEquipment(bool state, ref bool settingState)
         {
+            if (!this.gameObject.activeInHierarchy || window == null || !window.gameObject.activeInHierarchy) return;
             settingState = state;
             if (shouldrebuildhidebuttons)
             {
@@ -1974,7 +1977,7 @@ namespace TutorialCanvas.UI
             /*var buttonstodisable = allEELButtons.Except(a => a.Key.Contains(value));
             foreach (var button in buttonstodisable)
             {
-                button.Value.SetActive(false);
+                button.Value.SetActive(false);  
             }*/
             value = AllInputField.text;
             bool hassplitter = value.Contains(" ");
@@ -2011,7 +2014,7 @@ namespace TutorialCanvas.UI
             }
         }
 
-        public async void HandleFilterChangedCurrent(string value)
+        public void HandleFilterChangedCurrent(string value)
         {
             //VisualAdjustments.Main.logger.Log("filterchange");
             /*var buttonstodisable = allEELButtons.Except(a => a.Key.Contains(value));

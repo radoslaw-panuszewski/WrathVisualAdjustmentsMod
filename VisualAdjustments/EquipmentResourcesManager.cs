@@ -359,6 +359,7 @@ namespace VisualAdjustments
                     m_AllEEL["EE_Brows04_F_HE"] = "6f7acd99fe1abae4090c6639db5cffa7";
                     m_AllEEL["EE_Brows04_F_HL"] = "4dea70c2dcbe09f4596810dcabf7f445";
                     m_AllEEL["EE_Brows04_F_HM"] = "59b3949189a066d4298a6b39348613e9";
+                    m_AllEEL["EE_Brows04_F_HO"] = "d041597dc58f55449a829fb6ecb3100c";
                     m_AllEEL["EE_Brows04_F_TL"] = "7de258962ecb55c4395c765cf7366fbe";
                     m_AllEEL["EE_Brows04_M_DH"] = "b86e75a3df830d849ab774378ae57fe3";
                     m_AllEEL["EE_Brows04_M_DW"] = "be51b91f9455b9146a89a9395d2596d4";
@@ -367,17 +368,24 @@ namespace VisualAdjustments
                     m_AllEEL["EE_Brows04_M_HE"] = "50bcb93eda325cd4495450f18c2c46fb";
                     m_AllEEL["EE_Brows04_M_HL"] = "92533b3da37e53749a848dde423b1b24";
                     m_AllEEL["EE_Brows04_M_HM"] = "d5de06117150dfd49996c1b39a6f911e";
+                    m_AllEEL["EE_Brows04_M_HO"] = "b4983242e32e12a449cdc22ea37b40fd";
                     m_AllEEL["EE_Brows04_M_TL"] = "eb97a0ecfd0a0bd48ba45d219c68d1e6";
+                    m_AllEEL["EE_Brows05_F_AA"] = "cbaaf10cdc136e84f94bae8ec29032ff";
                     m_AllEEL["EE_Brows05_F_DH"] = "571ba7d00807ff4439fe6db76686eba1";
                     m_AllEEL["EE_Brows05_F_EL"] = "823b2b37bcb1cb6459f49bafb727732b";
                     m_AllEEL["EE_Brows05_F_HE"] = "d8c177c3e8c4cfc46af6baa9f7428713";
                     m_AllEEL["EE_Brows05_F_HM"] = "22f54993daa9e2445b8d66ae3858fa1c";
+                    m_AllEEL["EE_Brows05_F_TL"] = "998915befac22674eaddf4835f729c38";
                     m_AllEEL["EE_Brows05_M_AA"] = "d315403539f52124c90083d85671eefb";
                     m_AllEEL["EE_Brows05_M_DH"] = "99bffb6e508ca434d90147d54697efb6";
                     m_AllEEL["EE_Brows05_M_EL"] = "566c9cfc44946594db072e299492339e";
                     m_AllEEL["EE_Brows05_M_HE"] = "5011840583080194ea35775400824188";
                     m_AllEEL["EE_Brows05_M_HM"] = "bdcb8b8da31f11d4d9ab509b6da6798c";
+                    m_AllEEL["EE_Brows05_M_TL"] = "1b5f6042c3a8c6c45a7d9bd0aa5dcd60";
+                    m_AllEEL["EE_Brows06_F_DH"] = "864393b05164ced46b79746e25155df5";
                     m_AllEEL["EE_Brows06_F_HM"] = "1b65443c1d64a5e498ba5a0978448694";
+                    m_AllEEL["EE_Brows06_M_AA"] = "b6a8ce12ecfd73a478fff585e9cdd0e2";
+                    m_AllEEL["EE_Brows06_M_DH"] = "0a5b99acf89b86042aa8fb605edc9225";
                     m_AllEEL["EE_Brows06_M_HM"] = "29d1fcc93ce41134fa0a3b658c309fc0";
                     m_AllEEL["EE_Brows07_F_HM"] = "0e10c614b32622f42aba82f5392ef69f";
                     m_AllEEL["EE_Brows07_M_HM"] = "1715ed841a65d3a47a83b0ece039fa02";
@@ -389,6 +397,8 @@ namespace VisualAdjustments
                     m_AllEEL["EE_Brows10_M_HM"] = "a049bb2e2fc4c2444ac5a76adfd8da96";
                     m_AllEEL["EE_Brows11Nenio_F_HM"] = "44e188f73b4f8684d945d61766cfcfef";
                     m_AllEEL["EE_Brows11_M_HM"] = "3fdfe900b2f16c142a23a707ed8b28ad";
+                    m_AllEEL["EE_Brows13_M_HM"] = "1122ed4b4494a884f922245c5bf1cd50";
+                    m_AllEEL["EE_Brows14_F_HM"] = "0671abed8e0232d42adbe7cc006334bb";
                     m_AllEEL["EE_CapeTabard_F_Any"] = "6d61987c6621ddd40892c5ff404313b0";
                     m_AllEEL["EE_CapeTabard_M_Any"] = "161b74f7113ffe14cb9b34f46404cf77";
                     m_AllEEL["EE_CavalierAccessories_F_Any"] = "b2fe1a2aa7dd60c41a185dfdfca2e33f";
@@ -555,6 +565,30 @@ namespace VisualAdjustments
                     m_AllEEL["EE_FacePaint11_U_Any"] = "88f65f8d65c984b479976316cea3e3bc";
                     m_AllEEL["EE_FacePaint12_U_Any"] = "2796c4c3c9114df47bdf5924e367dfdb";
                     m_AllEEL["EE_FacePaint13_U_Any"] = "f9e8e86b27106d04f9e7b3acc63bbe50";
+                    m_AllEEL["EE_FacePaint14_U_Any"] = "0d0837c6124e70c43ab1ffc043a6f6ba";
+                    m_AllEEL["EE_FacePaint15_U_Any"] = "1c9ba560c29dbc14ab538890f5f1b130";
+                    m_AllEEL["EE_FacePaint16_U_Any"] = "232426a9d9fd4ca4b83cb58396e1d7f7";
+                    m_AllEEL["EE_FacePaint17_U_Any"] = "cb3466f6666cbec4f93d45f3dbda4b70";
+                    m_AllEEL["EE_FacePaint18_U_Any"] = "8a25b2227688c0943a59fb471b9b740a";
+                    m_AllEEL["EE_FacePaint19_U_Any"] = "8c5189716feb61241a68b45835a72851";
+                    m_AllEEL["EE_FacePaint20_U_Any"] = "4e829d4aabd124f49aabf8b82468bb0e";
+                    m_AllEEL["EE_FacePaint21_U_Any"] = "afea3383a2b216947a4a682b2f8e6eba";
+                    m_AllEEL["EE_FacePaint22_U_Any"] = "881f3297d3ac74c45802443ef9d1675b";
+                    m_AllEEL["EE_FacePaint23_U_Any"] = "ac1c3309701e88d4ea238bbd77f7c04f";
+                    m_AllEEL["EE_FacePaint24_U_Any"] = "ac1858ef69f22e4498d5407131099f1d";
+                    m_AllEEL["EE_FacePaint25_U_Any"] = "4874a3fbeac307e45853044615ae42ff";
+                    m_AllEEL["EE_FacePaint26_U_Any"] = "52854618251a7ab439627f37b285d386";
+                    m_AllEEL["EE_FacePaint27_U_Any"] = "8128c475040f4144ea08e8d27c2a06c2";
+                    m_AllEEL["EE_FacePaint28_U_Any"] = "b42cd5b711da4754db98455c052cc99c";
+                    m_AllEEL["EE_FacePaint29_U_Any"] = "efd2c7d6dc3da584190f0b3963dca7c7";
+                    m_AllEEL["EE_FacePaint30_U_Any"] = "1129d53e32345a24c9ad02f585ab8333";
+                    m_AllEEL["EE_FacePaint31_U_Any"] = "a55c32177a1778547b736b355d52487d";
+                    m_AllEEL["EE_FacePaint32_U_Any"] = "a2f2790623286cb42ac48ff01026f899";
+                    m_AllEEL["EE_FacePaint33_U_Any"] = "790d88a5799b6de40abdb0681f12358e";
+                    m_AllEEL["EE_FacePaint34_U_Any"] = "ba7afeebe75e5f449b2f795010f7fde6";
+                    m_AllEEL["EE_FacePaint35_U_Any"] = "a616bf262fdb1474aa91af7bfdc4bee9";
+                    m_AllEEL["EE_FacePaint36_U_Any"] = "048f3a47cfa1b1849a66687b779ccb3d";
+                    m_AllEEL["EE_FacePaint37_U_Any"] = "bd07ef08134cdc845be9d9144e7400bb";
                     m_AllEEL["EE_FighterAccessories_F_Any"] = "91a8a967871c8774eb531afe62942cab";
                     m_AllEEL["EE_FighterAccessories_M_Any"] = "c138b719e4e95534d838822c5f126389";
                     m_AllEEL["EE_Fighter_F_Any"] = "8277514a290c9a94098f71682dc30f6a";
@@ -815,6 +849,7 @@ namespace VisualAdjustments
                     m_AllEEL["EE_Hair04MediumArueshalae_F_HM"] = "fb79b0f415a030f4b9983e61b7d480fa";
                     m_AllEEL["EE_Hair04MediumArueshalae_F_SU"] = "a62b78dbb66a68247b03168502abfc0e";
                     m_AllEEL["EE_Hair04MediumUncombed_F_GN"] = "f83f7bc24f6d28c4494a4ed82f068d63";
+                    m_AllEEL["EE_Hair04Mohawk_M_TL"] = "5509e7a1d63e1b14097292be114e4d00";
                     m_AllEEL["EE_Hair04PixieLong_F_OD"] = "ca4204da40d572b47a2de7415abca7a1";
                     m_AllEEL["EE_Hair04PonyHawk_F_HO"] = "9356e94d2208cf540a34ff3a7c8f2267";
                     m_AllEEL["EE_Hair04PonyHawk_M_DW"] = "23f7230410a592b41b751421a5682da5";
@@ -826,8 +861,13 @@ namespace VisualAdjustments
                     m_AllEEL["EE_Hair05BraidShavedTemples_F_GN"] = "ef55d74e89da45042bd26bb52e974471";
                     m_AllEEL["EE_Hair05LibertySpikes_F_OD"] = "1ae45e229dc4dbc4a83ef2064b6ba0c4";
                     m_AllEEL["EE_Hair05LongBraids_F_HO"] = "6b1ddf341f07e49469a29a6b8571a1db";
+                    m_AllEEL["EE_Hair05LongTwoBraids_M_DW"] = "f4d5575b3af79a449b086380799535e0";
+                    m_AllEEL["EE_Hair05LongWavyBraids_F_TL"] = "ee38a6b141c8ac54697fba55ce144094";
+                    m_AllEEL["EE_Hair05LongWavy_F_HL"] = "ebeb7bd740edaf04d871b1d040c10fa0";
+                    m_AllEEL["EE_Hair05LongWavy_M_TL"] = "05eb3b064eb501149b1715156850bb8f";
                     m_AllEEL["EE_Hair05Mature_M_GN"] = "3b83462520d7d9145b3479454dae6bd0";
                     m_AllEEL["EE_Hair05MediumBun_M_AA"] = "d0d147e4a9ff9c345b336501018c17b2";
+                    m_AllEEL["EE_Hair05MediumCurly_M_HO"] = "a6ec284f75ea1f440a55447bb02cf90d";
                     m_AllEEL["EE_Hair05MediumMess_M_HL"] = "bee1ad535ae23fe43920e76c0ff5f574";
                     m_AllEEL["EE_Hair05Medium_M_DH"] = "32af38f1ad4239542a6ddf37d1bc5d87";
                     m_AllEEL["EE_Hair05Medium_M_HM"] = "739bcec114cc0974bbe60990afc9f8fd";
@@ -835,31 +875,59 @@ namespace VisualAdjustments
                     m_AllEEL["EE_Hair05PonyHawk_F_DW"] = "393a4c979e29f9d40bf97bc79d1ad3f5";
                     m_AllEEL["EE_Hair05PonytailClassic_F_HE"] = "ab19b4ef03602ed439eb87552e0ca67b";
                     m_AllEEL["EE_Hair05Senior_M_OD"] = "25b5299d3149437459ed66977a7a1385";
+                    m_AllEEL["EE_Hair06BobCut_F_OD"] = "e50163688063ff04cbe8f6d6235678e8";
                     m_AllEEL["EE_Hair06BrushUp_M_GN"] = "210cecceca9218949a501bd033ef5bc2";
                     m_AllEEL["EE_Hair06Daeran_M_AA"] = "7530921e80f4a9943ba2bca026ddf3a7";
+                    m_AllEEL["EE_Hair06DreadTail_F_TL"] = "103e1f478c298a748bb13445840bc4c5";
+                    m_AllEEL["EE_Hair06LongWavyBraids_F_AA"] = "62dfe086393d26943b7e756fb2569247";
                     m_AllEEL["EE_Hair06LongWavy_F_DH"] = "92098e7849f8b8742bcbc03605016e85";
                     m_AllEEL["EE_Hair06LongWavy_F_HM"] = "30d504db6b8cbe94dbc82d2437c8b468";
                     m_AllEEL["EE_Hair06MediumAnevia_F_EL"] = "131955108c91c2448a78f8021ca358a9";
                     m_AllEEL["EE_Hair06MediumAnevia_F_GN"] = "7e8c5b3e1973c5449bf921ca01073e62";
                     m_AllEEL["EE_Hair06MediumAnevia_F_HE"] = "a5efed3983dd97342a04e8335b9a8bdc";
                     m_AllEEL["EE_Hair06MediumBun_M_DH"] = "bc84e2564823a6743a2fbfe56c6ce4f8";
+                    m_AllEEL["EE_Hair06MediumBun_M_EL"] = "d82a4cc22803f8d4a895d8cb50013dab";
                     m_AllEEL["EE_Hair06MediumBun_M_HM"] = "609143dbf7607f6419babaf5748b82dc";
+                    m_AllEEL["EE_Hair06MediumBun_M_TL"] = "58115a09ef40db046adc4bb99c1ec5b8";
+                    m_AllEEL["EE_Hair06MediumCurly_M_HL"] = "dafb0ac1abb39534b9c8581b2c8619eb";
                     m_AllEEL["EE_Hair06MediumSlick_M_HE"] = "c7534bfe96280584884e17f8a076cf63";
+                    m_AllEEL["EE_Hair06Pompadour_M_OD"] = "70a19b1705cc0b34db6bd9cd73f12f87";
+                    m_AllEEL["EE_Hair07BobCut_F_HE"] = "fc59094132d3b99418d82bd12a3f50f8";
+                    m_AllEEL["EE_Hair07LongBangs_M_DH"] = "ffb641f88970a1f46bf9bed683d4efcc";
+                    m_AllEEL["EE_Hair07LongCamelia_F_AA"] = "b6ed73aa8db434a48afab56b6296181d";
                     m_AllEEL["EE_Hair07Long_F_EL"] = "57c595a0dece66f4283e888dc52d9df1";
+                    m_AllEEL["EE_Hair07MediumBun_M_HE"] = "26f2556760b2121418cb7a909e0e80bc";
                     m_AllEEL["EE_Hair07Military_M_AA"] = "4049f905c9dc7714793c654a577774b4";
                     m_AllEEL["EE_Hair07Mohawk_M_HM"] = "222890293b0f66145a400eae3432868d";
+                    m_AllEEL["EE_Hair07NobleBraids_F_DW"] = "1762cab3d178f53489f43ab791b87f9c";
+                    m_AllEEL["EE_Hair07PixieCut_F_GN"] = "42fc80a711b8e2d4eb07fdd9c7822c4b";
+                    m_AllEEL["EE_Hair07PixieCut_F_HO"] = "5930529c9d8eaa041b457dd7a722dd32";
                     m_AllEEL["EE_Hair07PonytailClassic_F_DH"] = "830e116d49d302346ab03e0e5009c39b";
                     m_AllEEL["EE_Hair07PonytailClassic_F_HM"] = "f32da5106fa223844b88c426e36b5821";
+                    m_AllEEL["EE_Hair07PonytailClassic_F_TL"] = "01adb2fc579b26a419a6ea83867c824b";
                     m_AllEEL["EE_Hair07PonytailClassic_M_DE"] = "bd4323ff9cc3c264f956228134395807";
                     m_AllEEL["EE_Hair07PonytailClassic_M_DW"] = "06e9c7725f9cc6349a363be23ae1e542";
                     m_AllEEL["EE_Hair07PonytailClassic_M_EL"] = "8e9394a7a860ead42b2d5acdfb35e3f5";
                     m_AllEEL["EE_Hair07PonytailClassic_M_HO"] = "095e60d6935c4c6479a94cff9880df07";
+                    m_AllEEL["EE_Hair08LongCurly_F_AA"] = "738b1694d13be8e4a994a9e48247a318";
+                    m_AllEEL["EE_Hair08LongWavyBraids_F_HE"] = "c8edacbc502d42242a5911ba000a411e";
+                    m_AllEEL["EE_Hair08LongWavy_M_AA"] = "3049a579a436de245b9a307e72c34c5a";
+                    m_AllEEL["EE_Hair08MediumEmo_M_DH"] = "8778ae88736ef1b43bf8e0a63724df2c";
+                    m_AllEEL["EE_Hair08MediumSide_M_GN"] = "61c42687c5cccef4eb8958bbc2297caa";
+                    m_AllEEL["EE_Hair08MediumSlick_M_HM"] = "128110ed2a1f2f2438f690b1850149d7";
+                    m_AllEEL["EE_Hair08Mohawk_F_TL"] = "d90a0bf179ad5884a98092b58d8f76ad";
                     m_AllEEL["EE_Hair08SideKare_F_DH"] = "293c10a3e2836b74bb3da7d02b4cb6e7";
+                    m_AllEEL["EE_Hair08SideKare_F_EL"] = "39d65ebde5c324f41821b36258791ee5";
                     m_AllEEL["EE_Hair08SideKare_F_HM"] = "3fa56cc5d206ca142bde8f93ad089a02";
                     m_AllEEL["EE_Hair08SideKare_F_HO"] = "e780cdb097a1d154b9cf9635b191f832";
                     m_AllEEL["EE_Hair09BowlCut_F_HM"] = "a7848ed746958e74ab7e9549dd4db16c";
+                    m_AllEEL["EE_Hair09LongCamelia_F_DH"] = "a819551f9c43d2248aa53c50c642bfca";
+                    m_AllEEL["EE_Hair09MediumEmo_M_HM"] = "3e4bb0a0defe2f74e9fb07ee4fb68d8f";
+                    m_AllEEL["EE_Hair10LongBangs_M_HM"] = "acdcfd7609f88ae49833e4f10656190e";
                     m_AllEEL["EE_Hair10SideBunNenio_F_HM"] = "db6e295d58b7a6a4686fa4c4b5b4b527";
                     m_AllEEL["EE_Hair11PonytailUpper_F_HM"] = "1f19aaaa1870e2b4b8bd99d36211ddf6";
+                    m_AllEEL["EE_Hair13LongCurly_F_HM"] = "b40cf766b28e512438678fc9e2aa34f1";
+                    m_AllEEL["EE_Hair14LongWavyBraids_F_HM"] = "779458079f7718c4bb960d9cef195339";
                     m_AllEEL["EE_HalfplateDemonic_F_Any"] = "8dd40451dbc645f4bbf634388b63b1a1";
                     m_AllEEL["EE_HalfplateDemonic_M_Any"] = "983caeaaa0560c14e945dc5491253210";
                     m_AllEEL["EE_HalfplateKnightNormal_F_Any"] = "86c22e5c4c7ea0a4b8c1c43d90fe725e";
@@ -1230,6 +1298,8 @@ namespace VisualAdjustments
                     m_AllEEL["EE_Head04_F_HE"] = "c3c0a999ac0c17d47a6d0b97f73f2d21";
                     m_AllEEL["EE_Head04_F_HL"] = "1b95041eb7818664fb0dde7c92dbb023";
                     m_AllEEL["EE_Head04_F_HM"] = "5bc92526cbe57564f96530aefe05e4c6";
+                    m_AllEEL["EE_Head04_F_HO"] = "2469680c6a387cb46891c29e36915e28";
+                    m_AllEEL["EE_Head04_F_OD"] = "f553c7d101e4bf740b33a0a42d79b8c3";
                     m_AllEEL["EE_Head04_F_TL"] = "f7fdd6a03bc43da4da6d913a57f28c7c";
                     m_AllEEL["EE_Head04_M_DH"] = "4bfbf79688b80be40bb342a7e8117c6f";
                     m_AllEEL["EE_Head04_M_DW"] = "9d7fe82eb773eeb4fa0118988f9687ee";
@@ -1237,19 +1307,29 @@ namespace VisualAdjustments
                     m_AllEEL["EE_Head04_M_GN"] = "8507d5cdf00b74542a9c3b0a99ec4f28";
                     m_AllEEL["EE_Head04_M_HE"] = "238d737b8edc6174685b58babd02d79f";
                     m_AllEEL["EE_Head04_M_HL"] = "c8c9b08a9b5210944a5421e0a1b563f7";
+                    m_AllEEL["EE_Head04_M_HO"] = "1cb8a6d149f308b44a880b5f15fb4a9d";
+                    m_AllEEL["EE_Head04_M_OD"] = "efe90f170706cd644a63d5c15b918c7d";
+                    m_AllEEL["EE_Head05A_F_AA"] = "925e5815d579d8044a478c2882d05f51";
                     m_AllEEL["EE_Head05A_M_AA"] = "ea436409685bf8b49acff98bfb0c7148";
+                    m_AllEEL["EE_Head05B_F_AA"] = "744440e13e3416843b0ba90cbddd4744";
                     m_AllEEL["EE_Head05B_M_AA"] = "757d3093306895347bbe8e1f1dc4a13c";
                     m_AllEEL["EE_Head05_F_DH"] = "da0a42f7ffc479148b21ce90d08cc6b9";
                     m_AllEEL["EE_Head05_F_EL"] = "f4308998cd0db524097f01c1083750b0";
                     m_AllEEL["EE_Head05_F_HE"] = "2744ddb25083f4740bd084d40d06b107";
                     m_AllEEL["EE_Head05_F_HM"] = "deb27e32c600dcc42ab7641de03a3fa8";
+                    m_AllEEL["EE_Head05_F_TL"] = "a88d1147b9c76364db8d34d956bb6fcb";
                     m_AllEEL["EE_Head05_M_DH"] = "a541a78cb1755304a8c31c383a191a4e";
                     m_AllEEL["EE_Head05_M_EL"] = "1e9eed78359ec1c48b1d66f01058b7a7";
                     m_AllEEL["EE_Head05_M_HE"] = "fbe65d13e062d024ca5c7b99719a370d";
                     m_AllEEL["EE_Head05_M_HM"] = "913b11311ec6b9f48bfa23d1f3423154";
+                    m_AllEEL["EE_Head05_M_TL"] = "a957a3408601f9046b56015f6c40a8d3";
+                    m_AllEEL["EE_Head06A_M_AA"] = "12810088281d2ad4aabe218c74152234";
                     m_AllEEL["EE_Head06Axiomite_F_EL"] = "7fc29faa99709394e84958df6cd8607b";
                     m_AllEEL["EE_Head06Axiomite_M_EL"] = "834af545d6893cb40a1922e337bc5b0b";
+                    m_AllEEL["EE_Head06B_M_AA"] = "9c3e9c6bf61759e48a05c4ee90e2c27a";
+                    m_AllEEL["EE_Head06_F_DH"] = "4d682a7f4cc2c884197ab6911c7eddc8";
                     m_AllEEL["EE_Head06_F_HM"] = "1709c29af3fd6634cbcc4cf1a24dd8ee";
+                    m_AllEEL["EE_Head06_M_DH"] = "a3203fc1047a6d246be616b2e8d84114";
                     m_AllEEL["EE_Head06_M_HM"] = "61ea9d574de4145469fdf7db7f83c951";
                     m_AllEEL["EE_Head07Villager_M_HM"] = "1649a6cb92729d547a0798d3eb655e13";
                     m_AllEEL["EE_Head07_F_HM"] = "55559eae6e70ef84c879803b7acecb5a";
@@ -1265,6 +1345,8 @@ namespace VisualAdjustments
                     m_AllEEL["EE_Head12Eritrice_F_KT"] = "dd8405501ffdb6e459f109de82138eb6";
                     m_AllEEL["EE_Head13Alderpash_M_HM"] = "bbd04613fbdf05243a7e72a060799bee";
                     m_AllEEL["EE_Head13Izyagna_F_HM"] = "24e389d5302d97e429dfe22768d1acf8";
+                    m_AllEEL["EE_Head13_M_HM"] = "9c086c7c230d1b34f963e3a3f843fb7f";
+                    m_AllEEL["EE_Head14_F_HM"] = "52a7bdb6964f65a41b735635a2513edd";
                     m_AllEEL["EE_HeadbandCrownHolyAzata_F_DW"] = "8d1ad0ec0d6189845a94bba06f53b78d";
                     m_AllEEL["EE_HeadbandCrownHolyAzata_F_EL"] = "2824a96d7c512094b875df7b70cf14cc";
                     m_AllEEL["EE_HeadbandCrownHolyAzata_F_GN"] = "c2ab1693bd96854429aaa943363a71fd";
@@ -3087,6 +3169,7 @@ namespace VisualAdjustments
         {
             foreach (var kv in LibraryThing.GetResourceGuidMap())
             {
+
                 var obj = ResourcesLibrary.TryGetResource<EquipmentEntity>(kv.Key);
                 //var go = obj as GameObject;
                 if (obj != null) //&& obj.name.Contains("Wing"))
@@ -3094,9 +3177,10 @@ namespace VisualAdjustments
                     Main.logger.Log("-----[\"" + obj.name + "\"] = ResourcesLibrary.TryGetResource<GameObject>(\"" + kv.Key + "\");");
                     // m_WingsEE[go.name] = go;
                 }
-                ResourcesLibrary.CleanupLoadedCache();
+                //ResourcesLibrary.CleanupLoadedCache();
             }
-;          /* foreach (var EE in ResourcesLibrary.GetLoadedResourcesOfType<EquipmentEntity>())
+            ResourcesLibrary.CleanupLoadedCache();
+                      /* foreach (var EE in ResourcesLibrary.GetLoadedResourcesOfType<EquipmentEntity>())
             {
                 Main.logger.Log("||");
                 Main.logger.Log(EE.ToString());

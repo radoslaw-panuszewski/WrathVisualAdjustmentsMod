@@ -5,6 +5,7 @@ using Kingmaker.Blueprints.CharGen;
 using Kingmaker.Blueprints.Classes;
 using Kingmaker.Blueprints.JsonSystem;
 using Kingmaker.Blueprints.Root;
+using Kingmaker.BundlesLoading;
 using Kingmaker.Cheats;
 using Kingmaker.EntitySystem.Entities;
 using Kingmaker.Enums;
@@ -12,6 +13,7 @@ using Kingmaker.PubSubSystem;
 using Kingmaker.ResourceLinks;
 using Kingmaker.UI.MVVM._PCView.InGame;
 using Kingmaker.UnitLogic;
+using Kingmaker.UnitLogic.Buffs.Blueprints;
 using Kingmaker.UnitLogic.Class.LevelUp;
 using Kingmaker.UnitLogic.Parts;
 using Kingmaker.Utility;
@@ -20,8 +22,10 @@ using Kingmaker.Visual.Sound;
 using ModKit;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
+using TutorialCanvas.UI;
 using UnityEngine;
 
 //using TutorialCanvas.UI;
@@ -121,6 +125,7 @@ namespace VisualAdjustments
             "Wizard",g
             "None"
         };*/
+        public static UIManager TutorialUI { get; set; }
         public static bool forceload = false;
         public static float UIscale = 1;
         private static bool haspatched = false;
@@ -129,6 +134,11 @@ namespace VisualAdjustments
         {
             try
             {
+               // System.Diagnostics.Stopwatch timer = new Stopwatch();
+                //timer.Start();
+
+
+
                 ModEntry = modEntry;
 
                 logger = modEntry.Logger;
@@ -140,7 +150,7 @@ namespace VisualAdjustments
                 //   haspatched = true;
                 harmony.PatchAll(Assembly.GetExecutingAssembly());
                 //}
-                TutorialCanvas.Main.Load(modEntry);
+                //TutorialCanvas.Main.Load(modEntry);
                 /// colorpicker = CreateColorPicker();
                 //dot = ColorPickerLoad.GetTexture(ModEntry.Path + "\\ColorPicker\\dot.png");
                 TutorialCanvas.Utilities.BundleManger.AddBundle("tutorialcanvas");
@@ -162,7 +172,11 @@ namespace VisualAdjustments
                     Main.GetClasses();
                 }
                 //  EventBus.Subscribe(new UpdateDataForUGUI());
-                //EventBus.Subscribe(new TestPubSub());
+                ////EventBus.Subscribe(new TestPubSub());
+                //timer.Stop();
+
+                //TimeSpan timeTaken = timer.Elapsed;
+                //Main.logger.Critical(timeTaken.ToString());
             }
             catch (Exception e)
             {
@@ -619,7 +633,7 @@ namespace VisualAdjustments
         private static bool OnToggle(UnityModManager.ModEntry modEntry, bool value /* active or inactive */)
         {
             enabled = value;
-            TutorialCanvas.Main.OnToggle(modEntry, value);
+            //TutorialCanvas.Main.OnToggle(modEntry, value);
             return true; // Permit or not.
         }
 

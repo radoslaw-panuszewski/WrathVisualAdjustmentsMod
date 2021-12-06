@@ -221,7 +221,7 @@ public class FXUIHandler : MonoBehaviour
         }
     }
 
-    public static Dictionary<string, Button> AllFXButtons = new Dictionary<string, Button>();
+    public Dictionary<string, Button> AllFXButtons = new Dictionary<string, Button>();
 
     public void Awake()
     {
@@ -244,27 +244,29 @@ public class FXUIHandler : MonoBehaviour
                 //this.ButtonForCloning = buttontoinstantiate.gameObject;
                 // var font = this.transform.parent.parent.parent.Find("Doll/DollTitle/TitleLabel").GetComponent<TextMeshProUGUI>().font;
                 //   Main.logger.Log("AwakeFX");
-                foreach (var fx in VisualAdjustments.EffectsManager.AllFX)
                 {
-                    var buttontoadd = Instantiate(ButtonForCloning.transform);
-                    //Main.logger.Log("Instantiated");
-                    var buttontoaddtext = buttontoadd.Find("TextB").GetComponent<TextMeshProUGUI>();
-                    // buttontoaddtext.text = GetTextAndSetupCategory(eename.Key);
-                    // buttontoaddtext.text = fx.Key;
-                    buttontoaddtext.text = UIManager.GetTextAndSetupCategory(fx.Key);
-                    // Main.logger.Log("SetText");
-                    // buttontoaddtext.text = eename.Key;
-                    //buttontoaddtext.font = font;
-                    //buttontoaddtext.color = Color.white;
-                    buttontoadd.transform.SetParent(content.transform, false);
-                    // Main.logger.Log("SetParent");
-                    var buttontoaddbuttoncomponent = buttontoadd.GetComponent<Button>();
-                    buttontoaddbuttoncomponent.onClick = new Button.ButtonClickedEvent();
-                    buttontoaddbuttoncomponent.onClick.AddListener(new UnityAction(() =>
+                    foreach (var fx in VisualAdjustments.EffectsManager.AllFX)
                     {
-                        selectedfx = (buttontoaddtext.text);
-                    }));
-                    AllFXButtons.Add(fx.Key, buttontoaddbuttoncomponent);
+                        var buttontoadd = Instantiate(ButtonForCloning.transform);
+                        //Main.logger.Log("Instantiated");
+                        var buttontoaddtext = buttontoadd.Find("TextB").GetComponent<TextMeshProUGUI>();
+                        // buttontoaddtext.text = GetTextAndSetupCategory(eename.Key);
+                        // buttontoaddtext.text = fx.Key;
+                        buttontoaddtext.text = UIManager.GetTextAndSetupCategory(fx.Key);
+                        // Main.logger.Log("SetText");
+                        // buttontoaddtext.text = eename.Key;
+                        //buttontoaddtext.font = font;
+                        //buttontoaddtext.color = Color.white;
+                        buttontoadd.transform.SetParent(content.transform, false);
+                        // Main.logger.Log("SetParent");
+                        var buttontoaddbuttoncomponent = buttontoadd.GetComponent<Button>();
+                        buttontoaddbuttoncomponent.onClick = new Button.ButtonClickedEvent();
+                        buttontoaddbuttoncomponent.onClick.AddListener(new UnityAction(() =>
+                        {
+                            selectedfx = (buttontoaddtext.text);
+                        }));
+                        AllFXButtons.Add(fx.Key, buttontoaddbuttoncomponent);
+                    }
                 }
                 {
                     // var placeholder = AllFXInput.gameObject.transform.Find("Text Area/Placeholder").GetComponent<TextMeshProUGUI>();

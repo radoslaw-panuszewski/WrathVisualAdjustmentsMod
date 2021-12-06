@@ -1,3 +1,10 @@
+using HarmonyLib;
+using Kingmaker.Blueprints;
+using Kingmaker.Visual.CharacterSystem;
+using System;
+using System.Collections;
+using System.Collections.Generic;
+
 namespace VisualAdjustments
 {
 #if DEBUG

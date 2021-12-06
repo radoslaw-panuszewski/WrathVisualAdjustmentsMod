@@ -2,6 +2,7 @@
 using Kingmaker.Controllers;
 using Kingmaker.EntitySystem.Entities;
 using Kingmaker.UI.ServiceWindow;
+using System;
 
 namespace VisualAdjustments.UGUI
 {
@@ -10,18 +11,25 @@ namespace VisualAdjustments.UGUI
     {
         private static void Postfix(UnitEntityData unit)
         {
-            //Main.logger.Log(unit.CharacterName);
-            if (unit != null)
+            try
             {
-                if (FXUIHandler.handler != null && TutorialCanvas.UI.UIManager.manager.UISelectGrid.activeInHierarchy)
+                //Main.logger.Log(unit.CharacterName);
+                if (unit != null)
                 {
-                    // var part = unit.Parts.Ensure<UnitPartVAFX>();
-                    var VisualInfo = VisualAdjustments.GlobalVisualInfo.Instance.ForCharacter(unit);
-                    var part = VisualInfo.FXpart;
-                    FXUIHandler.handler.WhiteOrBlackList = part.blackorwhitelist;
-                    FXUIHandler.currentUnitPart = part;
+                    if (FXUIHandler.handler != null && TutorialCanvas.UI.UIManager.manager.UISelectGrid.activeInHierarchy)
+                    {
+                        // var part = unit.Parts.Ensure<UnitPartVAFX>();
+                        var VisualInfo = VisualAdjustments.GlobalVisualInfo.Instance.ForCharacter(unit);
+                        var part = VisualInfo.FXpart;
+                        FXUIHandler.handler.WhiteOrBlackList = part.blackorwhitelist;
+                        FXUIHandler.currentUnitPart = part;
+                    }
+                    TutorialCanvas.UI.UIManager.data = unit;
                 }
-                TutorialCanvas.UI.UIManager.data = unit;
+            }
+            catch (Exception e)
+            {
+                Main.logger.Error(e.ToString());
             }
         }
     }
@@ -31,18 +39,25 @@ namespace VisualAdjustments.UGUI
     {
         private static void Postfix(UnitEntityData unit)
         {
-            //Main.logger.Log(unit.CharacterName);
-            if (unit != null)
+            try
             {
-                if (FXUIHandler.handler != null && TutorialCanvas.UI.UIManager.manager.UISelectGrid.activeInHierarchy)
+                //Main.logger.Log(unit.CharacterName);
+                if (unit != null)
                 {
-                    //  var part = unit.Parts.Ensure<UnitPartVAFX>();
-                    var VisualInfo = VisualAdjustments.GlobalVisualInfo.Instance.ForCharacter(unit);
-                    var part = VisualInfo.FXpart;
-                    FXUIHandler.handler.WhiteOrBlackList = part.blackorwhitelist;
-                    FXUIHandler.currentUnitPart = part;
+                    if (FXUIHandler.handler != null && TutorialCanvas.UI.UIManager.manager.UISelectGrid.activeInHierarchy)
+                    {
+                        //  var part = unit.Parts.Ensure<UnitPartVAFX>();
+                        var VisualInfo = VisualAdjustments.GlobalVisualInfo.Instance.ForCharacter(unit);
+                        var part = VisualInfo.FXpart;
+                        FXUIHandler.handler.WhiteOrBlackList = part.blackorwhitelist;
+                        FXUIHandler.currentUnitPart = part;
+                    }
+                    TutorialCanvas.UI.UIManager.data = unit;
                 }
-                TutorialCanvas.UI.UIManager.data = unit;
+            }
+            catch (Exception e)
+            {
+                Main.logger.Error(e.ToString());
             }
         }
     }

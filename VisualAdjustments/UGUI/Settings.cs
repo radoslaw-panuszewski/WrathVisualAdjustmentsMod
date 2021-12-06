@@ -1,4 +1,5 @@
-﻿using UnityModManagerNet;
+﻿#if false
+using UnityModManagerNet;
 
 namespace TutorialCanvas
 {
@@ -12,3 +13,4 @@ namespace TutorialCanvas
            public bool reuse;*/
     }
 }
+#endif
