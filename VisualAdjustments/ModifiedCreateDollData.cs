@@ -20,26 +20,18 @@ namespace VisualAdjustments
                     Main.logger.Error("nulldoll");
                     throw new Exception("null doll");
                 }
-
-                /* DollData dollData = new DollData
-                 {
-                     Gender = doll.Gender,
-                     RacePreset = doll.RacePreset
-                 };*/
                 DollData dollData = new DollData();
                 dollData.Gender = doll.Gender;
                 dollData.RacePreset = doll.RacePreset != null ? doll.RacePreset : doll.Race.Presets.First();
-                if (doll.Head.m_Entity != null && !doll.Head.AssetId.IsNullOrEmpty())
+                if (doll.Head.Load() != null)
                 {
                     dollData.EquipmentEntityIds.Add(doll.Head.AssetId);
                 }
-
-                if (doll.Eyebrows.m_Entity != null && !doll.Eyebrows.AssetId.IsNullOrEmpty())
+                if (doll.Eyebrows.Load() != null)
                 {
                     dollData.EquipmentEntityIds.Add(doll.Eyebrows.AssetId);
                 }
-
-                if (doll.Hair.m_Entity != null && !doll.Hair.AssetId.IsNullOrEmpty())
+                if (doll.Hair.Load() != null)
                 {
                     dollData.EquipmentEntityIds.Add(doll.Hair.AssetId);
                     if (doll.HairRampIndex >= 0)
@@ -47,15 +39,39 @@ namespace VisualAdjustments
                         dollData.EntityRampIdices[doll.Hair.AssetId] = doll.HairRampIndex;
                     }
                 }
-
-                if (doll.Beard.m_Entity != null && !doll.Beard.AssetId.IsNullOrEmpty())
+                if (doll.Beard.Load() != null)
                 {
                     dollData.EquipmentEntityIds.Add(doll.Beard.AssetId);
                 }
-
-                if (doll.Horn.m_Entity != null && !doll.Horn.AssetId.IsNullOrEmpty())
+                if (doll.Horn.Load() != null)
                 {
                     dollData.EquipmentEntityIds.Add(doll.Horn.AssetId);
+                }
+                foreach (DollState.DollPrint dollPrint in doll.Warprints)
+                {
+                    if (dollPrint.PaintEE.Load() != null)
+                    {
+                        dollData.EquipmentEntityIds.Add(dollPrint.PaintEE.AssetId);
+                        if (dollPrint.PaintRampIndex >= 0)
+                        {
+                            dollData.EntityRampIdices[dollPrint.PaintEE.AssetId] = dollPrint.PaintRampIndex;
+                        }
+                    }
+                }
+                foreach (DollState.DollPrint dollPrint2 in doll.Tattoos)
+                {
+                    if (dollPrint2.PaintEE.Load() != null)
+                    {
+                        dollData.EquipmentEntityIds.Add(dollPrint2.PaintEE.AssetId);
+                        if (dollPrint2.PaintRampIndex >= 0)
+                        {
+                            dollData.EntityRampIdices[dollPrint2.PaintEE.AssetId] = dollPrint2.PaintRampIndex;
+                        }
+                    }
+                }
+                if (doll.Scar.Load() != null)
+                {
+                    dollData.EquipmentEntityIds.Add(doll.Scar.AssetId);
                 }
                 if (doll.Race != null)
                 {
@@ -65,46 +81,35 @@ namespace VisualAdjustments
                         dollData.EquipmentEntityIds.Add(tail.AssetId);
                     }
                 }
-
                 if (doll.SkinRampIndex >= 0)
                 {
                     foreach (DollState.EEAdapter eeadapter in doll.GetSkinEntities())
                     {
                         dollData.EntityRampIdices[eeadapter.AssetId] = doll.SkinRampIndex;
                     }
-
-                    if (doll.Horn.m_Entity != null && !doll.Horn.AssetId.IsNullOrEmpty())
+                    if (doll.Horn.Load() != null)
                     {
                         dollData.EntitySecondaryRampIdices[doll.Horn.AssetId] = doll.SkinRampIndex;
                     }
                 }
-
-                if (doll.HairRampIndex >= 0 && !doll.Hair.AssetId.IsNullOrEmpty())
+                if (doll.HairRampIndex >= 0)
                 {
                     foreach (DollState.EEAdapter eeadapter2 in doll.GetHairEntities())
                     {
                         dollData.EntityRampIdices[eeadapter2.AssetId] = doll.HairRampIndex;
                     }
                 }
-
-                if (doll.Horn.m_Entity != null && doll.HornsRampIndex >= 0 && !doll.Horn.AssetId.IsNullOrEmpty())
+                if (doll.EyesColorRampIndex >= 0)
+                {
+                    foreach (DollState.EEAdapter eeadapter3 in doll.GetHeadEntities())
+                    {
+                        dollData.EntitySecondaryRampIdices[eeadapter3.AssetId] = doll.EyesColorRampIndex;
+                    }
+                }
+                if (doll.HornsRampIndex >= 0 && doll.Horn.Load() != null)
                 {
                     dollData.EntityRampIdices[doll.Horn.AssetId] = doll.HornsRampIndex;
                 }
-
-                if (doll.Warpaint.m_Link != null && doll.Warpaint.m_Link.AssetId != null && doll.Warpaint.Load() != null)
-                {
-                    dollData.EquipmentEntityIds.Add(EquipmentResourcesManager.AllEEL[doll.Warpaint.m_Entity.name]);
-                    // Main.logger.Log(EquipmentResourcesManager.AllEEL[doll.Warpaint.m_Entity.name]);
-                    //dollData.EquipmentEntityIds.Add(doll.Warpaint.AssetId);
-                }
-                if (doll.Scar.m_Link != null && doll.Scar.m_Link.AssetId != null && doll.Scar.Load() != null)
-                {
-                    dollData.EquipmentEntityIds.Add(EquipmentResourcesManager.AllEEL[doll.Scar.m_Entity.name]);
-                    // Main.logger.Log(EquipmentResourcesManager.AllEEL[doll.Scar.m_Entity.name]);
-                    //dollData.EquipmentEntityIds.Add(doll.Scar.AssetId);
-                }
-
                 dollData.ClothesPrimaryIndex = doll.EquipmentRampIndex;
                 dollData.ClothesSecondaryIndex = doll.EquipmentRampIndexSecondary;
                 return dollData;

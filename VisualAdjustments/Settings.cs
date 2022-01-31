@@ -118,7 +118,7 @@ namespace VisualAdjustments
             public bool hideGlasses = false;
             public bool hideShirt = false;
             public bool hideAll = false;
-            public bool ReloadStuff = false;
+            public bool Stuff = false;
             /*public int RaceIndex = -1;
             public int Face = -1;
             public int Hair = -1;

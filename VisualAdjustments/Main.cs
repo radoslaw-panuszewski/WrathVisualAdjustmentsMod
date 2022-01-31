@@ -25,6 +25,8 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
+using System.Threading;
+using System.Threading.Tasks;
 using TutorialCanvas.UI;
 using UnityEngine;
 
@@ -171,6 +173,14 @@ namespace VisualAdjustments
                 {
                     Main.GetClasses();
                 }
+               /* if(EquipmentResourcesManager.m_AllEEL == null || EquipmentResourcesManager.m_AllEEL.Count <= 0)
+                {
+                    var task = new Task(() =>
+                    {
+                        var _ = EquipmentResourcesManager.AllEEL;
+                    });
+                    task.Start();
+                }*/
                 //  EventBus.Subscribe(new UpdateDataForUGUI());
                 ////EventBus.Subscribe(new TestPubSub());
                 //timer.Stop();
@@ -346,7 +356,7 @@ namespace VisualAdjustments
             }
         }
 
-        public static void GenerateWarpaintColor(UnitEntityData data)
+       /* public static void GenerateWarpaintColor(UnitEntityData data)
         {
             try
             {
@@ -383,7 +393,7 @@ namespace VisualAdjustments
             {
                 Main.logger.Log(e.ToString());
             }
-        }
+        }*/
 
         public static void GenerateOutfitcolor(UnitEntityData dat)
         {
@@ -1845,7 +1855,7 @@ namespace VisualAdjustments
                                 if (doll.Scars.Count > 0)
                                     ChooseEEL(unitEntityData, doll, "Scar", doll.Scars.ToArray(), doll.Scar.m_Link, (EquipmentEntityLink ee) => doll.SetScar(ee));
                             },
-                            () => ChooseEEL(unitEntityData, doll, "Warpaint", doll.Warpaints.ToArray(), doll.Warpaint.m_Link, (EquipmentEntityLink ee) => doll.SetWarpaint(ee)),
+                          //  () => ChooseEEL(unitEntityData, doll, "Warpaint", DollState.GetWarpaintsList(doll.Race.RaceId).ToArray(), doll.Warpaint.m_Link, (EquipmentEntityLink ee) => doll.SetW(ee)),
                             () =>
                             {
                                 if (customizationOptions.Hair.Any())
@@ -1863,8 +1873,8 @@ namespace VisualAdjustments
                             },
                             () =>
                             {
-                                if (doll.Warpaints.Count > 0)
-                                    ChooseRamp(unitEntityData, doll, "Warpaint Color", doll.GetWarpaintRamps(), doll.WarpaintRampIndex, (int index) => doll.SetWarpaintColor(index));
+                                if (doll.Warprints.Count > 0)
+                                    ChooseRamp(unitEntityData, doll, "Warpaint Color", doll.GetWarpaintRamps(), doll.Warprints[0].PaintRampIndex, (int index) => doll.SetWarpaintColor(index,doll.Warprints[0].PaintRampIndex));
                             },
                             () => ChooseRamp(unitEntityData, doll, "Hair Color", doll.GetHairRamps(), doll.HairRampIndex, (int index) =>
                             {
@@ -2028,7 +2038,7 @@ namespace VisualAdjustments
                                             }
                                         }
 
-                                        using (UI.VerticalScope())
+                                       /* using (UI.VerticalScope())
                                         {
                                             UI.Toggle("Warpaint Color", ref Settings.customWarpaintColor);
                                             if (Settings.customWarpaintColor)
@@ -2046,7 +2056,7 @@ namespace VisualAdjustments
                                                 );
                                                 }
                                             }
-                                        }
+                                        }*/
                                     }
                                 }
                             }

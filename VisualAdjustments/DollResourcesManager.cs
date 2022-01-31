@@ -6,6 +6,7 @@ using Kingmaker.EntitySystem.Entities;
 using Kingmaker.ResourceLinks;
 using Kingmaker.UnitLogic;
 using Kingmaker.UnitLogic.Class.LevelUp;
+using Kingmaker.UnitLogic.Components;
 using Kingmaker.UnitLogic.Parts;
 using Kingmaker.Utility;
 using Kingmaker.Visual.CharacterSystem;
@@ -85,13 +86,13 @@ namespace VisualAdjustments
                         NewEEAdapter.m_Link = DollState.GetScarsList(state.Race.RaceId).FirstOrDefault((EquipmentEntityLink link2) => link2.Load(false) == ee);
                         state.Scar = NewEEAdapter;
                     }
-                    if (state.Warpaints.Contains((EquipmentEntityLink link) => link.Load(false) == ee))
+                   /* if (state.Warprints.Contains((DollState.DollPrint link) => link.PaintEE.m_Entity == ee))
                     {
                         var NewEEAdapter = new DollState.EEAdapter(ee);
-                        NewEEAdapter.m_Link = state.Warpaints.FirstOrDefault((EquipmentEntityLink link2) => link2.Load(false) == ee);
-                        state.Warpaint = NewEEAdapter;
+                        NewEEAdapter.m_Link = DollState.GetWarpaintsList(dollData2.RacePreset.RaceId).FirstOrDefault((EquipmentEntityLink link2) => link2.Load(false) == ee);
+                        state.SetWarpaint(NewEEAdapter,NewEEAdapter.m_Entity.ramp);
                         // state.Warpaint = new DollState.EEAdapter(ee);
-                    }
+                    }*/
                 }
             }
             List<EquipmentEntityLink> clothes;
@@ -107,7 +108,7 @@ namespace VisualAdjustments
                 clothes = characterClass.GetClothesLinks(gender, (race != null) ? race.RaceId : Kingmaker.Blueprints.Race.Human);
             }
             state.Clothes = clothes;
-            state.Warpaints = BlueprintRoot.Instance.CharGen.WarpaintsForCustomization.ToList<EquipmentEntityLink>();
+           // state.Warpaints = BlueprintRoot.Instance.CharGen.WarpaintsForCustomization.ToList<EquipmentEntityLink>();
             BlueprintRace race2 = state.Race;
             state.Scars = DollState.GetScarsList((race2 != null) ? race2.RaceId : Kingmaker.Blueprints.Race.Human);
             if (state.Hair.m_Entity != null)
@@ -123,10 +124,12 @@ namespace VisualAdjustments
             {
                 state.HornsRampIndex = unit.View.CharacterAvatar.GetPrimaryRampIndex(state.Horn.Load());
             }
-            if (state.Warpaint.m_Entity != null)
+           /* if (state.Warprints != null)
             {
+                foreach()
+                    {
                 state.WarpaintRampIndex = unit.View.CharacterAvatar.GetPrimaryRampIndex(state.Warpaint.Load());
-            }
+            }*/
             state.m_TrackPortrait = false;
             state.UpdateMechanicsEntities(unit.Descriptor);
             state.EquipmentRampIndex = dollData2.ClothesPrimaryIndex;
@@ -310,7 +313,8 @@ namespace VisualAdjustments
             var dollState = new DollState
             {
             };
-            dollState.SetupFromUnitLocal(unitEntityData);
+            var dollsettings = new PregenDollSettings();
+            dollState.SetupFromUnitLocal((unitEntityData));
             //dollState.SetRace(unitEntityData.Progression.Race); //Race must be set before class
             //This is a hack to work around harmony not allowing calls to the unpatched method
             CharacterManager.disableEquipmentClassPatch = true;

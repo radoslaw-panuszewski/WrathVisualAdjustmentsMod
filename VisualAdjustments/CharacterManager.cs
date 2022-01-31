@@ -124,10 +124,10 @@ namespace VisualAdjustments
                     {
                         Main.GenerateHornColor(unitEntityData);
                     }
-                    if (Settings.customWarpaintColor)
-                    {
-                        Main.GenerateWarpaintColor(unitEntityData);
-                    }
+                   // if (Settings.customWarpaintColor)
+                   // {
+                     //   Main.GenerateWarpaintColor(unitEntityData);
+                   // }
                     if (Settings.customOutfitColors)
                     {
                         Main.GenerateOutfitcolor(unitEntityData);
@@ -726,9 +726,9 @@ namespace VisualAdjustments
                          }
                          if (view.CharacterAvatar.EquipmentEntities.Contains(eetoremove)) view.CharacterAvatar.RemoveEquipmentEntity(eetoremove, false);
                      }*/
-                    if (wingsFxVisibilityManagers.ContainsKey(view) && wingsFxVisibilityManagers[view] != null) GameObject.Destroy(wingsFxVisibilityManagers[view]);
-                    //if (!characterSettings.overrideWingsFX.Empty())
+                    if (wingsFxVisibilityManagers.ContainsKey(view) && wingsFxVisibilityManagers[view] != null)
                     {
+                        GameObject.Destroy(wingsFxVisibilityManagers[view]);
                         wingsFxVisibilityManagers[view] = FxHelper.SpawnFxOnUnit(ResourcesLibrary.TryGetResource<GameObject>(EquipmentResourcesManager.WingsFX[characterSettings.overrideWingsFX]), view);
                     }
                     // if (characterSettings.overrideWingsEE != null) view.CharacterAvatar.AddEquipmentEntity(EquipmentResourcesManager.WingsEE[characterSettings.overrideWingsEE]);
@@ -1363,7 +1363,7 @@ namespace VisualAdjustments
             {
                 try
                 {
-                    var unit = Game.Instance.Player.PartyAndPets.FirstOrDefault(a => a.View.CharacterAvatar == __instance);
+                    var unit = Game.Instance.Player.PartyAndPets.FirstOrDefault(a => a?.View?.CharacterAvatar == __instance);
                     if (unit == null) return;
                     var settings = Main.settings.GetCharacterSettings(unit);
                     if (settings == null) return;
@@ -1382,5 +1382,109 @@ namespace VisualAdjustments
                 }
             }
         }
+        /*[HarmonyPatch(typeof(UnitEntityView), "UpdateAdditionalVisualSettings")]
+        public static class UpdateVisualSettings_Patch
+        {
+            public static void Prefix(UnitEntityView __instance)
+            {
+                try
+                {
+                    var unit = Game.Instance.Player.PartyAndPets.FirstOrDefault(a => a.View.CharacterAvatar == __instance);
+                    if (unit == null) return;
+                    var settings = Main.settings.GetCharacterSettings(unit);
+                    if (settings == null) return;
+                    if (settings.hideMythic)
+                    {
+                        __instance.m_AdditionalVisualSettings = null;
+                    }
+                    else if (!settings.overrideMythic.IsNullOrEmpty())
+                    {
+                        __instance.m_AdditionalVisualSettings = Utilities.GetBlueprint<BlueprintClassAdditionalVisualSettings>(settings.overrideMythic);
+                    }
+                }
+                catch (Exception e)
+                {
+                    Main.logger.Error(e.ToString());
+                }
+            }
+        }*/
+        [HarmonyPatch(typeof(UnitProgressionData), "AdditionalVisualSettings",methodType: MethodType.Getter)]
+        public static class UpdateVisualSettings_Patch
+        {
+            public static bool Prefix(UnitProgressionData __instance,ref BlueprintClassAdditionalVisualSettings __result)
+            {
+                try
+                {
+                    var unit = __instance.Owner;
+                    if (!unit.IsPlayerFaction) return true;
+                    if (unit == null) return true;
+                    var settings = Main.settings.GetCharacterSettings(unit);
+                    if (settings == null) return true;
+                  //  Main.logger.Log("Hid");
+                    if (settings.hideMythic)
+                    {
+                        __result = null;
+                        return false;
+                    }
+                }
+                catch (Exception e)
+                {
+                    Main.logger.Error(e.ToString());
+                }
+                return true;
+            }
+        }
+        [HarmonyPatch(typeof(UnitProgressionData), "GetVisualSettingsProvider")]
+        public static class GetAdditionalVisualSettings_Patch
+        {
+            public static bool Prefix(UnitProgressionData __instance, ref ClassData __result)
+            {
+                try
+                {
+                    var unit = __instance.Owner;
+                    if (!unit.IsPlayerFaction) return true;
+                    if (unit == null) return true;
+                    var settings = Main.settings.GetCharacterSettings(unit);
+                    if (settings == null) return true;
+                  //  Main.logger.Log("Hid");
+                    if (settings.hideMythic)
+                    {
+                        __result = null;
+                        return false;
+                    }
+                }
+                catch (Exception e)
+                {
+                    Main.logger.Error(e.ToString());
+                }
+                return true;
+            }
+        }
+        /*[HarmonyPatch(typeof(UnitProgressionData), "AdditionalVisualSettings", methodType: MethodType.Getter)]
+        public static class UpdateVisualSettings_Patch
+        {
+            public static bool Prefix(UnitProgressionData __instance, ref BlueprintClassAdditionalVisualSettings __result)
+            {
+                try
+                {
+                    var unit = __instance.Owner;
+                    if (!unit.IsPlayerFaction) return true;
+                    if (unit == null) return true;
+                    var settings = Main.settings.GetCharacterSettings(unit);
+                    if (settings == null) return true;
+                    Main.logger.Log("Hid");
+                    if (settings.hideMythic)
+                    {
+                        __result = null;
+                        return false;
+                    }
+                }
+                catch (Exception e)
+                {
+                    Main.logger.Error(e.ToString());
+                }
+                return true;
+            }
+        }*/
     }
 }

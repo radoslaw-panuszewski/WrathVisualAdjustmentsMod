@@ -527,11 +527,11 @@ namespace TutorialCanvas.UI
                 try
                 {
                     // fix this
-                    if (FXUIHandler.dollPcView == null && window != null && this?.gameObject?.activeInHierarchy == false)
+                    if (FXUIHandler.dollPcView == null && window != null && this?.gameObject?.activeInHierarchy == true)
                     {
                         FXUIHandler.dollPcView = window?.parent?.Find("Doll")?.GetComponent<InventoryDollPCView>();
                     }
-                    else if (FXUIHandler.dollPcView != null)
+                    if (FXUIHandler.dollPcView != null)
                     {
                         //FXUIHandlerHandler.dollPcView.Initialize();
                         // FXUIHandlerHandler.dollPcView.SwitchOffDoll();

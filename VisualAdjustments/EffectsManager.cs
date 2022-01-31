@@ -4845,6 +4845,40 @@ namespace VisualAdjustments
         [HarmonyPatch(typeof(UnitViewHandSlotData), "UpdateWeaponEnchantmentFx")]
         private static class UnitViewHandSlotData_UpdateWeaponEnchantmentFx_Patch
         {
+            private static bool Prefix(UnitViewHandSlotData __instance, ref bool isVisible)
+            {
+                try
+                {
+                    if (Main.enabled)
+                    {
+                        if (__instance.Owner.IsPlayerFaction)
+                        {
+                            var characterSettings = Main.settings.GetCharacterSettings(__instance.Owner);
+                            if (characterSettings != null)
+                            {
+                                if (characterSettings.hideWeaponEnchantments)
+                                {
+                                    __instance.Slot.FxSnapMap = null;
+                                    foreach (ItemEnchantment e in __instance.VisibleItem.Enchantments)
+                                    {
+                                        e.DestroyFx();
+                                    }
+                                    return false;
+                                }
+                                else return true;
+                            }
+                            else return true;
+                        }
+                        else return true;
+                    }
+                    else return true;
+                }
+                catch (Exception ex)
+                {
+                    Main.Error(ex);
+                    return true;
+                }
+            }
             private static void Postfix(UnitViewHandSlotData __instance, bool isVisible)
             {
                 try
@@ -4872,7 +4906,7 @@ namespace VisualAdjustments
                         {
                             var blueprint = ResourcesLibrary.TryGetBlueprint<BlueprintWeaponEnchantment>(enchantmentId);
                             if (blueprint == null || blueprint.WeaponFxPrefab == null) continue;
-                            var fxObject = RespawnFx(blueprint.WeaponFxPrefab, __instance.Slot.MaybeItem);
+                            var fxObject = RespawnFx(blueprint.WeaponFxPrefab.Load(), __instance.Slot.MaybeItem);
                             WeaponEnchantments[__instance.Slot.MaybeItem].Add(fxObject);
                         }
                         foreach (var asd in characterSettings.weaponEnchantments)
@@ -4887,7 +4921,7 @@ namespace VisualAdjustments
                                 {
                                     var blueprint = ResourcesLibrary.TryGetBlueprint<BlueprintWeaponEnchantment>(asd.Value.assetId);
                                     if (blueprint == null || blueprint.WeaponFxPrefab == null) continue;
-                                    var fxObject = RespawnFx(blueprint.WeaponFxPrefab, __instance.Slot.MaybeItem);
+                                    var fxObject = RespawnFx(blueprint.WeaponFxPrefab.Load(), __instance.Slot.MaybeItem);
                                     WeaponEnchantments[__instance.Slot.MaybeItem].Add(fxObject);
                                 }
                             }
@@ -4928,43 +4962,10 @@ namespace VisualAdjustments
             }
         }
 
-        [HarmonyPatch(typeof(UnitViewHandSlotData), "UpdateWeaponEnchantmentFx")]
+        //[HarmonyPatch(typeof(UnitViewHandSlotData), "UpdateWeaponEnchantmentFx")]
         private static class UpdateWeaponEnchantmentFx_Patch
         {
-            private static bool Prefix(UnitViewHandSlotData __instance, ref bool isVisible)
-            {
-                try
-                {
-                    if (Main.enabled)
-                    {
-                        if (__instance.Owner.IsPlayerFaction)
-                        {
-                            var characterSettings = Main.settings.GetCharacterSettings(__instance.Owner);
-                            if (characterSettings != null)
-                            {
-                                if (characterSettings.hideWeaponEnchantments)
-                                {
-                                    __instance.Slot.FxSnapMap = null;
-                                    foreach (ItemEnchantment e in __instance.VisibleItem.Enchantments)
-                                    {
-                                        e.DestroyFx();
-                                    }
-                                    return false;
-                                }
-                                else return true;
-                            }
-                            else return true;
-                        }
-                        else return true;
-                    }
-                    else return true;
-                }
-                catch (Exception ex)
-                {
-                    Main.Error(ex);
-                    return true;
-                }
-            }
+
         }
 
         /*static class UnitViewHandSlotData_RecreateModel_Patch
