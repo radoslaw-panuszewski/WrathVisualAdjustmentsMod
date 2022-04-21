@@ -11,6 +11,7 @@ using Kingmaker.UnitLogic.Parts;
 using Kingmaker.Utility;
 using Kingmaker.Visual.CharacterSystem;
 using Kingmaker.Visual.Sound;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -20,121 +21,147 @@ namespace VisualAdjustments
     {
         public static void SetupFromUnitLocal(this DollState state, UnitEntityData unit, SpecialDollType specialDollType = SpecialDollType.None)
         {
-            DollData dollData;
-            if (specialDollType == SpecialDollType.None)
+            try
             {
-                UnitPartDollData unitPartDollData = unit.Get<UnitPartDollData>();
-                dollData = ((unitPartDollData != null) ? unitPartDollData.Default : null);
-            }
-            else
-            {
-                UnitPartDollData unitPartDollData2 = unit.Get<UnitPartDollData>();
-                dollData = ((unitPartDollData2 != null) ? unitPartDollData2.GetSpecial(specialDollType) : null);
-            }
-            DollData dollData2 = dollData;
-            if (dollData2 == null)
-            {
-                return;
-            }
-            state.Gender = dollData2.Gender;
-            state.Race = Kingmaker.Game.Instance.BlueprintRoot.Progression.CharacterRaces.First(a => a.Presets.Contains(dollData2.RacePreset));
-            state.SetRacePreset(dollData2.RacePreset);
-            state.SetRace(state.Race);
-            state.SetRacePreset(dollData2.RacePreset);
-            state.Scars = DollState.GetScarsList(state.Race.RaceId);
-            //state.RacePreset = dollData2.RacePreset;
-            ClassData classData = unit.Progression.Classes.FirstOrDefault<ClassData>();
-            state.CharacterClass = ((classData != null) ? classData.CharacterClass : null);
-            foreach (ClassData classData2 in unit.Progression.Classes)
-            {
-                state.m_EquipmentIndex.Add(classData2.CharacterClass, new DollState.EquipmentIndexByClass
+                DollData dollData;
+                if (specialDollType == SpecialDollType.None)
                 {
-                    EquipmentRampIndex = classData2.CharacterClass.PrimaryColor,
-                    EquipmentRampIndexSecondary = classData2.CharacterClass.SecondaryColor
-                });
-            }
-            CustomizationOptions customizationOptions = (state.Gender == Gender.Male) ? state.Race.MaleOptions : state.Race.FemaleOptions;
-            using (List<EquipmentEntity>.Enumerator enumerator2 = unit.View.CharacterAvatar.EquipmentEntities.GetEnumerator())
-            {
-                while (enumerator2.MoveNext())
-                {
-                    EquipmentEntity ee = enumerator2.Current;
-                    if (customizationOptions.Heads.Contains((EquipmentEntityLink link) => link.Load(false) == ee))
-                    {
-                        state.Head = new DollState.EEAdapter(ee);
-                    }
-                    if (customizationOptions.Eyebrows.Contains((EquipmentEntityLink link) => link.Load(false) == ee))
-                    {
-                        state.Eyebrows = new DollState.EEAdapter(ee);
-                    }
-                    if (customizationOptions.Hair.Contains((EquipmentEntityLink link) => link.Load(false) == ee))
-                    //if (ee.name.Contains("Hair") || ee.name.Contains("hair"))
-                    {
-                        state.Hair = new DollState.EEAdapter(ee);
-                    }
-                    if (customizationOptions.Beards.Contains((EquipmentEntityLink link) => link.Load(false) == ee))
-                    {
-                        state.Beard = new DollState.EEAdapter(ee);
-                    }
-                    if (customizationOptions.Horns.Contains((EquipmentEntityLink link) => link.Load(false) == ee))
-                    {
-                        state.Horn = new DollState.EEAdapter(ee);
-                    }
-                    if (state.Scars.Contains((EquipmentEntityLink link) => link.Load(false) == ee))
-                    {
-                        var NewEEAdapter = new DollState.EEAdapter(ee);
-                        NewEEAdapter.m_Link = DollState.GetScarsList(state.Race.RaceId).FirstOrDefault((EquipmentEntityLink link2) => link2.Load(false) == ee);
-                        state.Scar = NewEEAdapter;
-                    }
-                   /* if (state.Warprints.Contains((DollState.DollPrint link) => link.PaintEE.m_Entity == ee))
-                    {
-                        var NewEEAdapter = new DollState.EEAdapter(ee);
-                        NewEEAdapter.m_Link = DollState.GetWarpaintsList(dollData2.RacePreset.RaceId).FirstOrDefault((EquipmentEntityLink link2) => link2.Load(false) == ee);
-                        state.SetWarpaint(NewEEAdapter,NewEEAdapter.m_Entity.ramp);
-                        // state.Warpaint = new DollState.EEAdapter(ee);
-                    }*/
+                    UnitPartDollData unitPartDollData = unit.Get<UnitPartDollData>();
+                    dollData = ((unitPartDollData != null) ? unitPartDollData.Default : null);
                 }
-            }
-            List<EquipmentEntityLink> clothes;
-            if (state.CharacterClass == null)
-            {
-                clothes = ((state.Gender == Gender.Male) ? DollState.Root.MaleClothes.ToList<EquipmentEntityLink>() : DollState.Root.FemaleClothes.ToList<EquipmentEntityLink>());
-            }
-            else
-            {
-                BlueprintCharacterClass characterClass = state.CharacterClass;
-                Gender gender = state.Gender;
-                BlueprintRace race = state.Race;
-                clothes = characterClass.GetClothesLinks(gender, (race != null) ? race.RaceId : Kingmaker.Blueprints.Race.Human);
-            }
-            state.Clothes = clothes;
-           // state.Warpaints = BlueprintRoot.Instance.CharGen.WarpaintsForCustomization.ToList<EquipmentEntityLink>();
-            BlueprintRace race2 = state.Race;
-            state.Scars = DollState.GetScarsList((race2 != null) ? race2.RaceId : Kingmaker.Blueprints.Race.Human);
-            if (state.Hair.m_Entity != null)
-            {
-                state.HairRampIndex = unit.View.CharacterAvatar.GetPrimaryRampIndex(state.Hair.Load());
-            }
-            DollState.EEAdapter eeadapter = state.GetSkinEntities().FirstOrDefault<DollState.EEAdapter>();
-            if (eeadapter.m_Entity != null)
-            {
-                state.SkinRampIndex = unit.View.CharacterAvatar.GetPrimaryRampIndex(eeadapter.Load());
-            }
-            if (state.Horn.m_Entity != null)
-            {
-                state.HornsRampIndex = unit.View.CharacterAvatar.GetPrimaryRampIndex(state.Horn.Load());
-            }
-           /* if (state.Warprints != null)
-            {
-                foreach()
+                else
+                {
+                    UnitPartDollData unitPartDollData2 = unit.Get<UnitPartDollData>();
+                    dollData = ((unitPartDollData2 != null) ? unitPartDollData2.GetSpecial(specialDollType) : null);
+                }
+                DollData dollData2 = dollData;
+                if (dollData2 == null)
+                {
+                    return;
+                }
+                state.Gender = dollData2.Gender;
+                state.Race = Kingmaker.Game.Instance.BlueprintRoot.Progression.CharacterRaces.First(a => a.Presets.Contains(dollData2.RacePreset));
+                state.SetRacePreset(dollData2.RacePreset);
+                state.SetRace(state.Race);
+                state.SetRacePreset(dollData2.RacePreset);
+                state.Scars = DollState.GetScarsList(state.Race.RaceId);
+                //state.RacePreset = dollData2.RacePreset;
+                ClassData classData = unit.Progression.Classes.FirstOrDefault<ClassData>();
+                state.CharacterClass = ((classData != null) ? classData.CharacterClass : null);
+                foreach (ClassData classData2 in unit.Progression.Classes)
+                {
+                    state.m_EquipmentIndex.Add(classData2.CharacterClass, new DollState.EquipmentIndexByClass
                     {
-                state.WarpaintRampIndex = unit.View.CharacterAvatar.GetPrimaryRampIndex(state.Warpaint.Load());
-            }*/
-            state.m_TrackPortrait = false;
-            state.UpdateMechanicsEntities(unit.Descriptor);
-            state.EquipmentRampIndex = dollData2.ClothesPrimaryIndex;
-            state.EquipmentRampIndexSecondary = dollData2.ClothesSecondaryIndex;
-            state.Updated();
+                        EquipmentRampIndex = classData2.CharacterClass.PrimaryColor,
+                        EquipmentRampIndexSecondary = classData2.CharacterClass.SecondaryColor
+                    });
+                }
+                CustomizationOptions customizationOptions = (state.Gender == Gender.Male) ? state.Race.MaleOptions : state.Race.FemaleOptions;
+                var j = unit?.View?.CharacterAvatar?.EquipmentEntities;
+                if (j != null)
+                {
+                    foreach (var ee in unit?.View?.CharacterAvatar?.EquipmentEntities)
+                    {
+                        //EquipmentEntity ee = enumerator2.Current;
+                        if (customizationOptions.Heads.Contains((EquipmentEntityLink link) => link.Load(false) == ee))
+                        {
+                            state.Head = new DollState.EEAdapter(customizationOptions.Heads.FirstOrDefault(a => a.Load() == ee));
+                            //state.Head = new DollState.EEAdapter(ee);
+                        }
+                        if (customizationOptions.Eyebrows.Contains((EquipmentEntityLink link) => link.Load(false) == ee))
+                        {
+                            state.Eyebrows = new DollState.EEAdapter(customizationOptions.Eyebrows.FirstOrDefault(a => a.Load() == ee));
+                            ///state.Eyebrows = new DollState.EEAdapter(ee);
+                        }
+                        if (customizationOptions.Hair.Contains((EquipmentEntityLink link) => link.Load(false) == ee))
+                        //if (ee.name.Contains("Hair") || ee.name.Contains("hair"))
+                        {
+                            state.Hair = new DollState.EEAdapter(customizationOptions.Hair.FirstOrDefault(a => a.Load() == ee));
+                            //state.Hair = new DollState.EEAdapter(ee);
+                        }
+                        if (customizationOptions.Beards.Contains((EquipmentEntityLink link) => link.Load(false) == ee))
+                        {
+                            state.Beard = new DollState.EEAdapter(customizationOptions.Beards.FirstOrDefault(a => a.Load() == ee));
+                            //state.Beard = new DollState.EEAdapter(ee);
+                        }
+                        if (customizationOptions.Horns.Contains((EquipmentEntityLink link) => link.Load(false) == ee))
+                        {
+                            state.Horn = new DollState.EEAdapter(customizationOptions.Horns.FirstOrDefault(a => a.Load() == ee));
+                            // state.Horn = new DollState.EEAdapter(ee);
+                        }
+                        if (state.Scars.Contains((EquipmentEntityLink link) => link.Load(false) == ee))
+                        {
+                            var NewEEAdapter = new DollState.EEAdapter();
+                            NewEEAdapter.m_Link = DollState.GetScarsList(state.Race.RaceId).FirstOrDefault((EquipmentEntityLink link2) => link2.Load(false) == ee);
+                            state.Scar = NewEEAdapter;
+                        }
+                    }
+                }
+                /*using (List<EquipmentEntity>.Enumerator enumerator2 = unit.View.CharacterAvatar.EquipmentEntities.GetEnumerator())
+                {
+                    while (enumerator2.MoveNext())
+                    {
+
+                        /* if (state.Warprints.Contains((DollState.DollPrint link) => link.PaintEE.m_Entity == ee))
+                         {
+                             var NewEEAdapter = new DollState.EEAdapter(ee);
+                             NewEEAdapter.m_Link = DollState.GetWarpaintsList(dollData2.RacePreset.RaceId).FirstOrDefault((EquipmentEntityLink link2) => link2.Load(false) == ee);
+                             state.SetWarpaint(NewEEAdapter,NewEEAdapter.m_Entity.ramp);
+                             // state.Warpaint = new DollState.EEAdapter(ee);
+                         }*//*
+                    }
+                }*/
+                List<EquipmentEntityLink> clothes;
+                if (state.CharacterClass == null)
+                {
+                    clothes = ((state.Gender == Gender.Male) ? DollState.Root.MaleClothes.ToList<EquipmentEntityLink>() : DollState.Root.FemaleClothes.ToList<EquipmentEntityLink>());
+                }
+                else
+                {
+                    BlueprintCharacterClass characterClass = state.CharacterClass;
+                    Gender gender = state.Gender;
+                    BlueprintRace race = state.Race;
+                    clothes = characterClass.GetClothesLinks(gender, (race != null) ? race.RaceId : Kingmaker.Blueprints.Race.Human);
+                }
+                state.Clothes = clothes;
+                // state.Warpaints = BlueprintRoot.Instance.CharGen.WarpaintsForCustomization.ToList<EquipmentEntityLink>();
+                BlueprintRace race2 = state.Race;
+                state.Scars = DollState.GetScarsList((race2 != null) ? race2.RaceId : Kingmaker.Blueprints.Race.Human);
+                if (unit?.View?.CharacterAvatar != null)
+                {
+
+                    if (state.Hair.m_Link?.Load() != null)
+                    {
+                        state.HairRampIndex = unit.View.CharacterAvatar.GetPrimaryRampIndex(state.Hair.Load());
+                    }
+                    DollState.EEAdapter eeadapter = state.GetSkinEntities().FirstOrDefault<DollState.EEAdapter>();
+                    if (eeadapter.m_Link?.Load() != null)
+                    {
+                        state.SkinRampIndex = unit.View.CharacterAvatar.GetPrimaryRampIndex(eeadapter.Load());
+                    }
+                    if (state.Horn.m_Link?.Load() != null)
+                    {
+                        state.HornsRampIndex = unit.View.CharacterAvatar.GetPrimaryRampIndex(state.Horn.Load());
+                    }
+                }
+                /* if (state.Warprints != null)
+                 {
+                     foreach()
+                         {
+                     state.WarpaintRampIndex = unit.View.CharacterAvatar.GetPrimaryRampIndex(state.Warpaint.Load());
+                 }*/
+                state.m_TrackPortrait = false;
+                state.UpdateMechanicsEntities(unit.Descriptor);
+                state.EquipmentRampIndex = dollData2.ClothesPrimaryIndex;
+                state.EquipmentRampIndexSecondary = dollData2.ClothesSecondaryIndex;
+                //state.Updated();
+                state.CreateTattos(state?.m_DefaultSettings);
+                state.CreateWarpaints(state?.m_DefaultSettings, state.Race.RaceId);
+            }
+            catch (Exception ex)
+            {
+                Main.logger.Error(ex.ToString());
+            }
         }
     }
 

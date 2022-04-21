@@ -226,7 +226,7 @@ namespace VisualAdjustments
                 var settingcol = new Color(colornum[0], colornum[1], colornum[2]);
                 if (doll.GetHairEntities().Count <= 0)
                     return;
-                if (!doll.Hair.m_Entity.PrimaryColorsProfile.Ramps.Where(b => b.isReadable).Any(a => a.GetPixel(1, 1).ToString() == settingcol.ToString()))
+                if (!doll.Hair.m_Link.Load().PrimaryColorsProfile.Ramps.Where(b => b.isReadable).Any(a => a.GetPixel(1, 1).ToString() == settingcol.ToString()))
                 {
                     var texture = new Texture2D(256, 1, TextureFormat.ARGB32, false)
                     {
@@ -244,13 +244,13 @@ namespace VisualAdjustments
                     /// if (!HairColors.ContainsKey(jas.ToString()))
                     {
                         /// HairColors.Add(jas.ToString(), texture);
-                        doll.Hair.m_Entity.PrimaryColorsProfile.Ramps.Add(texture);
+                        doll.Hair.m_Link.Load().PrimaryColorsProfile.Ramps.Add(texture);
                     }
                     ///something with the indexing it messing up and returning -1
                     ///var index = doll.Hair.m_Entity.PrimaryColorsProfile.Ramps.Where(b => b.isReadable).First(a => a.GetPixel(1,1).ToString() == texture.GetPixel(1,1).ToString());
                 }
-                var index = doll.Hair.m_Entity.PrimaryColorsProfile.Ramps.Where(b => b.isReadable).First(a => a.GetPixel(1, 1).ToString() == settingcol.ToString());
-                doll.SetHairColor(doll.Hair.m_Entity.PrimaryColorsProfile.Ramps.IndexOf(index));
+                var index = doll.Hair.m_Link.Load().PrimaryColorsProfile.Ramps.Where(b => b.isReadable).First(a => a.GetPixel(1, 1).ToString() == settingcol.ToString());
+                doll.SetHairColor(doll.Hair.m_Link.Load().PrimaryColorsProfile.Ramps.IndexOf(index));
                 //Main.logger.Log(settings.HairColor.ToString());
                 ///Main.logger.Log(jas.ToString());
                 /*if(!doll.Hair.m_Entity.PrimaryColorsProfile.Ramps.Any(a => a == texture))
@@ -277,7 +277,7 @@ namespace VisualAdjustments
                 var settings = Main.settings.GetCharacterSettings(data);
                 var colornum = settings.skinColor;
                 var settingcol = new Color(colornum[0], colornum[1], colornum[2]);
-                if (!doll.Head.m_Entity.PrimaryColorsProfile.Ramps.Where(b => b.isReadable).Any(a => a.GetPixel(1, 1).ToString() == settingcol.ToString()))
+                if (!doll.Head.m_Link.Load().PrimaryColorsProfile.Ramps.Where(b => b.isReadable).Any(a => a.GetPixel(1, 1).ToString() == settingcol.ToString()))
                 {
                     var texture = new Texture2D(256, 1, TextureFormat.ARGB32, false)
                     {
@@ -291,17 +291,17 @@ namespace VisualAdjustments
                         }
                     }
                     texture.Apply();
-                    if (!doll.Head.m_Entity.PrimaryColorsProfile.Ramps.Where(b => b.isReadable).Any(a => a.GetPixel(1, 1).ToString() == texture.GetPixel(1, 1).ToString()))
+                    if (!doll.Head.m_Link.Load().PrimaryColorsProfile.Ramps.Where(b => b.isReadable).Any(a => a.GetPixel(1, 1).ToString() == texture.GetPixel(1, 1).ToString()))
                     /// if (!HairColors.ContainsKey(jas.ToString()))
                     {
                         /// HairColors.Add(jas.ToString(), texture);
-                        doll.Head.m_Entity.PrimaryColorsProfile.Ramps.Add(texture);
+                        doll.Head.m_Link.Load().PrimaryColorsProfile.Ramps.Add(texture);
                     }
                     ///something with the indexing it messing up and returning -1
                     ///var index = doll.Hair.m_Entity.PrimaryColorsProfile.Ramps.Where(b => b.isReadable).First(a => a.GetPixel(1,1).ToString() == texture.GetPixel(1,1).ToString());
                 }
-                var index = doll.Head.m_Entity.PrimaryColorsProfile.Ramps.Where(b => b.isReadable).First(a => a.GetPixel(1, 1).ToString() == settingcol.ToString());
-                doll.SetSkinColor(doll.Head.m_Entity.PrimaryColorsProfile.Ramps.IndexOf(index));
+                var index = doll.Head.m_Link.Load().PrimaryColorsProfile.Ramps.Where(b => b.isReadable).First(a => a.GetPixel(1, 1).ToString() == settingcol.ToString());
+                doll.SetSkinColor(doll.Head.m_Link.Load().PrimaryColorsProfile.Ramps.IndexOf(index));
                 //Main.logger.Log(settings.SkinColor.ToString());
                 ///Main.logger.Log(jas.ToString());
                 /*if(!doll.Hair.m_Entity.PrimaryColorsProfile.Ramps.Any(a => a == texture))
@@ -323,12 +323,12 @@ namespace VisualAdjustments
                 var doll = DollResourcesManager.GetDoll(data);
                 if (doll == null)
                     return;
-                if (doll.Horn.m_Entity == null)
+                if (doll.Horn.m_Link.Load() == null)
                     return;
                 var settings = Main.settings.GetCharacterSettings(data);
                 var colornum = settings.hornColor;
                 var settingcol = new Color(colornum[0], colornum[1], colornum[2]);
-                if (!doll.Horn.m_Entity.PrimaryColorsProfile.Ramps.Where(b => b.isReadable).Any(a => a.GetPixel(1, 1).ToString() == settingcol.ToString()))
+                if (!doll.Horn.m_Link.Load().PrimaryColorsProfile.Ramps.Where(b => b.isReadable).Any(a => a.GetPixel(1, 1).ToString() == settingcol.ToString()))
                 {
                     var texture = new Texture2D(256, 1, TextureFormat.ARGB32, false)
                     {
@@ -342,13 +342,13 @@ namespace VisualAdjustments
                         }
                     }
                     texture.Apply();
-                    if (!doll.Horn.m_Entity.PrimaryColorsProfile.Ramps.Where(b => b.isReadable).Any(a => a.GetPixel(1, 1).ToString() == texture.GetPixel(1, 1).ToString()))
+                    if (!doll.Horn.m_Link.Load().PrimaryColorsProfile.Ramps.Where(b => b.isReadable).Any(a => a.GetPixel(1, 1).ToString() == texture.GetPixel(1, 1).ToString()))
                     {
-                        doll.Horn.m_Entity.PrimaryColorsProfile.Ramps.Add(texture);
+                        doll.Horn.m_Link.Load().PrimaryColorsProfile.Ramps.Add(texture);
                     }
                 }
-                var index = doll.Horn.m_Entity.PrimaryColorsProfile.Ramps.Where(b => b.isReadable).First(a => a.GetPixel(1, 1).ToString() == settingcol.ToString());
-                doll.SetHornsColor(doll.Horn.m_Entity.PrimaryColorsProfile.Ramps.IndexOf(index));
+                var index = doll.Horn.m_Link.Load().PrimaryColorsProfile.Ramps.Where(b => b.isReadable).First(a => a.GetPixel(1, 1).ToString() == settingcol.ToString());
+                doll.SetHornsColor(doll.Horn.m_Link.Load().PrimaryColorsProfile.Ramps.IndexOf(index));
             }
             catch (Exception e)
             {
