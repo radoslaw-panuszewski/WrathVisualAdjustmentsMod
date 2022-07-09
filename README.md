@@ -1,3 +1,5 @@
+# Deprecated by [Visual Adjustments 2](https://github.com/BarleyFlour/VisualAdjustments2)
+
 # WrathVisualAdjustmentsMod
 Mod to adjust character appearance for the Game Pathfinder Wrath of the Righteous.
 
