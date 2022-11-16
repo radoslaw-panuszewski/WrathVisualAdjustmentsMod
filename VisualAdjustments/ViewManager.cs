@@ -227,7 +227,7 @@ namespace VisualAdjustments
         private static Vector3 m_OriginalScaleRef;
         private static float m_ScaleRef;
 
-        [HarmonyPatch(typeof(UnitEntityView), "LateUpdate")]
+     // TODO [the patched method is not found]  [HarmonyPatch((typeof(UnitEntityView), "LateUpdate")]
         private static class UnitEntityView_LateUpdate_Patch
         {
             /*static bool Prepare(UnitEntityView __instance)

@@ -162,10 +162,10 @@ namespace VisualAdjustments
             {
                 var bakedCharacter = unitEntityData.View.CharacterAvatar.BakedCharacter;
                 unitEntityData.View.CharacterAvatar.BakedCharacter = null;
-                bool useClassEquipment = unitEntityData.Descriptor.ForcceUseClassEquipment;
-                unitEntityData.Descriptor.ForcceUseClassEquipment = true;
+                // TODO [it doesn't compile] bool useClassEquipment = unitEntityData.Descriptor.ForcceUseClassEquipment;
+                // TODO [it doesn't compile] unitEntityData.Descriptor.ForcceUseClassEquipment = true;
                 unitEntityData.View.UpdateClassEquipment();
-                unitEntityData.Descriptor.ForcceUseClassEquipment = useClassEquipment;
+                // TODO [it doesn't compile] unitEntityData.Descriptor.ForcceUseClassEquipment = useClassEquipment;
                 unitEntityData.View.CharacterAvatar.BakedCharacter = bakedCharacter;
             }
             if (GUILayout.Button("Update Body Equipment", GUILayout.Width(175f)))

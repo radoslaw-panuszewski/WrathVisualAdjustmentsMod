@@ -91,11 +91,11 @@ namespace VisualAdjustments
                             var buffbp = ResourcesLibrary.TryGetBlueprint<BlueprintBuff>(overridebuff.AssetID);
                             if (buffbp.FxOnStart != null)
                             {
-                                part.currentoverrides.Add(overridebuff.AssetID, FxHelper.SpawnFxOnUnit(buffbp.FxOnStart.Load(), data.View));
+                                // TODO [it doesn't compile] part.currentoverrides.Add(overridebuff.AssetID, FxHelper.SpawnFxOnUnit(buffbp.FxOnStart.Load(), data.View));
                             }
                             else if (buffbp.FxOnRemove != null)
                             {
-                                part.currentoverrides.Add(overridebuff.AssetID, FxHelper.SpawnFxOnUnit(buffbp.FxOnRemove.Load(), data.View));
+                                // TODO [it doesn't compile] part.currentoverrides.Add(overridebuff.AssetID, FxHelper.SpawnFxOnUnit(buffbp.FxOnRemove.Load(), data.View));
                             }
                         }
                     }
@@ -104,11 +104,11 @@ namespace VisualAdjustments
                         var buffbp = ResourcesLibrary.TryGetBlueprint<BlueprintBuff>(overridebuff.AssetID);
                         if (buffbp.FxOnStart != null)
                         {
-                            part.currentoverrides.Add(overridebuff.AssetID, FxHelper.SpawnFxOnUnit(buffbp.FxOnStart.Load(), data.View));
+                            // TODO [it doesn't compile] part.currentoverrides.Add(overridebuff.AssetID, FxHelper.SpawnFxOnUnit(buffbp.FxOnStart.Load(), data.View));
                         }
                         else if (buffbp.FxOnRemove != null)
                         {
-                            part.currentoverrides.Add(overridebuff.AssetID, FxHelper.SpawnFxOnUnit(buffbp.FxOnRemove.Load(), data.View));
+                            // TODO [it doesn't compile] part.currentoverrides.Add(overridebuff.AssetID, FxHelper.SpawnFxOnUnit(buffbp.FxOnRemove.Load(), data.View));
                         }
                     }
                 }

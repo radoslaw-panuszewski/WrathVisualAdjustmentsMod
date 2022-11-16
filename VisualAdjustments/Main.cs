@@ -1782,7 +1782,7 @@ namespace VisualAdjustments
                     unitEntityData.Parts.PostLoad();
                     unitEntityData.Descriptor.Doll = null;
                     unitEntityData.Descriptor.m_LoadedDollData = null;
-                    unitEntityData.Descriptor.ForcceUseClassEquipment = false;
+                    // TODO [it doesn't compile] unitEntityData.Descriptor.ForcceUseClassEquipment = false;
                     ///   unitEntityData.View.CharacterAvatar.LoadBakedCharacter();
                     ///   unitEntityData.DetachView();
                     /// unitEntityData.View.Destroy();

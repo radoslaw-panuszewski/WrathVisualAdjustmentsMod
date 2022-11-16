@@ -208,9 +208,9 @@
     <Error Condition="!Exists('..\packages\Aze.Publicise.MSBuild.Task.1.0.0\build\Aze.Publicise.MSBuild.Task.props')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Aze.Publicise.MSBuild.Task.1.0.0\build\Aze.Publicise.MSBuild.Task.props'))" />
   </Target>
   <PropertyGroup>
-    <PostBuildEvent>echo "$(TargetPath)" "&gt;$(WrathPath)\Mods\$(ProjectName)\$(ProjectName).dll*"
-xcopy /Y "$(TargetPath)" "$(WrathPath)\Mods\$(ProjectName)\$(ProjectName).dll*"
-xcopy /Y "$(TargetDir)$(TargetName).pdb" "$(WrathPath)\Mods\$(ProjectName)\$(ProjectName).pdb*"
-</PostBuildEvent>
+    <PostBuildEvent>
+      xcopy /Y "$(TargetPath)" "$(WrathPath)\Mods\$(ProjectName)\$(ProjectName).dll*"
+      xcopy /Y "$(TargetPath)" "$(WrathPath)\Mods\$(ProjectName)\$(ProjectName).pdb*"
+    </PostBuildEvent>
   </PropertyGroup>
 </Project>

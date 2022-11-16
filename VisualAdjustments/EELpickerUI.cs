@@ -291,7 +291,7 @@ namespace VisualAdjustments
                             ssri.SecondaryIndex = 0;
                             data.View.CharacterAvatar.m_SavedRampIndices.Remove(ssri);
                             data.View.CharacterAvatar.m_SavedEquipmentEntities.Remove(eel);
-                            data.View.CharacterAvatar.EquipmentEntitiesForPreload.Remove(eel);
+                            // TODO [it doesn't compile] data.View.CharacterAvatar.EquipmentEntitiesForPreload.Remove(eel);
                             removeFromAddEEpart(selectedEntity);
                             addToRemoveEEPart(selectedEntity);
                         }
@@ -322,7 +322,7 @@ namespace VisualAdjustments
                         {
                             var eel = new EquipmentEntityLink();
                             eel.AssetId = EquipmentResourcesManager.AllEEL[selectedEntity.name];
-                            data.View.CharacterAvatar.EquipmentEntitiesForPreload.Add(eel);
+                            // TODO [it doesn't compile] data.View.CharacterAvatar.EquipmentEntitiesForPreload.Add(eel);
                             data.View.CharacterAvatar.m_SavedEquipmentEntities.Add(eel);
                             var ssri = new Character.SavedSelectedRampIndices();
                             ssri.EquipmentEntityLink = eel;

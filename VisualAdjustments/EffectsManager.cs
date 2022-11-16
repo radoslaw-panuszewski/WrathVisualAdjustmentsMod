@@ -4776,7 +4776,7 @@ namespace VisualAdjustments
             WeaponSlot weaponSlot = item.HoldingSlot as WeaponSlot;
             var weaponSnap = weaponSlot?.FxSnapMap;
             var unit = item.Wielder.Unit?.View;
-            return FxHelper.SpawnFxOnWeapon(prefab, unit, weaponSnap);
+            return FxHelper.SpawnFxOnWeapon(prefab, unit, weaponSnap).SpawnedObject;
         }
 
         private static void DestroyFx(GameObject FxObject)

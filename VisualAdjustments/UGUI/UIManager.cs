@@ -435,7 +435,7 @@ namespace TutorialCanvas.UI
                     haschanged = true;
                 }*/
 
-                if (m_Data == null) m_Data = Kingmaker.UI.Common.UIUtility.GetCurrentCharacter();
+                // TODO [it doesn't compile] if (m_Data == null) m_Data = Kingmaker.UI.Common.UIUtility.GetCurrentCharacter();
                 return m_Data;
             }
             set
@@ -2160,7 +2160,7 @@ namespace TutorialCanvas.UI
 
         public void RebuildCurrentEEButtons()
         {
-            m_Data = Kingmaker.UI.Common.UIUtility.GetCurrentCharacter();
+            // TODO [it doesn't compile] m_Data = Kingmaker.UI.Common.UIUtility.GetCurrentCharacter();
             foreach (var eebutton in currentEELButtons?.Values.ToTempList())
             {
                 eebutton?.gameObject?.SafeDestroy();

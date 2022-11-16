@@ -74,7 +74,7 @@ namespace VisualAdjustments
                 if (DollResourcesManager.GetDoll(unitEntityData) != null) doll = ModifiedCreateDollData.CreateDataModified(DollResourcesManager.GetDoll(unitEntityData));
                 if (doll == null && Settings.classOutfit.Name == "Default")
                 {
-                    unitEntityData.Descriptor.ForcceUseClassEquipment = false;
+                    // TODO [it doesn't compile] unitEntityData.Descriptor.ForcceUseClassEquipment = false;
                     Traverse.Create(unitEntityData.Descriptor).Field("UseClassEquipment").SetValue(false);
                 }
                 var character = unitEntityData.View.CharacterAvatar;
@@ -83,7 +83,7 @@ namespace VisualAdjustments
                 if (doll != null)
                 {
                     ///  Main.logger.Log("dollnotnull " + unitEntityData.CharacterName);
-                    unitEntityData.Descriptor.ForcceUseClassEquipment = true;
+                    // TODO [it doesn't compile] unitEntityData.Descriptor.ForcceUseClassEquipment = true;
                     Traverse.Create(unitEntityData.Descriptor).Field("UseClassEquipment").SetValue(true);
                     var savedEquipment = false;
                     character.RemoveAllEquipmentEntities(savedEquipment);
@@ -729,7 +729,7 @@ namespace VisualAdjustments
                     if (wingsFxVisibilityManagers.ContainsKey(view) && wingsFxVisibilityManagers[view] != null)
                     {
                         GameObject.Destroy(wingsFxVisibilityManagers[view]);
-                        wingsFxVisibilityManagers[view] = FxHelper.SpawnFxOnUnit(ResourcesLibrary.TryGetResource<GameObject>(EquipmentResourcesManager.WingsFX[characterSettings.overrideWingsFX]), view);
+                        // TODO [it doesn't compile] wingsFxVisibilityManagers[view] = FxHelper.SpawnFxOnUnit(ResourcesLibrary.TryGetResource<GameObject>(EquipmentResourcesManager.WingsFX[characterSettings.overrideWingsFX]), view);
                     }
                     // if (characterSettings.overrideWingsEE != null) view.CharacterAvatar.AddEquipmentEntity(EquipmentResourcesManager.WingsEE[characterSettings.overrideWingsEE]);
                 }
@@ -1186,7 +1186,7 @@ namespace VisualAdjustments
             }
         }
 
-        [HarmonyPatch(typeof(Game), "OnAreaLoaded")]
+     // TODO [the patched method is not found]  [HarmonyPatch((typeof(Game), "OnAreaLoaded")]
         static class Game_OnAreaLoaded_Patch
         {
             static void Postfix(Game __instance)
@@ -1204,6 +1204,7 @@ namespace VisualAdjustments
                 }
             }
         }
+        
         /* [HarmonyPatch(typeof(DollState), "Updated")]
          static class DollStateUpdated
          {

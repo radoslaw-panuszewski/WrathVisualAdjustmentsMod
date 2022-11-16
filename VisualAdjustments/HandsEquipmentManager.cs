@@ -197,7 +197,11 @@ namespace VisualAdjustments
          *
          */
 
-        [HarmonyPatch(typeof(UnitViewHandSlotData), "VisibleItemBlueprint", MethodType.Getter)]
+        [HarmonyPatch(
+            typeof(UnitViewHandSlotData), 
+            nameof(UnitViewHandSlotData.VisibleItemVisualParameters),
+            MethodType.Getter
+        )]
         private static class UnitViewHandsSlotData_VisibleItemBlueprint_Patch
         {
             private static void Postfix(UnitViewHandSlotData __instance, ref BlueprintItemEquipmentHand __result)
