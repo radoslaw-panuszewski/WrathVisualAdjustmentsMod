@@ -197,11 +197,7 @@ namespace VisualAdjustments
          *
          */
 
-        [HarmonyPatch(
-            typeof(UnitViewHandSlotData), 
-            nameof(UnitViewHandSlotData.VisibleItemVisualParameters),
-            MethodType.Getter
-        )]
+        // TODO [the patched method is not found] [HarmonyPatch(typeof(UnitViewHandSlotData), "VisibleItemBlueprint", MethodType.Getter)]	
         private static class UnitViewHandsSlotData_VisibleItemBlueprint_Patch
         {
             private static void Postfix(UnitViewHandSlotData __instance, ref BlueprintItemEquipmentHand __result)
